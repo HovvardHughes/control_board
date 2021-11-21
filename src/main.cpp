@@ -26,7 +26,6 @@ public:
 
   void write(int newState)
   {
-    // test 
     state = newState;
     digitalWrite(iONumber, newState);
   }
