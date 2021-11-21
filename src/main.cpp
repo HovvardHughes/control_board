@@ -7,8 +7,6 @@
 #define DELAY_IN_MILLIS 5000
 #define DELAY_COMMAND  -1
 
-#define my_sizeof(type) ((char *)(&type + 1) - (char *)(&type))
-
 class PowerRelay
 {
 public:
