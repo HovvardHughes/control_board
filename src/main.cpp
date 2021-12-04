@@ -1,22 +1,25 @@
 #include <Arduino.h>
 #include "OneButton.h"
 
-#define PIN_INPUT 19
+#define POWER_BUTTON_PIN 19
+#define INPUT_SELECTOR_BUTTON_PIN 18
+
 #define PIN_LED 15
 #define COM_PORT_SPEED 115200
 #define DELAY_IN_MILLIS 1000
 #define DELAY_COMMAND -1
 
-class PowerRelay
+#define POWER_RELAY_COUNT 5
+#define INPUT_RELAY_COUNT 2
+
+class Relay
 {
 public:
-  int order;
   int iONumber;
   bool writable;
 
-  PowerRelay(int orderArg, int iONumberArg)
+  Relay(int iONumberArg)
   {
-    order = orderArg;
     iONumber = iONumberArg;
     writable = true;
   }
@@ -35,15 +38,21 @@ public:
 
 bool power = false;
 
-#define POWER_RELAY_COUNT 5
-PowerRelay allPowerRelays[POWER_RELAY_COUNT] = {
-    PowerRelay(0, 25),
-    PowerRelay(1, 26),
-    PowerRelay(2, 27),
-    PowerRelay(3, 14),
-    PowerRelay(4, 12)};
+Relay allPowerRelays[] = {
+    Relay(25),
+    Relay(26),
+    Relay(27),
+    Relay(14),
+    Relay(12)};
 
-OneButton button(PIN_INPUT, true);
+Relay allInputRelays[] = {
+    Relay(32),
+    Relay(33)};
+
+Relay currentInputRelay = allInputRelays[0];
+
+OneButton powerButton(POWER_BUTTON_PIN);
+OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN);
 
 static void setPowerToRelays(int relayIndexesAndDelayCommands[], int size, int state)
 {
@@ -57,12 +66,12 @@ static void setPowerToRelays(int relayIndexesAndDelayCommands[], int size, int s
       continue;
     }
 
-    PowerRelay powerRelay = allPowerRelays[relayIndex];
+    Relay powerRelay = allPowerRelays[relayIndex];
     powerRelay.writeState(state);
   }
 }
 
-void onDoubleClick()
+void onDoubleClickPowerButton()
 {
   if (!power)
     return;
@@ -74,7 +83,7 @@ void onDoubleClick()
   setPowerToRelays(state ? indexesToPowerOffRelaysAndDelayCommands : indexesToPowerOnRelaysAndDelayCommands, 4, !state);
 }
 
-void onClick()
+void onClickPowerButton()
 {
   if (!power)
     power = true;
@@ -86,18 +95,38 @@ void onClick()
   int size = POWER_RELAY_COUNT + 1;
 
   setPowerToRelays(power ? indexesToPowerOnRelaysAndDelayCommands : indexesToPowerOffRelaysAndDelayCommands, size, power);
+  currentInputRelay.writeState(power);
 }
 
-void onLongPressStart()
+void onLongPressPowerButtonStart()
 {
   if (!power)
     return;
 
-  PowerRelay &powerRelay = allPowerRelays[4];
-  if (powerRelay.readState())
+  Relay &relay = allPowerRelays[4];
+  if (relay.readState())
   {
-    powerRelay.writeState(LOW);
-    powerRelay.writable = false;
+    relay.writeState(LOW);
+    relay.writable = false;
+  }
+}
+
+void onClickInputSelectorButton()
+{
+  if (!power)
+    return;
+
+  for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+  {
+
+    Relay relay = allInputRelays[i];
+
+    bool newState = !relay.readState();
+
+    relay.writeState(newState);
+
+    if (newState)
+      currentInputRelay = relay;
   }
 }
 
@@ -106,28 +135,30 @@ void setup()
   Serial.begin(COM_PORT_SPEED);
   Serial.println("One Button Example with polling.");
 
-  pinMode(PIN_LED, OUTPUT); // sets the digital pin as output
-
+  pinMode(PIN_LED, OUTPUT);
   digitalWrite(PIN_LED, HIGH);
 
   for (size_t i = 0; i < POWER_RELAY_COUNT; i++)
   {
-    PowerRelay powerRelay = allPowerRelays[i];
-    pinMode(powerRelay.iONumber, OUTPUT);
+    Relay relay = allPowerRelays[i];
+    pinMode(relay.iONumber, OUTPUT);
   }
 
-  button.attachDoubleClick(onDoubleClick);
-  button.attachClick(onClick);
-  button.attachLongPressStart(onLongPressStart);
+  for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+  {
+    Relay relay = allInputRelays[i];
+    pinMode(relay.iONumber, OUTPUT);
+  }
+
+  powerButton.attachDoubleClick(onDoubleClickPowerButton);
+  powerButton.attachClick(onClickPowerButton);
+  powerButton.attachLongPressStart(onLongPressPowerButtonStart);
+
+  inputSelectorButton.attachClick(onClickInputSelectorButton);
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
-
-  // keep watching the push button:
-  button.tick();
-
-  // You can implement other code in here or just wait a while
-  delay(10);
+  powerButton.tick();
+  inputSelectorButton.tick();
 }
