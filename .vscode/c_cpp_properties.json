@@ -8,9 +8,9 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "C:/PlatformIO/Projects/control_board/include",
-                "C:/PlatformIO/Projects/control_board/src",
-                "C:/PlatformIO/Projects/control_board/.pio/libdeps/esp32dev/OneButton/src",
+                "c:/PlatformIO/Projects/control_board/include",
+                "c:/PlatformIO/Projects/control_board/src",
+                "c:/PlatformIO/Projects/control_board/.pio/libdeps/esp32dev/OneButton/src",
                 "C:/Users/HovvardHughes/.platformio/packages/framework-arduinoespressif32/tools/sdk/include/config",
                 "C:/Users/HovvardHughes/.platformio/packages/framework-arduinoespressif32/tools/sdk/include/app_trace",
                 "C:/Users/HovvardHughes/.platformio/packages/framework-arduinoespressif32/tools/sdk/include/app_update",
@@ -107,9 +107,9 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "C:/PlatformIO/Projects/control_board/include",
-                    "C:/PlatformIO/Projects/control_board/src",
-                    "C:/PlatformIO/Projects/control_board/.pio/libdeps/esp32dev/OneButton/src",
+                    "c:/PlatformIO/Projects/control_board/include",
+                    "c:/PlatformIO/Projects/control_board/src",
+                    "c:/PlatformIO/Projects/control_board/.pio/libdeps/esp32dev/OneButton/src",
                     "C:/Users/HovvardHughes/.platformio/packages/framework-arduinoespressif32/tools/sdk/include/config",
                     "C:/Users/HovvardHughes/.platformio/packages/framework-arduinoespressif32/tools/sdk/include/app_trace",
                     "C:/Users/HovvardHughes/.platformio/packages/framework-arduinoespressif32/tools/sdk/include/app_update",
@@ -205,7 +205,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=50203",
+                "PLATFORMIO=50205",
                 "ARDUINO_ESP32_DEV",
                 "ESP32",
                 "ESP_PLATFORM",
