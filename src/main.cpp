@@ -1,104 +1,20 @@
- /* 
- Setup:
- * Connect a btn0 to pin 19 (ButtonPin) and ground.
- * Connect a btn1 to pin 18 (ButtonPin) and ground.
- * 
- * The Serial interface is used for output the detected events. 
- */
 
+#include <constants.h>
 #include <Arduino.h>
 #include <OneButton.h>
 #include <Ticker.h>
+#include <Relay.h>
 
-/*
-GPIO Pins Corresponding:
+int buzzerState = LOW;
 
-GPIO      Connected to...
-2         BTNLED1             'INPUT_SELECTOR_BUTTON_LED'
-4         SPK                 'BUZZER'
-12        PRLY4               'PowerRelay(12)'  (360VDCOUT)
-13        1WIRE               'TEMP_SENS'
-14        PRLY3               'PowerRelay(14)'  (6.3ACOUT)
-15        BTNLED0             'POWER_BUTTON_LED'
-16        VOLUME MOTOR REV
-17        VOLUME MOTOR FWD
-18        BTN1                'INPUT_SELECTOR_BUTTON'
-19        BTN0                'POWER_BUTTON'
-21        MPWRON              'MAINPOWERON'
-22        SDA                 'I2C_SDA'
-23        SCL                 'I2C_SCL'
-25        PRLY0               'PowerRelay(25)'  (230VACIN)
-26        PRLY1               'PowerRelay(26)'  (12ACOUT)
-27        PRLY2               'PowerRelay(27)'  (250VACOUT)
-32        INPTRLY0            'InputRelay(32)'  (IN1)
-33        INPTRLY1            'InputRelay(33)'  (IN2)
-36        ADC1                'SELFVIN'
-*/
-
-//BUTTONS:
-#define POWER_BUTTON_PIN 19
-#define INPUT_SELECTOR_BUTTON_PIN 18
-#define MAINPOWERON_PIN 21
-//LEDS:
-#define POWER_BUTTON_LED_PIN 15
-#define INPUT_SELECTOR_BUTTON_LED_PIN 2
-//BUZZER:
-#define BUZZER_PIN 4
-//I2C:
-
-//1WIRE:
-
-
-#define COM_PORT_SPEED 115200      //COM Port Baud Rate
-
-#define DELAY_IN_MILLIS 1000       //For Debugging
-//#define DELAY_IN_MILLIS 25000    //For Release - Pre-programmed Heating Filaments Delay
-
-#define DELAY_COMMAND -1
-
-#define POWER_RELAY_COUNT 5         //Number of power-relays in array
-#define INPUT_RELAY_COUNT 2         //Number of power-relays in array
-
-//Buzzer settings:
-
-
-const int buzztime = 50;             //buzz time in millis
-const int buzznumber = 2;            //how many buzzes 
-int BUZZERstate = LOW;
-
-
-void BuzzTicker() {
-   BUZZERstate = !BUZZERstate;
-  digitalWrite(BUZZER_PIN, BUZZERstate);
-  Serial.println("Buzz!");
-  }
-
-Ticker timer1(BuzzTicker, buzztime, buzznumber*2); // once, immediately 
-
-
-class Relay
+void BuzzTicker()
 {
-public:
-  int iONumber;
-  bool writable;
+  buzzerState = !buzzerState;
+  digitalWrite(BUZZER_PIN, buzzerState);
+  Serial.println("Buzz!");
+}
 
-  Relay(int iONumberArg)
-  {
-    iONumber = iONumberArg;
-    writable = true;
-  }
-
-  void writeState(int newState)
-  {
-    if (writable)
-      digitalWrite(iONumber, newState);
-  }
-
-  bool readState()
-  {
-    return digitalRead(iONumber);
-  }
-};
+Ticker timer1(BuzzTicker, BUZZ_TIME, BUZZ_NUMBER * 2); // once, immediately
 
 bool power = false;
 
@@ -115,9 +31,9 @@ Relay allInputRelays[] = {
 
 Relay currentInputRelay = allInputRelays[0];
 
-OneButton powerButton(POWER_BUTTON_PIN);  // Setup a new OneButton on pin 19
+OneButton powerButton(POWER_BUTTON_PIN);                  // Setup a new OneButton on pin 19
 OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN); // Setup a new OneButton on pin 18
-OneButton mainPowerOnButton(MAINPOWERON_PIN); // Setup a new (virtual) OneButton on pin 21
+OneButton mainPowerOnButton(MAINPOWERON_PIN);             // Setup a new (virtual) OneButton on pin 21
 
 static void setPowerToRelays(int relayIndexesAndDelayCommands[], int size, int state)
 {
@@ -127,7 +43,7 @@ static void setPowerToRelays(int relayIndexesAndDelayCommands[], int size, int s
 
     if (relayIndex == DELAY_COMMAND)
     {
-      Serial.println ("Pre-programmedHeatingFilamentsBeginning...");
+      Serial.println("Pre-programmedHeatingFilamentsBeginning...");
       delay(DELAY_IN_MILLIS);
       continue;
     }
@@ -154,7 +70,7 @@ void onDoubleClickPowerButton()
 void onClickPowerButton()
 {
   Serial.println("PowerButtonClick:InitialisingPowerSequence...");
-timer1.start();
+  timer1.start();
   if (!power)
     power = true;
   else
@@ -205,13 +121,13 @@ void onClickInputSelectorButton()
 }
 
 void onLongPressMainPowerOnButtonStart()
-{ 
+{
   Serial.println("MasterDeviceOff:PowerSequenceWasStopping...");
-     if (power)
-    power = false; 
+  if (power)
+    power = false;
 
-    int indexesToPowerOffRelaysAndDelayCommands[] = {2, 4, DELAY_COMMAND, 0, 1, 3};
-    int size = POWER_RELAY_COUNT + 1;
+  int indexesToPowerOffRelaysAndDelayCommands[] = {2, 4, DELAY_COMMAND, 0, 1, 3};
+  int size = POWER_RELAY_COUNT + 1;
 
   setPowerToRelays(indexesToPowerOffRelaysAndDelayCommands, size, power);
   currentInputRelay.writeState(power);
@@ -220,11 +136,11 @@ void onLongPressMainPowerOnButtonStart()
 void onLongPressMainPowerOnButtonStop()
 {
   Serial.println("MasterDeviceOn:MainPowerOnSequenceWasStarting...");
-    if (!power)
+  if (!power)
     power = true;
 
-    int indexesToPowerOnRelaysAndDelayCommands[] = {0, 1, 3, DELAY_COMMAND, 2, 4};
-    int size = POWER_RELAY_COUNT + 1;
+  int indexesToPowerOnRelaysAndDelayCommands[] = {0, 1, 3, DELAY_COMMAND, 2, 4};
+  int size = POWER_RELAY_COUNT + 1;
 
   setPowerToRelays(indexesToPowerOnRelaysAndDelayCommands, size, power);
   currentInputRelay.writeState(power);
@@ -235,19 +151,18 @@ void setup()
   Serial.begin(COM_PORT_SPEED);
   Serial.println("OneButton Starting...");
 
-  //Setup PULLUPS: INPUT_PULLUP - means pushbutton connected to VCC, INPUT_PULLDOWN - means pushbutton connected to GND
+  // Setup PULLUPS: INPUT_PULLUP - means pushbutton connected to VCC, INPUT_PULLDOWN - means pushbutton connected to GND
   pinMode(POWER_BUTTON_PIN, INPUT_PULLUP);
   pinMode(INPUT_SELECTOR_BUTTON_PIN, INPUT_PULLUP);
   pinMode(MAINPOWERON_PIN, INPUT_PULLDOWN);
 
   pinMode(POWER_BUTTON_LED_PIN, OUTPUT);
- // digitalWrite(POWER_BUTTON_LED_PIN, HIGH);  //dummy
+  // digitalWrite(POWER_BUTTON_LED_PIN, HIGH);  //dummy
 
   pinMode(INPUT_SELECTOR_BUTTON_LED_PIN, OUTPUT);
- //digitalWrite(INPUT_SELECTOR_BUTTON_LED_PIN, HIGH);    //dummy
+  // digitalWrite(INPUT_SELECTOR_BUTTON_LED_PIN, HIGH);    //dummy
 
   pinMode(BUZZER_PIN, OUTPUT);
-
 
   for (size_t i = 0; i < POWER_RELAY_COUNT; i++)
   {
@@ -273,13 +188,10 @@ void setup()
 
 void loop()
 {
-  //watching the push buttons:
+  // watching the push buttons:
   powerButton.tick();
   inputSelectorButton.tick();
   mainPowerOnButton.tick();
 
-  timer1.update(); //it will check the Ticker and if necessary, it will run the callback function.
-
-
-
+  timer1.update(); // it will check the Ticker and if necessary, it will run the callback function.
 }
