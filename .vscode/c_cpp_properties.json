@@ -10,6 +10,7 @@
             "includePath": [
                 "c:/PlatformIO/Projects/control_board/include",
                 "c:/PlatformIO/Projects/control_board/src",
+                "c:/PlatformIO/Projects/control_board/.pio/libdeps/esp32dev/Ticker",
                 "c:/PlatformIO/Projects/control_board/.pio/libdeps/esp32dev/OneButton/src",
                 "C:/Users/HovvardHughes/.platformio/packages/framework-arduinoespressif32/tools/sdk/include/config",
                 "C:/Users/HovvardHughes/.platformio/packages/framework-arduinoespressif32/tools/sdk/include/app_trace",
@@ -109,6 +110,7 @@
                 "path": [
                     "c:/PlatformIO/Projects/control_board/include",
                     "c:/PlatformIO/Projects/control_board/src",
+                    "c:/PlatformIO/Projects/control_board/.pio/libdeps/esp32dev/Ticker",
                     "c:/PlatformIO/Projects/control_board/.pio/libdeps/esp32dev/OneButton/src",
                     "C:/Users/HovvardHughes/.platformio/packages/framework-arduinoespressif32/tools/sdk/include/config",
                     "C:/Users/HovvardHughes/.platformio/packages/framework-arduinoespressif32/tools/sdk/include/app_trace",
@@ -205,7 +207,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=50205",
+                "PLATFORMIO=60001",
                 "ARDUINO_ESP32_DEV",
                 "ESP32",
                 "ESP_PLATFORM",

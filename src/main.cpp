@@ -7,7 +7,8 @@
  */
 
 #include <Arduino.h>
-#include "OneButton.h"
+#include <OneButton.h>
+#include <Ticker.h>
 
 /*
 GPIO Pins Corresponding:
@@ -34,24 +35,46 @@ GPIO      Connected to...
 36        ADC1                'SELFVIN'
 */
 
-//BUTTONS
+//BUTTONS:
 #define POWER_BUTTON_PIN 19
 #define INPUT_SELECTOR_BUTTON_PIN 18
 #define MAINPOWERON_PIN 21
-//LEDS
+//LEDS:
 #define POWER_BUTTON_LED_PIN 15
 #define INPUT_SELECTOR_BUTTON_LED_PIN 2
-//OTHER
+//BUZZER:
 #define BUZZER_PIN 4
+//I2C:
+
+//1WIRE:
 
 
-#define COM_PORT_SPEED 115200
-#define DELAY_IN_MILLIS 1000  //For Debugging
+#define COM_PORT_SPEED 115200      //COM Port Baud Rate
+
+#define DELAY_IN_MILLIS 1000       //For Debugging
 //#define DELAY_IN_MILLIS 25000    //For Release - Pre-programmed Heating Filaments Delay
+
 #define DELAY_COMMAND -1
 
-#define POWER_RELAY_COUNT 5
-#define INPUT_RELAY_COUNT 2
+#define POWER_RELAY_COUNT 5         //Number of power-relays in array
+#define INPUT_RELAY_COUNT 2         //Number of power-relays in array
+
+//Buzzer settings:
+
+
+const int buzztime = 50;             //buzz time in millis
+const int buzznumber = 2;            //how many buzzes 
+int BUZZERstate = LOW;
+
+
+void BuzzTicker() {
+   BUZZERstate = !BUZZERstate;
+  digitalWrite(BUZZER_PIN, BUZZERstate);
+  Serial.println("Buzz!");
+  }
+
+Ticker timer1(BuzzTicker, buzztime, buzznumber*2); // once, immediately 
+
 
 class Relay
 {
@@ -131,7 +154,7 @@ void onDoubleClickPowerButton()
 void onClickPowerButton()
 {
   Serial.println("PowerButtonClick:InitialisingPowerSequence...");
-
+timer1.start();
   if (!power)
     power = true;
   else
@@ -254,4 +277,9 @@ void loop()
   powerButton.tick();
   inputSelectorButton.tick();
   mainPowerOnButton.tick();
+
+  timer1.update(); //it will check the Ticker and if necessary, it will run the callback function.
+
+
+
 }
