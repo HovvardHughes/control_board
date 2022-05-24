@@ -32,5 +32,4 @@
 *.app
 
 /.pio
-
-**/.vscode/
+.vscode
