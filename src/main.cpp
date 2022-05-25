@@ -154,9 +154,13 @@ void TurnOffPowerRelayAndForbidWriting(Relay *relay)
 void onLongPressPowerButtonStart()
 {
   Serial.println("PowerButtonLongPressStart:PoweringOffVU's...");
+  isLongButtonTaskRunning = true;
+
   TurnOffPowerRelayAndForbidWriting(&allPowerRelays[4]);
   t.setTimeout([]()
-               { TurnOffPowerRelayAndForbidWriting(&allPowerRelays[3]); },
+               { 
+                 TurnOffPowerRelayAndForbidWriting(&allPowerRelays[3]); 
+                 isLongButtonTaskRunning = false; },
                DELAY_IN_MILLIS);
 }
 
