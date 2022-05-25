@@ -142,16 +142,22 @@ void onDoubleClickPowerButton()
   }
 }
 
+void TurnOffPowerRelayAndForbidWriting(Relay *relay)
+{
+  if (relay->readState())
+  {
+    relay->writeState(LOW);
+    relay->writable = false;
+  }
+}
+
 void onLongPressPowerButtonStart()
 {
   Serial.println("PowerButtonLongPressStart:PoweringOffVU's...");
-
-  Relay &relay = allPowerRelays[4];
-  if (relay.readState())
-  {
-    relay.writeState(LOW);
-    relay.writable = false;
-  }
+  TurnOffPowerRelayAndForbidWriting(&allPowerRelays[4]);
+  t.setTimeout([]()
+               { TurnOffPowerRelayAndForbidWriting(&allPowerRelays[3]); },
+               DELAY_IN_MILLIS);
 }
 
 bool allInputSelectorsHasState(int state)
