@@ -4,14 +4,33 @@
 #include <OneButton.h>
 #include <Ticker.h>
 #include <Relay.h>
+#include <AsyncTimer.h>
 
-int buzzerState = LOW;
+AsyncTimer t;
+
+void OldBuzzTicker()
+{
+  // buzzerState = !buzzerState;
+  // digitalWrite(BUZZER_PIN, buzzerState);
+  // Serial.println("Buzz!");
+}
+
+void BuzzTickerInteral(int timeout)
+{
+  digitalWrite(BUZZER_PIN, HIGH);
+  Serial.println("Buzz!");
+
+  t.setTimeout([]()
+               {  
+                  digitalWrite(BUZZER_PIN, LOW);
+                      Serial.println("Buzz!"); },
+               timeout);
+}
 
 void BuzzTicker()
 {
-  buzzerState = !buzzerState;
-  digitalWrite(BUZZER_PIN, buzzerState);
-  Serial.println("Buzz!");
+  BuzzTickerInteral(BUZZ_TIME);
+  BuzzTickerInteral(BUZZ_TIME * 2);
 }
 
 Ticker timer1(BuzzTicker, BUZZ_TIME, BUZZ_NUMBER * 2); // once, immediately
@@ -35,24 +54,6 @@ OneButton powerButton(POWER_BUTTON_PIN);                  // Setup a new OneButt
 OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN); // Setup a new OneButton on pin 18
 OneButton mainPowerOnButton(MAINPOWERON_PIN);             // Setup a new (virtual) OneButton on pin 21
 
-static void setPowerToRelays(int relayIndexesAndDelayCommands[], int size, int state)
-{
-  for (size_t i = 0; i < size; i++)
-  {
-    int relayIndex = relayIndexesAndDelayCommands[i];
-
-    if (relayIndex == DELAY_COMMAND)
-    {
-      Serial.println("Pre-programmedHeatingFilamentsBeginning...");
-      delay(DELAY_IN_MILLIS);
-      continue;
-    }
-
-    Relay powerRelay = allPowerRelays[relayIndex];
-    powerRelay.writeState(state);
-  }
-}
-
 void onDoubleClickPowerButton()
 {
   Serial.println("PowerButtonDoubleClick:Stand-bySequenceWasStarting...");
@@ -60,28 +61,67 @@ void onDoubleClickPowerButton()
   if (!power)
     return;
 
-  bool state = allPowerRelays[2].readState();
-  int indexesToPowerOffRelaysAndDelayCommands[] = {2, DELAY_COMMAND, 1, 3};
-  int indexesToPowerOnRelaysAndDelayCommands[] = {1, 3, DELAY_COMMAND, 2};
+  bool currentState = allPowerRelays[2].readState();
 
-  setPowerToRelays(state ? indexesToPowerOffRelaysAndDelayCommands : indexesToPowerOnRelaysAndDelayCommands, 4, !state);
+  if (currentState)
+  {
+    allPowerRelays[2].writeState(LOW);
+    t.setTimeout([]()
+                 {  
+                    allPowerRelays[1].writeState(LOW);
+                    allPowerRelays[3].writeState(LOW); },
+                 DELAY_IN_MILLIS);
+  }
+  else
+  {
+    allPowerRelays[1].writeState(HIGH);
+    allPowerRelays[3].writeState(HIGH);
+    t.setTimeout([]()
+                 { allPowerRelays[2].writeState(HIGH); 
+                    BuzzTicker();
+                    
+                     },
+                 DELAY_IN_MILLIS);
+  }
+}
+
+void setPowerStateToRelaysInLinearOrder()
+{
+  allPowerRelays[0].writeState(power);
+  allPowerRelays[1].writeState(power);
+  allPowerRelays[3].writeState(power);
+  t.setTimeout([]()
+               {  
+                    allPowerRelays[2].writeState(power);
+                    allPowerRelays[4].writeState(power);
+                    currentInputRelay.writeState(power); 
+                    BuzzTicker(); },
+               DELAY_IN_MILLIS);
+}
+
+void setPowerStateToRelaysInReverseOrder()
+{
+  allPowerRelays[2].writeState(power);
+  allPowerRelays[4].writeState(power);
+  t.setTimeout([]()
+               {
+    allPowerRelays[0].writeState(power);
+    allPowerRelays[1].writeState(power);
+    allPowerRelays[3].writeState(power);
+    currentInputRelay.writeState(power); },
+               DELAY_IN_MILLIS);
 }
 
 void onClickPowerButton()
 {
   Serial.println("PowerButtonClick:InitialisingPowerSequence...");
-  timer1.start();
-  if (!power)
-    power = true;
+
+  power = !power;
+
+  if (power)
+    setPowerStateToRelaysInLinearOrder();
   else
-    power = false;
-
-  int indexesToPowerOnRelaysAndDelayCommands[] = {0, 1, 3, DELAY_COMMAND, 2, 4};
-  int indexesToPowerOffRelaysAndDelayCommands[] = {2, 4, DELAY_COMMAND, 0, 1, 3};
-  int size = POWER_RELAY_COUNT + 1;
-
-  setPowerToRelays(power ? indexesToPowerOnRelaysAndDelayCommands : indexesToPowerOffRelaysAndDelayCommands, size, power);
-  currentInputRelay.writeState(power);
+    setPowerStateToRelaysInReverseOrder();
 }
 
 void onLongPressPowerButtonStart()
@@ -111,11 +151,11 @@ void onClickInputSelectorButton()
 
     Relay relay = allInputRelays[i];
 
-    bool newState = !relay.readState();
+    bool invertedState = !relay.readState();
 
-    relay.writeState(newState);
+    relay.writeState(invertedState);
 
-    if (newState)
+    if (invertedState)
       currentInputRelay = relay;
   }
 }
@@ -123,27 +163,21 @@ void onClickInputSelectorButton()
 void onLongPressMainPowerOnButtonStart()
 {
   Serial.println("MasterDeviceOff:PowerSequenceWasStopping...");
+
   if (power)
     power = false;
 
-  int indexesToPowerOffRelaysAndDelayCommands[] = {2, 4, DELAY_COMMAND, 0, 1, 3};
-  int size = POWER_RELAY_COUNT + 1;
-
-  setPowerToRelays(indexesToPowerOffRelaysAndDelayCommands, size, power);
-  currentInputRelay.writeState(power);
+  setPowerStateToRelaysInReverseOrder();
 }
 
 void onLongPressMainPowerOnButtonStop()
 {
   Serial.println("MasterDeviceOn:MainPowerOnSequenceWasStarting...");
+
   if (!power)
     power = true;
 
-  int indexesToPowerOnRelaysAndDelayCommands[] = {0, 1, 3, DELAY_COMMAND, 2, 4};
-  int size = POWER_RELAY_COUNT + 1;
-
-  setPowerToRelays(indexesToPowerOnRelaysAndDelayCommands, size, power);
-  currentInputRelay.writeState(power);
+  setPowerStateToRelaysInLinearOrder();
 }
 
 void setup()
@@ -188,6 +222,7 @@ void setup()
 
 void loop()
 {
+  t.handle();
   // watching the push buttons:
   powerButton.tick();
   inputSelectorButton.tick();
