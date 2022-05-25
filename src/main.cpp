@@ -1,10 +1,11 @@
-#include <constants.h>
+
+#include <storedCurrentInputRelay.h>
 #include <Arduino.h>
 #include <OneButton.h>
-#include <Relay.h>
 #include <AsyncTimer.h>
+#include <EEPROM.h>
 
-bool power = false;
+bool power;
 
 AsyncTimer t;
 bool isLongButtonTaskRunning;
@@ -17,10 +18,21 @@ Relay allPowerRelays[] = {
     Relay(12)};
 
 Relay allInputRelays[] = {
-    Relay(32),
+    Relay(MAIN_INPUT_RELAY_IO_NUMBER),
     Relay(33)};
 
 Relay currentInputRelay = allInputRelays[0];
+
+void tryReinitCurrentInputRelayFromEEPROM()
+{
+  byte readIONumber = readCurrentInputRelayIONumberFromEEPROM();
+  for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+  {
+    Relay relay = allInputRelays[i];
+    if (relay.iONumber == readIONumber)
+      currentInputRelay = relay;
+  }
+}
 
 OneButton powerButton(POWER_BUTTON_PIN);                  // Setup a new OneButton on pin 19
 OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN); // Setup a new OneButton on pin 18
@@ -178,7 +190,10 @@ void onClickInputSelectorButton()
       relay.writeState(invertedState);
 
       if (invertedState)
+      {
         currentInputRelay = relay;
+        writeCurrentInputRelayIONumberToEEPROM(relay.iONumber);
+      }
     }
   }
 }
@@ -235,6 +250,9 @@ void setup()
 {
   Serial.begin(COM_PORT_SPEED);
   Serial.println("OneButton Starting...");
+
+  InitEEPROM();
+  tryReinitCurrentInputRelayFromEEPROM();
 
   // Setup PULLUPS: INPUT_PULLUP - means pushbutton connected to VCC, INPUT_PULLDOWN - means pushbutton connected to GND
   pinMode(POWER_BUTTON_PIN, INPUT_PULLUP);

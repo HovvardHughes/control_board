@@ -1,10 +1,10 @@
- /* 
- Setup:
- * Connect a btn0 to pin 19 (ButtonPin) and ground.
- * Connect a btn1 to pin 18 (ButtonPin) and ground.
- * 
- * The Serial interface is used for output the detected events. 
- */
+/*
+Setup:
+* Connect a btn0 to pin 19 (ButtonPin) and ground.
+* Connect a btn1 to pin 18 (ButtonPin) and ground.
+*
+* The Serial interface is used for output the detected events.
+*/
 
 /*
 GPIO Pins Corresponding:
@@ -31,28 +31,29 @@ GPIO      Connected to...
 36        ADC1                'SELFVIN'
 */
 
-//BUTTONS:
+// BUTTONS:
 #define POWER_BUTTON_PIN 19
 #define INPUT_SELECTOR_BUTTON_PIN 18
 #define MAINPOWERON_PIN 21
-//LEDS:
+// LEDS:
 #define POWER_BUTTON_LED_PIN 15
 #define INPUT_SELECTOR_BUTTON_LED_PIN 2
-//BUZZER:
+// BUZZER:
 #define BUZZER_PIN 4
-//I2C:
+// I2C:
 
-//1WIRE:
+// 1WIRE:
 
+#define COM_PORT_SPEED 115200 // COM Port Baud Rate
 
-#define COM_PORT_SPEED 115200      //COM Port Baud Rate
-
-#define DELAY_IN_MILLIS 1000       //For Debugging
+#define DELAY_IN_MILLIS 1000 // For Debugging
 //#define DELAY_IN_MILLIS 25000    //For Release - Pre-programmed Heating Filaments Delay
 
 #define DELAY_COMMAND -1
 
-#define POWER_RELAY_COUNT 5         //Number of power-relays in array
-#define INPUT_RELAY_COUNT 2         //Number of power-relays in array
+#define POWER_RELAY_COUNT 5 // Number of power-relays in array
+#define INPUT_RELAY_COUNT 2 // Number of power-relays in array
 
-#define BUZZ_TIME 50             //buzz time in millis
+#define BUZZ_TIME 50 // buzz time in millis
+
+#define MAIN_INPUT_RELAY_IO_NUMBER 32

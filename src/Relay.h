@@ -3,7 +3,7 @@
 class Relay
 {
 public:
-  int iONumber;
+  byte iONumber;
   bool writable;
 
   Relay(int iONumberArg)
