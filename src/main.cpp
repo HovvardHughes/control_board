@@ -134,7 +134,7 @@ void onClickPowerButton()
 
 void onLongPressPowerButtonStart()
 {
-  Serial.println("PowerButtonLongpressStart:PoweringOffVU's...");
+  Serial.println("PowerButtonLongPressStart:PoweringOffVU's...");
 
   Relay &relay = allPowerRelays[4];
   if (relay.readState())
@@ -144,30 +144,55 @@ void onLongPressPowerButtonStart()
   }
 }
 
+bool allInputSelectorsHasState(int state)
+{
+
+  for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+  {
+    Relay relay = allInputRelays[i];
+    if (relay.readState() != state)
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 void onClickInputSelectorButton()
 {
   Serial.println("InptSelectorButtonCick:SwitcingInputs...");
 
-  for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+  if (allInputSelectorsHasState(LOW))
   {
-
-    Relay relay = allInputRelays[i];
-
-    bool invertedState = !relay.readState();
-
-    relay.writeState(invertedState);
-
-    if (invertedState)
-      currentInputRelay = relay;
+    currentInputRelay.writeState(HIGH);
   }
+  else
+  {
+    for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+    {
+
+      Relay relay = allInputRelays[i];
+
+      bool invertedState = !relay.readState();
+
+      relay.writeState(invertedState);
+
+      if (invertedState)
+        currentInputRelay = relay;
+    }
+  }
+}
+
+void onLongPressInputSelectorButtonStart()
+{
+  Serial.println("InptSelectorButtonLongPressStart:TurnOffInputsOrTurnOnPrevious...");
+  currentInputRelay.writeState(allInputSelectorsHasState(LOW) ? HIGH : LOW);
 }
 
 void onLongPressMainPowerOnButtonStart()
 {
   Serial.println("MasterDeviceOff:PowerSequenceWasStopping...");
-
-  if (isLongButtonTaskRunning)
-    return;
 
   if (power)
     power = false;
@@ -178,9 +203,6 @@ void onLongPressMainPowerOnButtonStart()
 void onLongPressMainPowerOnButtonStop()
 {
   Serial.println("MasterDeviceOn:MainPowerOnSequenceWasStarting...");
-
-  if (isLongButtonTaskRunning)
-    return;
 
   if (!power)
     power = true;
@@ -223,16 +245,19 @@ void setup()
 
   powerButton.attachDoubleClick([]()
                                 { WithPowerCheck(onDoubleClickPowerButton); });
-  powerButton.attachDoubleClick([]()
-                                { WithPowerCheck(onLongPressPowerButtonStart); });
+  powerButton.attachLongPressStart([]()
+                                   { WithPowerCheck(onLongPressPowerButtonStart); });
 
-  inputSelectorButton.attachDoubleClick([]()
-                                        { WithPowerCheck(onClickInputSelectorButton); });
+  inputSelectorButton.attachClick([]()
+                                  { WithPowerCheck(onClickInputSelectorButton); });
 
-  mainPowerOnButton.attachDoubleClick([]()
-                                      { WithRunningTaskCheck(onLongPressMainPowerOnButtonStart); });
-  mainPowerOnButton.attachDoubleClick([]()
-                                      { WithRunningTaskCheck(onLongPressMainPowerOnButtonStop); });
+  inputSelectorButton.attachLongPressStart([]()
+                                           { WithPowerCheck(onLongPressInputSelectorButtonStart); });
+
+  mainPowerOnButton.attachLongPressStart([]()
+                                         { WithRunningTaskCheck(onLongPressMainPowerOnButtonStart); });
+  mainPowerOnButton.attachLongPressStop([]()
+                                        { WithRunningTaskCheck(onLongPressMainPowerOnButtonStop); });
 }
 
 void loop()
