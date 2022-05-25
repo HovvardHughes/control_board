@@ -56,5 +56,3 @@ GPIO      Connected to...
 #define INPUT_RELAY_COUNT 2         //Number of power-relays in array
 
 #define BUZZ_TIME 50             //buzz time in millis
-#define BUZZ_NUMBER 2            //how many buzzes 
-
