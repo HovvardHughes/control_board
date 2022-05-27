@@ -168,9 +168,16 @@ void onLongPressPowerButtonStart()
 
   TurnOffPowerRelayAndForbidWriting(&allPowerRelays[4]);
   t.setTimeout([]()
-               { 
-                 TurnOffPowerRelayAndForbidWriting(&allPowerRelays[3]); 
-                 isLongButtonTaskRunning = false; },
+               {
+                 Relay* relay = &allPowerRelays[3];
+                 bool wasWritable = relay->writable;
+
+                 TurnOffPowerRelayAndForbidWriting(relay);
+                
+                 if(wasWritable) 
+                    BuzzTwoTimes();
+    
+                  isLongButtonTaskRunning = false; },
                DELAY_IN_MILLIS);
 }
 
