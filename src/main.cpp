@@ -1,14 +1,15 @@
 
-#include <storedCurrentInputRelay.h>
+#include <ControlBoardEEPROM.h>
 #include <Arduino.h>
 #include <OneButton.h>
 #include <AsyncTimer.h>
-#include <EEPROM.h>
 
 bool power;
 
 AsyncTimer t;
 bool isLongButtonTaskRunning;
+
+ControlBoardEEPROM controlBoardEEPROM;
 
 Relay allPowerRelays[] = {
     Relay(25),
@@ -25,7 +26,7 @@ Relay currentInputRelay = allInputRelays[0];
 
 void tryReinitCurrentInputRelayFromEEPROM()
 {
-  byte readIONumber = readCurrentInputRelayIONumberFromEEPROM();
+  byte readIONumber = controlBoardEEPROM.readCurrentInputRelayIONumberFromEEPROM();
   for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
   {
     Relay relay = allInputRelays[i];
@@ -36,9 +37,18 @@ void tryReinitCurrentInputRelayFromEEPROM()
 
 OneButton powerButton(POWER_BUTTON_PIN);                  // Setup a new OneButton on pin 19
 OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN); // Setup a new OneButton on pin 18
-OneButton mainPowerOnButton(MAINPOWERON_PIN);             // Setup a new (virtual) OneButton on pin 21
+OneButton mainPowerOnButton(MAIN_POWER_ON_PIN);           // Setup a new (virtual) OneButton on pin 21
 
-void Buzz()
+void BuzzOneTime()
+{
+  digitalWrite(BUZZER_PIN, HIGH);
+
+  t.setTimeout([]()
+               { digitalWrite(BUZZER_PIN, LOW); },
+               BUZZ_TIME);
+}
+
+void BuzzTwoTimes()
 {
   digitalWrite(BUZZER_PIN, HIGH);
 
@@ -68,7 +78,7 @@ void setPowerStateToRelaysInLinearOrder()
                     allPowerRelays[2].writeState(power);
                     allPowerRelays[4].writeState(power);
                     currentInputRelay.writeState(power); 
-                    Buzz(); 
+                    BuzzTwoTimes(); 
                     isLongButtonTaskRunning = false; },
                DELAY_IN_MILLIS);
 }
@@ -202,10 +212,12 @@ void onClickInputSelectorButton()
       if (invertedState)
       {
         currentInputRelay = relay;
-        writeCurrentInputRelayIONumberToEEPROM(relay.iONumber);
+        controlBoardEEPROM.writeCurrentInputRelayIONumber(relay.iONumber);
       }
     }
   }
+
+  BuzzOneTime();
 }
 
 void onLongPressMainPowerOnButtonStart()
@@ -222,14 +234,23 @@ void onDoubleClickInputSelectorButton()
 {
   Serial.println("InptSelectorButtonLongPressStart:TurnOnInputsOrTurnOnPrevious...");
 
+  bool buzTwoTimes = true;
   for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
   {
     Relay relay = allInputRelays[i];
     if (relay.readState() && relay.iONumber != currentInputRelay.iONumber)
+    {
       relay.writeState(LOW);
+      buzTwoTimes = false;
+    }
     else
       relay.writeState(HIGH);
   }
+
+  if (buzTwoTimes)
+    BuzzTwoTimes();
+  else
+    BuzzOneTime();
 }
 
 void onLongPressInputSelectorButtonStart()
@@ -242,7 +263,10 @@ void onLongPressInputSelectorButtonStart()
     if (relay.readState())
       relay.writeState(LOW);
     else if (relay.iONumber == currentInputRelay.iONumber)
+    {
       relay.writeState(HIGH);
+      BuzzOneTime();
+    }
   }
 }
 
@@ -261,13 +285,13 @@ void setup()
   Serial.begin(COM_PORT_SPEED);
   Serial.println("OneButton Starting...");
 
-  InitEEPROM();
+  controlBoardEEPROM = ControlBoardEEPROM();
   tryReinitCurrentInputRelayFromEEPROM();
 
   // Setup PULLUPS: INPUT_PULLUP - means pushbutton connected to VCC, INPUT_PULLDOWN - means pushbutton connected to GND
   pinMode(POWER_BUTTON_PIN, INPUT_PULLUP);
   pinMode(INPUT_SELECTOR_BUTTON_PIN, INPUT_PULLUP);
-  pinMode(MAINPOWERON_PIN, INPUT_PULLDOWN);
+  pinMode(MAIN_POWER_ON_PIN, INPUT_PULLDOWN);
 
   pinMode(POWER_BUTTON_LED_PIN, OUTPUT);
   // digitalWrite(POWER_BUTTON_LED_PIN, HIGH);  //dummy
