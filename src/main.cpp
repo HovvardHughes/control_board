@@ -113,7 +113,8 @@ void turnOffPower()
             allPowerRelays[1].writeState(LOW);
             allPowerRelays[3].writeState(LOW);
 
-            currentInputRelay.writeState(LOW); 
+             for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+              allInputRelays[i].writeState(LOW);
 
             return false; });
 }
