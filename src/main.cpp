@@ -1,15 +1,12 @@
-
 #include <ControlBoardEEPROM.h>
 #include <Arduino.h>
 #include <OneButton.h>
-#include <AsyncTimer.h>
+#include <arduino-timer.h>
 
 bool power;
+auto timer = timer_create_default();
 
-AsyncTimer t;
-bool isLongButtonTaskRunning;
-
-ControlBoardEEPROM controlBoardEEPROM;
+ControlBoardEEPROM controlBoardEEPROM = ControlBoardEEPROM();
 
 Relay allPowerRelays[] = {
     Relay(25),
@@ -26,7 +23,7 @@ Relay currentInputRelay = allInputRelays[0];
 
 void tryReinitCurrentInputRelayFromEEPROM()
 {
-  byte readIONumber = controlBoardEEPROM.readCurrentInputRelayIONumberFromEEPROM();
+  byte readIONumber = controlBoardEEPROM.readCurrentInputRelayIONumber();
   for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
   {
     Relay relay = allInputRelays[i];
@@ -39,116 +36,122 @@ OneButton powerButton(POWER_BUTTON_PIN);                  // Setup a new OneButt
 OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN); // Setup a new OneButton on pin 18
 OneButton mainPowerOnButton(MAIN_POWER_ON_PIN);           // Setup a new (virtual) OneButton on pin 21
 
-void BuzzOneTime()
-{
-  digitalWrite(BUZZER_PIN, HIGH);
-
-  t.setTimeout([]()
-               { digitalWrite(BUZZER_PIN, LOW); },
-               BUZZ_TIME);
-}
-
-void BuzzTwoTimes()
-{
-  digitalWrite(BUZZER_PIN, HIGH);
-
-  t.setTimeout([]()
-               {
-                 digitalWrite(BUZZER_PIN, LOW);
-                 t.setTimeout([]()
-                             { 
-                              digitalWrite(BUZZER_PIN, HIGH); 
-                              t.setTimeout([]()
-                                  { digitalWrite(BUZZER_PIN, LOW); },   
-                                  BUZZ_TIME);
-                               },
-                             BUZZ_TIME); },
-               BUZZ_TIME);
-}
-
-void setPowerStateToRelaysInLinearOrder()
-{
-  isLongButtonTaskRunning = true;
-
-  allPowerRelays[0].writeState(power);
-  allPowerRelays[1].writeState(power);
-  allPowerRelays[3].writeState(power);
-  t.setTimeout([]()
-               {  
-                    allPowerRelays[2].writeState(power);
-                    allPowerRelays[4].writeState(power);
-                    currentInputRelay.writeState(power); 
-                    BuzzTwoTimes(); 
-                    isLongButtonTaskRunning = false; },
-               DELAY_IN_MILLIS);
-}
-
-void setPowerStateToRelaysInReverseOrder()
-{
-  isLongButtonTaskRunning = true;
-
-  allPowerRelays[2].writeState(power);
-  allPowerRelays[4].writeState(power);
-  t.setTimeout([]()
-               {
-    allPowerRelays[0].writeState(power);
-    allPowerRelays[1].writeState(power);
-    allPowerRelays[3].writeState(power);
-    currentInputRelay.writeState(power);
-    isLongButtonTaskRunning = false; },
-               DELAY_IN_MILLIS);
-}
-
-void onClickPowerButton()
-{
-  Serial.println("PowerButtonClick:InitialisingPowerSequence...");
-
-  power = !power;
-  if (power)
-    setPowerStateToRelaysInLinearOrder();
-  else
-    setPowerStateToRelaysInReverseOrder();
-}
-
 void withRunningTaskCheck(void (*action)())
 {
   Serial.println("WithRunningTaskCheck...");
-  if (!isLongButtonTaskRunning)
+  if (timer.empty())
     action();
+  else
+    Serial.println("WithRunningTaskCheck:Skip action");
 }
 
 void withPowerCheck(void (*action)())
 {
   Serial.println("WithPowerCheck...");
   if (power)
-    withRunningTaskCheck(action);
+    action();
+  else
+    Serial.println("WithPowerCheck:Skip action");
 }
+
+void BuzzOneTime()
+{
+  digitalWrite(BUZZER_PIN, HIGH);
+
+  timer.in(BUZZ_TIME, [](void *) -> bool
+           {
+                digitalWrite(BUZZER_PIN, LOW);
+                return false; });
+}
+
+void BuzzTwoTimes()
+{
+  digitalWrite(BUZZER_PIN, HIGH);
+
+  timer.in(BUZZ_TIME, [](void *) -> bool
+           {
+              digitalWrite(BUZZER_PIN, LOW);
+              timer.in(BUZZ_TIME, [](void *) -> bool
+                {  
+                  BuzzOneTime();
+                  return false;
+                }
+                ); 
+            return false; });
+}
+
+void turnOnPower()
+{
+  power = true;
+
+  allPowerRelays[0].writeState(HIGH);
+  allPowerRelays[1].writeState(HIGH);
+  allPowerRelays[3].writeState(HIGH);
+
+  timer.in(DELAY_IN_MILLIS, [](void *) -> bool
+           {  
+            allPowerRelays[2].writeState(HIGH);
+            allPowerRelays[4].writeState(HIGH);
+
+            currentInputRelay.writeState(HIGH); 
+
+            BuzzTwoTimes();;
+
+            return false; });
+}
+
+void turnOffPower()
+{
+  power = false;
+
+  allPowerRelays[2].writeState(LOW);
+  allPowerRelays[4].writeState(LOW);
+
+  timer.in(DELAY_IN_MILLIS, [](void *) -> bool
+           {
+            allPowerRelays[0].writeState(LOW);
+            allPowerRelays[1].writeState(LOW);
+            allPowerRelays[3].writeState(LOW);
+
+            currentInputRelay.writeState(LOW); 
+
+            return false; });
+}
+
+void onClickPowerButton()
+{
+  Serial.println("PowerButtonClick:InitialisingPowerSequence...");
+
+  if (!power)
+    turnOnPower();
+  else
+    turnOffPower();
+}
+
 void onDoubleClickPowerButton()
 {
   Serial.println("PowerButtonDoubleClick:Stand-bySequenceWasStarting...");
-
-  isLongButtonTaskRunning = true;
 
   bool currentState = allPowerRelays[2].readState();
   if (currentState)
   {
     allPowerRelays[2].writeState(LOW);
-    t.setTimeout([]()
-                 {  
-                    allPowerRelays[1].writeState(LOW);
-                    allPowerRelays[3].writeState(LOW); 
-                    isLongButtonTaskRunning = false; },
-                 DELAY_IN_MILLIS);
+    timer.in(DELAY_IN_MILLIS, [](void *) -> bool
+             {  
+                allPowerRelays[1].writeState(LOW);
+                allPowerRelays[3].writeState(LOW); 
+                BuzzTwoTimes();
+                return false; });
   }
   else
   {
     allPowerRelays[1].writeState(HIGH);
     allPowerRelays[3].writeState(HIGH);
-    t.setTimeout([]()
-                 {
-                   allPowerRelays[2].writeState(HIGH);
-                   isLongButtonTaskRunning = false; },
-                 DELAY_IN_MILLIS);
+    timer.in(DELAY_IN_MILLIS, [](void *) -> bool
+             { 
+               allPowerRelays[2].writeState(HIGH); 
+               BuzzTwoTimes();
+               return false; });
   }
 }
 
@@ -164,21 +167,20 @@ void TurnOffPowerRelayAndForbidWriting(Relay *relay)
 void onLongPressPowerButtonStart()
 {
   Serial.println("PowerButtonLongPressStart:PoweringOffVU's...");
-  isLongButtonTaskRunning = true;
 
   TurnOffPowerRelayAndForbidWriting(&allPowerRelays[4]);
-  t.setTimeout([]()
-               {
-                 Relay* relay = &allPowerRelays[3];
+
+  timer.in(
+      DELAY_IN_MILLIS, [](void *) -> bool
+      {
+                 Relay *relay = &allPowerRelays[3];
                  bool wasWritable = relay->writable;
 
                  TurnOffPowerRelayAndForbidWriting(relay);
-                
-                 if(wasWritable) 
-                    BuzzTwoTimes();
-    
-                  isLongButtonTaskRunning = false; },
-               DELAY_IN_MILLIS);
+
+                 if (wasWritable)
+                   BuzzTwoTimes(); 
+                   return false; });
 }
 
 bool allInputSelectorsHasState(int state)
@@ -227,21 +229,12 @@ void onClickInputSelectorButton()
   BuzzOneTime();
 }
 
-void onLongPressMainPowerOnButtonStart()
-{
-  Serial.println("MasterDeviceOff:PowerSequenceWasStopping...");
-
-  if (power)
-    power = false;
-
-  setPowerStateToRelaysInReverseOrder();
-}
-
 void onDoubleClickInputSelectorButton()
 {
   Serial.println("InptSelectorButtonLongPressStart:TurnOnInputsOrTurnOnPrevious...");
 
   bool buzTwoTimes = true;
+
   for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
   {
     Relay relay = allInputRelays[i];
@@ -277,14 +270,20 @@ void onLongPressInputSelectorButtonStart()
   }
 }
 
+void onLongPressMainPowerOnButtonStart()
+{
+  Serial.println("MasterDeviceOff:PowerSequenceWasStopping...");
+
+  if (power)
+    turnOffPower();
+}
+
 void onLongPressMainPowerOnButtonStop()
 {
   Serial.println("MasterDeviceOn:MainPowerOnSequenceWasStarting...");
 
   if (!power)
-    power = true;
-
-  setPowerStateToRelaysInLinearOrder();
+    turnOnPower();
 }
 
 void setup()
@@ -292,7 +291,6 @@ void setup()
   Serial.begin(COM_PORT_SPEED);
   Serial.println("OneButton Starting...");
 
-  controlBoardEEPROM = ControlBoardEEPROM();
   tryReinitCurrentInputRelayFromEEPROM();
 
   // Setup PULLUPS: INPUT_PULLUP - means pushbutton connected to VCC, INPUT_PULLDOWN - means pushbutton connected to GND
@@ -342,7 +340,7 @@ void setup()
 
 void loop()
 {
-  t.handle();
+  timer.tick();
   // watching the push buttons:
   powerButton.tick();
   inputSelectorButton.tick();

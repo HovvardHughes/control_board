@@ -13,7 +13,7 @@ public:
   {
     // EEPROM.begin(EEPROM_SIZE_IN_BYTES);
   }
-  byte readCurrentInputRelayIONumberFromEEPROM()
+  byte readCurrentInputRelayIONumber()
   {
     return -1;
     // return EEPROM.read(CURRENT_INPUT_RELAY_IO_NUMBER_EEPROM_ADDRESS);
