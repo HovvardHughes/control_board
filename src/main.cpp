@@ -21,6 +21,10 @@ Relay allInputRelays[] = {
 
 Relay currentInputRelay = allInputRelays[0];
 
+OneButton powerButton(POWER_BUTTON_PIN);                  // Setup a new OneButton on pin 19
+OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN); // Setup a new OneButton on pin 18
+OneButton mainPowerOnButton(MAIN_POWER_ON_PIN);           // Setup a new (virtual) OneButton on pin 21
+
 void tryReinitCurrentInputRelayFromEEPROM()
 {
   byte readIONumber = controlBoardEEPROM.readCurrentInputRelayIONumber();
@@ -31,10 +35,6 @@ void tryReinitCurrentInputRelayFromEEPROM()
       currentInputRelay = relay;
   }
 }
-
-OneButton powerButton(POWER_BUTTON_PIN);                  // Setup a new OneButton on pin 19
-OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN); // Setup a new OneButton on pin 18
-OneButton mainPowerOnButton(MAIN_POWER_ON_PIN);           // Setup a new (virtual) OneButton on pin 21
 
 void withRunningTaskCheck(void (*action)())
 {
@@ -54,7 +54,7 @@ void withPowerCheck(void (*action)())
     Serial.println("WithPowerCheck:Skip action");
 }
 
-void BuzzOneTime()
+void buzzOneTime()
 {
   digitalWrite(BUZZER_PIN, HIGH);
 
@@ -64,7 +64,7 @@ void BuzzOneTime()
                 return false; });
 }
 
-void BuzzTwoTimes()
+void buzzTwoTimes()
 {
   digitalWrite(BUZZER_PIN, HIGH);
 
@@ -73,7 +73,7 @@ void BuzzTwoTimes()
               digitalWrite(BUZZER_PIN, LOW);
               timer.in(BUZZ_TIME, [](void *) -> bool
                 {  
-                  BuzzOneTime();
+                  buzzOneTime();
                   return false;
                 }
                 ); 
@@ -95,7 +95,7 @@ void turnOnPower()
 
             currentInputRelay.writeState(HIGH); 
 
-            BuzzTwoTimes();;
+            buzzTwoTimes();;
 
             return false; });
 }
@@ -140,7 +140,7 @@ void onDoubleClickPowerButton()
              {  
                 allPowerRelays[1].writeState(LOW);
                 allPowerRelays[3].writeState(LOW); 
-                BuzzTwoTimes();
+                buzzTwoTimes();
                 return false; });
   }
   else
@@ -150,12 +150,12 @@ void onDoubleClickPowerButton()
     timer.in(DELAY_IN_MILLIS, [](void *) -> bool
              { 
                allPowerRelays[2].writeState(HIGH); 
-               BuzzTwoTimes();
+               buzzTwoTimes();
                return false; });
   }
 }
 
-void TurnOffPowerRelayAndForbidWriting(Relay *relay)
+void turnOffPowerRelayAndForbidWriting(Relay *relay)
 {
   if (relay->readState())
   {
@@ -168,7 +168,7 @@ void onLongPressPowerButtonStart()
 {
   Serial.println("PowerButtonLongPressStart:PoweringOffVU's...");
 
-  TurnOffPowerRelayAndForbidWriting(&allPowerRelays[4]);
+  turnOffPowerRelayAndForbidWriting(&allPowerRelays[4]);
 
   timer.in(
       DELAY_IN_MILLIS, [](void *) -> bool
@@ -176,10 +176,10 @@ void onLongPressPowerButtonStart()
                  Relay *relay = &allPowerRelays[3];
                  bool wasWritable = relay->writable;
 
-                 TurnOffPowerRelayAndForbidWriting(relay);
+                 turnOffPowerRelayAndForbidWriting(relay);
 
                  if (wasWritable)
-                   BuzzTwoTimes(); 
+                   buzzTwoTimes(); 
                    return false; });
 }
 
@@ -226,7 +226,7 @@ void onClickInputSelectorButton()
     }
   }
 
-  BuzzOneTime();
+  buzzOneTime();
 }
 
 void onDoubleClickInputSelectorButton()
@@ -248,9 +248,9 @@ void onDoubleClickInputSelectorButton()
   }
 
   if (buzTwoTimes)
-    BuzzTwoTimes();
+    buzzTwoTimes();
   else
-    BuzzOneTime();
+    buzzOneTime();
 }
 
 void onLongPressInputSelectorButtonStart()
@@ -265,7 +265,7 @@ void onLongPressInputSelectorButtonStart()
     else if (relay.iONumber == currentInputRelay.iONumber)
     {
       relay.writeState(HIGH);
-      BuzzOneTime();
+      buzzOneTime();
     }
   }
 }
