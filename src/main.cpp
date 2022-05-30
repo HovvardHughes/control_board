@@ -27,7 +27,7 @@ OneButton mainPowerOnButton(MAIN_POWER_ON_PIN);           // Setup a new (virtua
 
 void tryReinitCurrentInputRelayFromEEPROM()
 {
-  byte readIONumber = controlBoardEEPROM.readCurrentInputRelayIONumber();
+  const byte readIONumber = controlBoardEEPROM.readCurrentInputRelayIONumber();
   for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
   {
     Relay relay = allInputRelays[i];
@@ -54,11 +54,11 @@ void withPowerCheck(void (*action)())
     Serial.println("WithPowerCheck:Skip action");
 }
 
-void buzzOneTime()
+void buzzOneTime(unsigned long delay = SHORT_BUZZ_TIME)
 {
   digitalWrite(BUZZER_PIN, HIGH);
 
-  timer.in(BUZZ_TIME, [](void *) -> bool
+  timer.in(delay, [](void *) -> bool
            {
                 digitalWrite(BUZZER_PIN, LOW);
                 return false; });
@@ -68,10 +68,10 @@ void buzzTwoTimes()
 {
   digitalWrite(BUZZER_PIN, HIGH);
 
-  timer.in(BUZZ_TIME, [](void *) -> bool
+  timer.in(SHORT_BUZZ_TIME, [](void *) -> bool
            {
               digitalWrite(BUZZER_PIN, LOW);
-              timer.in(BUZZ_TIME, [](void *) -> bool
+              timer.in(SHORT_BUZZ_TIME, [](void *) -> bool
                 {  
                   buzzOneTime();
                   return false;
@@ -133,7 +133,7 @@ void onDoubleClickPowerButton()
 {
   Serial.println("PowerButtonDoubleClick:Stand-bySequenceWasStarting...");
 
-  bool currentState = allPowerRelays[2].readState();
+  const bool currentState = allPowerRelays[2].readState();
   if (currentState)
   {
     allPowerRelays[2].writeState(LOW);
@@ -169,19 +169,27 @@ void onLongPressPowerButtonStart()
 {
   Serial.println("PowerButtonLongPressStart:PoweringOffVU's...");
 
-  turnOffPowerRelayAndForbidWriting(&allPowerRelays[4]);
+  Relay *firstRelay = &allPowerRelays[3];
+  const bool wasWritable = firstRelay->writable;
+  if (wasWritable)
+  {
+    buzzOneTime(LONG_BUZZ_TIME);
 
-  timer.in(
-      DELAY_IN_MILLIS, [](void *) -> bool
-      {
-                 Relay *relay = &allPowerRelays[3];
-                 bool wasWritable = relay->writable;
+    turnOffPowerRelayAndForbidWriting(firstRelay);
 
-                 turnOffPowerRelayAndForbidWriting(relay);
+    timer.in(
+        DELAY_IN_MILLIS, [](void *) -> bool
+        {
+          turnOffPowerRelayAndForbidWriting(&allPowerRelays[3]);
+          digitalWrite(BUZZER_PIN, LOW);
+          return false; });
+  }
+}
 
-                 if (wasWritable)
-                   buzzTwoTimes(); 
-                   return false; });
+void onLongPressPowerButtonEnd()
+{
+  Serial.println("PowerButtonLongPressStart:PoweringOffVU's...");
+  digitalWrite(BUZZER_PIN, LOW);
 }
 
 bool allInputSelectorsHasState(int state)
@@ -216,7 +224,7 @@ void onClickInputSelectorButton()
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
     {
       Relay relay = allInputRelays[i];
-      bool invertedState = !relay.readState();
+      const bool invertedState = !relay.readState();
       relay.writeState(invertedState);
 
       if (invertedState)
