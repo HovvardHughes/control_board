@@ -49,7 +49,7 @@ void withPowerCheck(void (*action)())
 {
   Serial.println("WithPowerCheck...");
   if (power)
-    action();
+    return withRunningTaskCheck(action);
   else
     Serial.println("WithPowerCheck:Skip action");
 }
@@ -184,12 +184,6 @@ void onLongPressPowerButtonStart()
           digitalWrite(BUZZER_PIN, LOW);
           return false; });
   }
-}
-
-void onLongPressPowerButtonEnd()
-{
-  Serial.println("PowerButtonLongPressStart:PoweringOffVU's...");
-  digitalWrite(BUZZER_PIN, LOW);
 }
 
 bool allInputSelectorsHasState(int state)
