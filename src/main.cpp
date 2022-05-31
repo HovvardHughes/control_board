@@ -141,7 +141,6 @@ void onDoubleClickPowerButton()
              {  
                 allPowerRelays[1].writeState(LOW);
                 allPowerRelays[3].writeState(LOW); 
-                buzzTwoTimes();
                 return false; });
   }
   else
@@ -151,9 +150,10 @@ void onDoubleClickPowerButton()
     timer.in(DELAY_IN_MILLIS, [](void *) -> bool
              { 
                allPowerRelays[2].writeState(HIGH); 
-               buzzTwoTimes();
                return false; });
   }
+
+  buzzTwoTimes();
 }
 
 void turnOffPowerRelayAndForbidWriting(Relay *relay)
