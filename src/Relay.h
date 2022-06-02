@@ -2,24 +2,37 @@
 
 class Relay
 {
+private:
+  bool _isWritable;
+
 public:
   byte iONumber;
-  bool writable;
 
   Relay(int iONumberArg)
   {
     iONumber = iONumberArg;
-    writable = true;
+    _isWritable = true;
   }
 
-  void writeState(int newState)
+  void write(int newState)
   {
-    if (writable)
+    if (_isWritable)
       digitalWrite(iONumber, newState);
   }
 
-  bool readState()
+  void writeAndForbidWriting(int newState)
+  {
+    write(newState);
+    _isWritable = false;
+  }
+
+  bool read()
   {
     return digitalRead(iONumber);
+  }
+
+  bool isWritable()
+  {
+    return _isWritable;
   }
 };

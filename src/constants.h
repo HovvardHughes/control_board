@@ -58,3 +58,7 @@ GPIO      Connected to...
 #define LONG_BUZZ_TIME 100 // long buzz time in millis
 
 #define MAIN_INPUT_RELAY_IO_NUMBER 32
+
+#define FREQUENCY 25000
+#define LED_CHANNEL  0
+#define LED_RESOLUTION  8

@@ -6,6 +6,9 @@
 bool power;
 auto timer = timer_create_default();
 
+int dutyCycle = 0;
+int currentDutyCycleOperation = HIGH;
+
 ControlBoardEEPROM controlBoardEEPROM = ControlBoardEEPROM();
 
 Relay allPowerRelays[] = {
@@ -84,16 +87,16 @@ void turnOnPower()
 {
   power = true;
 
-  allPowerRelays[0].writeState(HIGH);
-  allPowerRelays[1].writeState(HIGH);
-  allPowerRelays[3].writeState(HIGH);
+  allPowerRelays[0].write(HIGH);
+  allPowerRelays[1].write(HIGH);
+  allPowerRelays[3].write(HIGH);
 
   timer.in(DELAY_IN_MILLIS, [](void *) -> bool
            {  
-            allPowerRelays[2].writeState(HIGH);
-            allPowerRelays[4].writeState(HIGH);
+            allPowerRelays[2].write(HIGH);
+            allPowerRelays[4].write(HIGH);
 
-            currentInputRelay.writeState(HIGH); 
+            currentInputRelay.write(HIGH); 
 
             buzzTwoTimes();;
 
@@ -104,17 +107,17 @@ void turnOffPower()
 {
   power = false;
 
-  allPowerRelays[2].writeState(LOW);
-  allPowerRelays[4].writeState(LOW);
+  allPowerRelays[2].write(LOW);
+  allPowerRelays[4].write(LOW);
 
   timer.in(DELAY_IN_MILLIS, [](void *) -> bool
            {
-            allPowerRelays[0].writeState(LOW);
-            allPowerRelays[1].writeState(LOW);
-            allPowerRelays[3].writeState(LOW);
+            allPowerRelays[0].write(LOW);
+            allPowerRelays[1].write(LOW);
+            allPowerRelays[3].write(LOW);
 
              for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-              allInputRelays[i].writeState(LOW);
+              allInputRelays[i].write(LOW);
 
             return false; });
 }
@@ -122,6 +125,8 @@ void turnOffPower()
 void onClickPowerButton()
 {
   Serial.println("PowerButtonClick:InitialisingPowerSequence...");
+
+  buzzOneTime();
 
   if (!power)
     turnOnPower();
@@ -133,54 +138,45 @@ void onDoubleClickPowerButton()
 {
   Serial.println("PowerButtonDoubleClick:Stand-bySequenceWasStarting...");
 
-  const bool currentState = allPowerRelays[2].readState();
+  const bool currentState = allPowerRelays[2].read();
   if (currentState)
   {
-    allPowerRelays[2].writeState(LOW);
+    allPowerRelays[2].write(LOW);
     timer.in(DELAY_IN_MILLIS, [](void *) -> bool
              {  
-                allPowerRelays[1].writeState(LOW);
-                allPowerRelays[3].writeState(LOW); 
+                allPowerRelays[1].write(LOW);
+                allPowerRelays[3].write(LOW); 
                 return false; });
   }
   else
   {
-    allPowerRelays[1].writeState(HIGH);
-    allPowerRelays[3].writeState(HIGH);
+    allPowerRelays[1].write(HIGH);
+    allPowerRelays[3].write(HIGH);
     timer.in(DELAY_IN_MILLIS, [](void *) -> bool
              { 
-               allPowerRelays[2].writeState(HIGH); 
+               allPowerRelays[2].write(HIGH); 
                return false; });
   }
 
   buzzTwoTimes();
 }
 
-void turnOffPowerRelayAndForbidWriting(Relay *relay)
-{
-  if (relay->readState())
-  {
-    relay->writeState(LOW);
-    relay->writable = false;
-  }
-}
-
 void onLongPressPowerButtonStart()
 {
   Serial.println("PowerButtonLongPressStart:PoweringOffVU's...");
 
-  Relay *firstRelay = &allPowerRelays[3];
-  const bool wasWritable = firstRelay->writable;
+  Relay firstRelay = allPowerRelays[3];
+  const bool wasWritable = firstRelay.isWritable();
   if (wasWritable)
   {
     buzzOneTime(LONG_BUZZ_TIME);
 
-    turnOffPowerRelayAndForbidWriting(firstRelay);
+    firstRelay.writeAndForbidWriting(LOW);
 
     timer.in(
         DELAY_IN_MILLIS, [](void *) -> bool
         {
-          turnOffPowerRelayAndForbidWriting(&allPowerRelays[3]);
+          allPowerRelays[3].writeAndForbidWriting(LOW);
           digitalWrite(BUZZER_PIN, LOW);
           return false; });
   }
@@ -191,7 +187,7 @@ bool allInputSelectorsHasState(int state)
   for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
   {
     Relay relay = allInputRelays[i];
-    if (relay.readState() != state)
+    if (relay.read() != state)
       return false;
   }
 
@@ -203,14 +199,14 @@ void onClickInputSelectorButton()
   Serial.println("InptSelectorButtonCick:SwitcingInputs...");
 
   if (allInputSelectorsHasState(LOW))
-    currentInputRelay.writeState(HIGH);
+    currentInputRelay.write(HIGH);
   else if (allInputSelectorsHasState(HIGH))
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
     {
       Relay relay = allInputRelays[i];
       if (relay.iONumber != currentInputRelay.iONumber)
-        relay.writeState(LOW);
+        relay.write(LOW);
     }
   }
   else
@@ -218,8 +214,8 @@ void onClickInputSelectorButton()
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
     {
       Relay relay = allInputRelays[i];
-      const bool invertedState = !relay.readState();
-      relay.writeState(invertedState);
+      const bool invertedState = !relay.read();
+      relay.write(invertedState);
 
       if (invertedState)
       {
@@ -241,13 +237,13 @@ void onDoubleClickInputSelectorButton()
   for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
   {
     Relay relay = allInputRelays[i];
-    if (relay.readState() && relay.iONumber != currentInputRelay.iONumber)
+    if (relay.read() && relay.iONumber != currentInputRelay.iONumber)
     {
-      relay.writeState(LOW);
+      relay.write(LOW);
       buzTwoTimes = false;
     }
     else
-      relay.writeState(HIGH);
+      relay.write(HIGH);
   }
 
   if (buzTwoTimes)
@@ -263,11 +259,11 @@ void onLongPressInputSelectorButtonStart()
   for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
   {
     Relay relay = allInputRelays[i];
-    if (relay.readState())
-      relay.writeState(LOW);
+    if (relay.read())
+      relay.write(LOW);
     else if (relay.iONumber == currentInputRelay.iONumber)
     {
-      relay.writeState(HIGH);
+      relay.write(HIGH);
       buzzOneTime();
     }
   }
@@ -339,6 +335,11 @@ void setup()
                                          { withRunningTaskCheck(onLongPressMainPowerOnButtonStart); });
   mainPowerOnButton.attachLongPressStop([]()
                                         { withRunningTaskCheck(onLongPressMainPowerOnButtonStop); });
+
+  ledcSetup(LED_CHANNEL, FREQUENCY, LED_RESOLUTION);
+  ledcAttachPin(POWER_BUTTON_LED_PIN, LED_CHANNEL);
+
+  ledcWrite(LED_CHANNEL, 255);
 }
 
 void loop()
