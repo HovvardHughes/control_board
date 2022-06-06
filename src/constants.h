@@ -38,6 +38,19 @@ GPIO      Connected to...
 // LEDS:
 #define POWER_BUTTON_LED_PIN 15
 #define INPUT_SELECTOR_BUTTON_LED_PIN 2
+
+#define POWER_BUTTON_LED_CHANNEL 0
+#define INPUT_SELECTOR_BUTTON_LED_CHANNEL 1
+
+#define FREQUENCY 25000
+
+#define LED_RESOLUTION 8
+
+#define MIN_LED__DUTY 0
+#define MAX_LED__DUTY 255
+
+#define LED_BLINK_DELAY 100 // blink delay in millis
+
 // BUZZER:
 #define BUZZER_PIN 4
 // I2C:
@@ -54,11 +67,8 @@ GPIO      Connected to...
 #define POWER_RELAY_COUNT 5 // Number of power-relays in array
 #define INPUT_RELAY_COUNT 2 // Number of power-relays in array
 
-#define SHORT_BUZZ_TIME 50 // short buzz time in millis
-#define LONG_BUZZ_TIME 100 // long buzz time in millis
+#define SHORT_BUZZ_TIME 50 // short buzz delay in millis
+#define LONG_BUZZ_TIME 100 // long buzz delay in millis
 
 #define MAIN_INPUT_RELAY_IO_NUMBER 32
-
-#define FREQUENCY 25000
-#define LED_CHANNEL  0
-#define LED_RESOLUTION  8
+#define SECONDARY_INPUT_RELAY_IO_NUMBER 33

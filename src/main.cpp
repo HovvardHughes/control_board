@@ -1,7 +1,7 @@
 #include <ControlBoardEEPROM.h>
+#include <Led.h>
 #include <Arduino.h>
 #include <OneButton.h>
-#include <arduino-timer.h>
 
 bool power;
 auto timer = timer_create_default();
@@ -20,9 +20,12 @@ Relay allPowerRelays[] = {
 
 Relay allInputRelays[] = {
     Relay(MAIN_INPUT_RELAY_IO_NUMBER),
-    Relay(33)};
+    Relay(SECONDARY_INPUT_RELAY_IO_NUMBER)};
 
 Relay currentInputRelay = allInputRelays[0];
+
+Led powerLed = Led(POWER_BUTTON_LED_CHANNEL, POWER_BUTTON_LED_PIN);
+Led inputSelectorLed = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUTTON_LED_PIN);
 
 OneButton powerButton(POWER_BUTTON_PIN);                  // Setup a new OneButton on pin 19
 OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN); // Setup a new OneButton on pin 18
@@ -98,7 +101,11 @@ void turnOnPower()
 
             currentInputRelay.write(HIGH); 
 
-            buzzTwoTimes();;
+
+            powerLed.writeMax();
+            inputSelectorLed.writeMax();
+
+            buzzTwoTimes();
 
             return false; });
 }
@@ -116,8 +123,11 @@ void turnOffPower()
             allPowerRelays[1].write(LOW);
             allPowerRelays[3].write(LOW);
 
-             for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+            for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
               allInputRelays[i].write(LOW);
+
+            powerLed.writeMin();
+            inputSelectorLed.writeMin();
 
             return false; });
 }
@@ -224,7 +234,7 @@ void onClickInputSelectorButton()
       }
     }
   }
-
+  inputSelectorLed.blink(&timer);
   buzzOneTime();
 }
 
@@ -298,10 +308,7 @@ void setup()
   pinMode(MAIN_POWER_ON_PIN, INPUT_PULLDOWN);
 
   pinMode(POWER_BUTTON_LED_PIN, OUTPUT);
-  // digitalWrite(POWER_BUTTON_LED_PIN, HIGH);  //dummy
-
   pinMode(INPUT_SELECTOR_BUTTON_LED_PIN, OUTPUT);
-  // digitalWrite(INPUT_SELECTOR_BUTTON_LED_PIN, HIGH);    //dummy
 
   pinMode(BUZZER_PIN, OUTPUT);
 
@@ -336,10 +343,8 @@ void setup()
   mainPowerOnButton.attachLongPressStop([]()
                                         { withRunningTaskCheck(onLongPressMainPowerOnButtonStop); });
 
-  ledcSetup(LED_CHANNEL, FREQUENCY, LED_RESOLUTION);
-  ledcAttachPin(POWER_BUTTON_LED_PIN, LED_CHANNEL);
-
-  ledcWrite(LED_CHANNEL, 255);
+  powerLed.setup();
+  inputSelectorLed.setup();
 }
 
 void loop()
