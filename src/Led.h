@@ -8,7 +8,7 @@ private:
   uint8_t _channel;
   uint8_t _pin;
 
-  static bool callback(void *p)
+  static bool writeInvertedCallback(void *p)
   {
     Led *ptr = (Led *)p;
     ptr->writeInverted();
@@ -24,6 +24,7 @@ public:
 
   void setup()
   {
+    pinMode(_pin, OUTPUT);
     ledcSetup(_channel, FREQUENCY, LED_RESOLUTION);
     ledcAttachPin(_pin, _channel);
   }
@@ -52,7 +53,7 @@ public:
   {
     writeInverted();
 
-    timer->in(delay, callback, this);
+    timer->in(delay, writeInvertedCallback, this);
   }
 
   uint32_t read()

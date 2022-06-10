@@ -2,9 +2,14 @@
 #include <Led.h>
 #include <Arduino.h>
 #include <OneButton.h>
+#include "checkers.h"
+#include <Buzzer.h>
 
 bool power;
-auto timer = timer_create_default();
+
+Timer<> timer = timer_create_default();
+
+Buzzer buzzer = Buzzer(&timer);
 
 int dutyCycle = 0;
 int currentDutyCycleOperation = HIGH;
@@ -42,50 +47,6 @@ void tryReinitCurrentInputRelayFromEEPROM()
   }
 }
 
-void withRunningTaskCheck(void (*action)())
-{
-  Serial.println("WithRunningTaskCheck...");
-  if (timer.empty())
-    action();
-  else
-    Serial.println("WithRunningTaskCheck:Skip action");
-}
-
-void withPowerCheck(void (*action)())
-{
-  Serial.println("WithPowerCheck...");
-  if (power)
-    return withRunningTaskCheck(action);
-  else
-    Serial.println("WithPowerCheck:Skip action");
-}
-
-void buzzOneTime(unsigned long delay = SHORT_BUZZ_TIME)
-{
-  digitalWrite(BUZZER_PIN, HIGH);
-
-  timer.in(delay, [](void *) -> bool
-           {
-                digitalWrite(BUZZER_PIN, LOW);
-                return false; });
-}
-
-void buzzTwoTimes()
-{
-  digitalWrite(BUZZER_PIN, HIGH);
-
-  timer.in(SHORT_BUZZ_TIME, [](void *) -> bool
-           {
-              digitalWrite(BUZZER_PIN, LOW);
-              timer.in(SHORT_BUZZ_TIME, [](void *) -> bool
-                {  
-                  buzzOneTime();
-                  return false;
-                }
-                ); 
-            return false; });
-}
-
 void turnOnPower()
 {
   power = true;
@@ -105,7 +66,7 @@ void turnOnPower()
             powerLed.writeMax();
             inputSelectorLed.writeMax();
 
-            buzzTwoTimes();
+            buzzer.buzzTwoTimes();
 
             return false; });
 }
@@ -136,7 +97,7 @@ void onClickPowerButton()
 {
   Serial.println("PowerButtonClick:InitialisingPowerSequence...");
 
-  buzzOneTime();
+  buzzer.buzzOneTime();
 
   if (!power)
     turnOnPower();
@@ -168,7 +129,7 @@ void onDoubleClickPowerButton()
                return false; });
   }
 
-  buzzTwoTimes();
+  buzzer.buzzTwoTimes();
 }
 
 void onLongPressPowerButtonStart()
@@ -179,7 +140,7 @@ void onLongPressPowerButtonStart()
   const bool wasWritable = firstRelay.isWritable();
   if (wasWritable)
   {
-    buzzOneTime(LONG_BUZZ_TIME);
+    buzzer.buzzOneTime(LONG_BUZZ_TIME);
 
     firstRelay.writeAndForbidWriting(LOW);
 
@@ -235,7 +196,7 @@ void onClickInputSelectorButton()
     }
   }
   inputSelectorLed.blink(&timer);
-  buzzOneTime();
+  buzzer.buzzOneTime();
 }
 
 void onDoubleClickInputSelectorButton()
@@ -257,9 +218,9 @@ void onDoubleClickInputSelectorButton()
   }
 
   if (buzTwoTimes)
-    buzzTwoTimes();
+    buzzer.buzzTwoTimes();
   else
-    buzzOneTime();
+    buzzer.buzzOneTime();
 }
 
 void onLongPressInputSelectorButtonStart()
@@ -274,7 +235,7 @@ void onLongPressInputSelectorButtonStart()
     else if (relay.iONumber == currentInputRelay.iONumber)
     {
       relay.write(HIGH);
-      buzzOneTime();
+      buzzer.buzzOneTime();
     }
   }
 }
@@ -307,22 +268,16 @@ void setup()
   pinMode(INPUT_SELECTOR_BUTTON_PIN, INPUT_PULLUP);
   pinMode(MAIN_POWER_ON_PIN, INPUT_PULLDOWN);
 
-  pinMode(POWER_BUTTON_LED_PIN, OUTPUT);
-  pinMode(INPUT_SELECTOR_BUTTON_LED_PIN, OUTPUT);
+  powerLed.setup();
+  inputSelectorLed.setup();
 
-  pinMode(BUZZER_PIN, OUTPUT);
+  buzzer.setup();
 
   for (size_t i = 0; i < POWER_RELAY_COUNT; i++)
-  {
-    Relay relay = allPowerRelays[i];
-    pinMode(relay.iONumber, OUTPUT);
-  }
+    allPowerRelays[i].setup();
 
   for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-  {
-    Relay relay = allInputRelays[i];
-    pinMode(relay.iONumber, OUTPUT);
-  }
+    allInputRelays[i].setup();
 
   powerButton.attachClick([]()
                           { withRunningTaskCheck(onClickPowerButton); });
@@ -343,8 +298,6 @@ void setup()
   mainPowerOnButton.attachLongPressStop([]()
                                         { withRunningTaskCheck(onLongPressMainPowerOnButtonStop); });
 
-  powerLed.setup();
-  inputSelectorLed.setup();
 }
 
 void loop()

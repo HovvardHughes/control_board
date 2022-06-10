@@ -14,6 +14,11 @@ public:
     _isWritable = true;
   }
 
+  void setup()
+  {
+    pinMode(iONumber, OUTPUT);
+  }
+
   void write(int newState)
   {
     if (_isWritable)
