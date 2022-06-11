@@ -53,6 +53,9 @@ GPIO      Connected to...
 
 // BUZZER:
 #define BUZZER_PIN 4
+#define SHORT_BUZZ_INTERVAL 50 // short buzz delay in millis
+#define LONG_BUZZ_INTERVAL 100 // long buzz delay in millis
+
 // I2C:
 
 // 1WIRE:
@@ -67,8 +70,7 @@ GPIO      Connected to...
 #define POWER_RELAY_COUNT 5 // Number of power-relays in array
 #define INPUT_RELAY_COUNT 2 // Number of power-relays in array
 
-#define SHORT_BUZZ_TIME 50 // short buzz delay in millis
-#define LONG_BUZZ_TIME 100 // long buzz delay in millis
+
 
 #define MAIN_INPUT_RELAY_IO_NUMBER 32
 #define SECONDARY_INPUT_RELAY_IO_NUMBER 33

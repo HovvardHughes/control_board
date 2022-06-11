@@ -2,7 +2,6 @@
 #include <Led.h>
 #include <Arduino.h>
 #include <OneButton.h>
-#include <Buzzer.h>
 
 class InputSelector
 {
@@ -14,12 +13,7 @@ private:
       Relay(SECONDARY_INPUT_RELAY_IO_NUMBER)};
 
   byte _selectedRelayIONumber = _allRelays[0].iONumber;
-
   byte _notSelectedRelayIONumber = _allRelays[1].iONumber;
-
-  Led _led = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUTTON_LED_PIN, &timer);
-
-  Buzzer *_buzzer;
 
   void tryReinitCurrentInputRelayFromEEPROM()
   {
@@ -32,7 +26,7 @@ private:
     }
   }
 
-  void writeTo(int ioNumber, int state, bool silently = false)
+  void writeTo(int ioNumber, int state)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
     {
@@ -40,64 +34,32 @@ private:
       if (relay.iONumber == ioNumber)
         relay.write(state);
     }
-
-    if (!silently)
-    {
-      _buzzer->buzzOneTime();
-      _led.blink();
-    }
   }
 
 public:
-  OneButton button = OneButton(INPUT_SELECTOR_BUTTON_PIN);
-
-  InputSelector(Timer<> *timer, Buzzer *buzzer)
-  {
-    _led = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUTTON_LED_PIN, timer);
-    _buzzer = buzzer;
-  };
-
   void setup()
   {
-    pinMode(INPUT_SELECTOR_BUTTON_PIN, INPUT_PULLUP);
-
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
       _allRelays[i].setup();
-
-    _led.setup();
 
     tryReinitCurrentInputRelayFromEEPROM();
   }
 
-  void writeToLed(int state)
-  {
-    if (state)
-      _led.writeMax();
-    else
-      _led.writeMin();
-  }
-
-  void writeToAll(int state, bool silently = false)
+  void writeToAll(int state)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
       _allRelays[i].write(state);
-
-    if (!silently)
-    {
-      _led.blink();
-      _buzzer->buzzTwoTimes();
-    }
   }
 
   void
-  writeToSeleted(int state, bool silently = false)
+  writeToSeleted(int state)
   {
-    writeTo(_selectedRelayIONumber, state, silently);
+    writeTo(_selectedRelayIONumber, state);
   }
 
-  void writeToNotSelected(int state, bool silently = false)
+  void writeToNotSelected(int state)
   {
-    writeTo(_notSelectedRelayIONumber, state, silently);
+    writeTo(_notSelectedRelayIONumber, state);
   }
 
   void swap()
@@ -108,7 +70,7 @@ public:
 
     _controlBoardEEPROM.writeCurrentInputRelayIONumber(_selectedRelayIONumber);
 
-    writeTo(_notSelectedRelayIONumber, LOW, true);
+    writeTo(_notSelectedRelayIONumber, LOW);
     writeTo(_selectedRelayIONumber, HIGH);
   }
 

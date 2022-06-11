@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <constants.h>
 
-byte _buzzedTimes = 0;
+byte _countToBuzz = 0;
 
 class Buzzer
 {
@@ -19,32 +19,21 @@ public:
     pinMode(BUZZER_PIN, OUTPUT);
   }
 
-  void buzzOneTime(unsigned long delay = SHORT_BUZZ_TIME)
+  void buzz(byte count, unsigned long interval = SHORT_BUZZ_INTERVAL)
   {
+    _countToBuzz  = count * 2;
+
     digitalWrite(BUZZER_PIN, HIGH);
+    _countToBuzz--;
 
-    _timer->in(delay, [](void *) -> bool
-               {
-                digitalWrite(BUZZER_PIN, LOW);
-                return false; });
-  }
+    Serial.println(_countToBuzz);
 
-  void buzzTwoTimes()
-  {
-    digitalWrite(BUZZER_PIN, HIGH);
-    _buzzedTimes++;
-
-    Serial.println(_buzzedTimes);
-
-    _timer->every(SHORT_BUZZ_TIME, [](void *) -> bool
+    _timer->every(interval, [](void *) -> bool
                {
                 digitalWrite(BUZZER_PIN, !digitalRead(BUZZER_PIN));
-                _buzzedTimes++;
-                
-                if(_buzzedTimes != 4) 
-                  return true;
+                  _countToBuzz--;
 
-                _buzzedTimes = 0;
-                return false; });
+                _countToBuzz;
+                return _countToBuzz > 0; });
   }
 };

@@ -1,5 +1,6 @@
 #include "checkers.h"
 #include <InputSelector.h>
+#include <Buzzer.h>
 
 bool power;
 
@@ -15,11 +16,13 @@ Relay allPowerRelays[] = {
     Relay(12)};
 
 Led powerLed = Led(POWER_BUTTON_LED_CHANNEL, POWER_BUTTON_LED_PIN, &timer);
+Led inputSelectorLed = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUTTON_LED_PIN, &timer);
 
-OneButton powerButton(POWER_BUTTON_PIN);        // Setup a new OneButton on pin 19
-OneButton mainPowerOnButton(MAIN_POWER_ON_PIN); // Setup a new (virtual) OneButton on pin 21
+OneButton powerButton(POWER_BUTTON_PIN);
+OneButton inputSelectorButton = OneButton(INPUT_SELECTOR_BUTTON_PIN);
+OneButton mainPowerOnButton(MAIN_POWER_ON_PIN);
 
-InputSelector inputSelector = InputSelector(&timer, &buzzer);
+InputSelector inputSelector = InputSelector();
 
 void turnOnPower()
 {
@@ -33,13 +36,12 @@ void turnOnPower()
            {  
             allPowerRelays[2].write(HIGH);
             allPowerRelays[4].write(HIGH);
-
-            inputSelector.writeToSeleted(HIGH, true);
-            inputSelector.writeToLed(HIGH);
-
             powerLed.writeMax();
 
-            buzzer.buzzTwoTimes();
+            inputSelector.writeToSeleted(HIGH);
+            inputSelectorLed.writeMax();
+
+            buzzer.buzz(2);
 
             return false; });
 }
@@ -58,8 +60,9 @@ void turnOffPower()
             allPowerRelays[3].write(LOW);
             powerLed.writeMin();
 
-            inputSelector.writeToAll(LOW,true);
-            inputSelector.writeToLed(LOW);
+            inputSelector.writeToAll(LOW);
+            inputSelectorLed.writeMin();
+
 
             return false; });
 }
@@ -68,7 +71,7 @@ void onClickPowerButton()
 {
   Serial.println("PowerButtonClick:InitialisingPowerSequence...");
 
-  buzzer.buzzOneTime();
+  buzzer.buzz(1);
 
   if (!power)
     turnOnPower();
@@ -100,7 +103,7 @@ void onDoubleClickPowerButton()
                return false; });
   }
 
-  buzzer.buzzTwoTimes();
+  buzzer.buzz(2);
 }
 
 void onLongPressPowerButtonStart()
@@ -111,7 +114,7 @@ void onLongPressPowerButtonStart()
   const bool wasWritable = firstRelay.isWritable();
   if (wasWritable)
   {
-    buzzer.buzzOneTime(LONG_BUZZ_TIME);
+    buzzer.buzz(1, LONG_BUZZ_INTERVAL);
 
     firstRelay.writeAndForbidWriting(LOW);
 
@@ -134,6 +137,8 @@ void onClickInputSelectorButton()
     inputSelector.writeToNotSelected(LOW);
   else
     inputSelector.swap();
+
+  buzzer.buzz(1);
 }
 
 void onDoubleClickInputSelectorButton()
@@ -142,11 +147,13 @@ void onDoubleClickInputSelectorButton()
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOnCurrentSelectedInput...");
     inputSelector.writeToNotSelected(LOW);
+    buzzer.buzz(1);
   }
   else
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOnAllInputs...");
     inputSelector.writeToAll(HIGH);
+    buzzer.buzz(2);
   }
 }
 
@@ -156,6 +163,7 @@ void onLongPressInputSelectorButtonStart()
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOnCurrentSelectedInput...");
     inputSelector.writeToSeleted(HIGH);
+    buzzer.buzz(1);
   }
   else
   {
@@ -187,9 +195,11 @@ void setup()
 
   // Setup PULLUPS: INPUT_PULLUP - means pushbutton connected to VCC, INPUT_PULLDOWN - means pushbutton connected to GND
   pinMode(POWER_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(INPUT_SELECTOR_BUTTON_PIN, INPUT_PULLUP);
   pinMode(MAIN_POWER_ON_PIN, INPUT_PULLDOWN);
 
   powerLed.setup();
+  inputSelectorLed.setup();
 
   buzzer.setup();
 
@@ -205,12 +215,12 @@ void setup()
   powerButton.attachLongPressStart([]()
                                    { withPowerCheck(onLongPressPowerButtonStart); });
 
-  inputSelector.button.attachClick([]()
-                                   { withPowerCheck(onClickInputSelectorButton); });
-  inputSelector.button.attachLongPressStart([]()
-                                            { withPowerCheck(onLongPressInputSelectorButtonStart); });
-  inputSelector.button.attachDoubleClick([]()
-                                         { withPowerCheck(onDoubleClickInputSelectorButton); });
+  inputSelectorButton.attachClick([]()
+                                  { withPowerCheck(onClickInputSelectorButton); });
+  inputSelectorButton.attachLongPressStart([]()
+                                           { withPowerCheck(onLongPressInputSelectorButtonStart); });
+  inputSelectorButton.attachDoubleClick([]()
+                                        { withPowerCheck(onDoubleClickInputSelectorButton); });
 
   mainPowerOnButton.attachLongPressStart([]()
                                          { withRunningTaskCheck(onLongPressMainPowerOnButtonStart); });
@@ -223,6 +233,6 @@ void loop()
   timer.tick();
   // watching the push buttons:
   powerButton.tick();
-  inputSelector.button.tick();
+  inputSelectorButton.tick();
   mainPowerOnButton.tick();
 }
