@@ -34,6 +34,8 @@ public:
     digitalWrite(BUZZER_PIN, HIGH);
     _buzzedTimes++;
 
+    Serial.println(_buzzedTimes);
+
     _timer->every(SHORT_BUZZ_TIME, [](void *) -> bool
                {
                 digitalWrite(BUZZER_PIN, !digitalRead(BUZZER_PIN));

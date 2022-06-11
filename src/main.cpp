@@ -1,20 +1,11 @@
-#include <ControlBoardEEPROM.h>
-#include <Led.h>
-#include <Arduino.h>
-#include <OneButton.h>
 #include "checkers.h"
-#include <Buzzer.h>
+#include <InputSelector.h>
 
 bool power;
 
 Timer<> timer = timer_create_default();
 
 Buzzer buzzer = Buzzer(&timer);
-
-int dutyCycle = 0;
-int currentDutyCycleOperation = HIGH;
-
-ControlBoardEEPROM controlBoardEEPROM = ControlBoardEEPROM();
 
 Relay allPowerRelays[] = {
     Relay(25),
@@ -23,29 +14,12 @@ Relay allPowerRelays[] = {
     Relay(14),
     Relay(12)};
 
-Relay allInputRelays[] = {
-    Relay(MAIN_INPUT_RELAY_IO_NUMBER),
-    Relay(SECONDARY_INPUT_RELAY_IO_NUMBER)};
+Led powerLed = Led(POWER_BUTTON_LED_CHANNEL, POWER_BUTTON_LED_PIN, &timer);
 
-Relay currentInputRelay = allInputRelays[0];
+OneButton powerButton(POWER_BUTTON_PIN);        // Setup a new OneButton on pin 19
+OneButton mainPowerOnButton(MAIN_POWER_ON_PIN); // Setup a new (virtual) OneButton on pin 21
 
-Led powerLed = Led(POWER_BUTTON_LED_CHANNEL, POWER_BUTTON_LED_PIN);
-Led inputSelectorLed = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUTTON_LED_PIN);
-
-OneButton powerButton(POWER_BUTTON_PIN);                  // Setup a new OneButton on pin 19
-OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN); // Setup a new OneButton on pin 18
-OneButton mainPowerOnButton(MAIN_POWER_ON_PIN);           // Setup a new (virtual) OneButton on pin 21
-
-void tryReinitCurrentInputRelayFromEEPROM()
-{
-  const byte readIONumber = controlBoardEEPROM.readCurrentInputRelayIONumber();
-  for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-  {
-    Relay relay = allInputRelays[i];
-    if (relay.iONumber == readIONumber)
-      currentInputRelay = relay;
-  }
-}
+InputSelector inputSelector = InputSelector(&timer, &buzzer);
 
 void turnOnPower()
 {
@@ -60,11 +34,10 @@ void turnOnPower()
             allPowerRelays[2].write(HIGH);
             allPowerRelays[4].write(HIGH);
 
-            currentInputRelay.write(HIGH); 
-
+            inputSelector.writeToSeleted(HIGH, true);
+            inputSelector.writeToLed(HIGH);
 
             powerLed.writeMax();
-            inputSelectorLed.writeMax();
 
             buzzer.buzzTwoTimes();
 
@@ -83,12 +56,10 @@ void turnOffPower()
             allPowerRelays[0].write(LOW);
             allPowerRelays[1].write(LOW);
             allPowerRelays[3].write(LOW);
-
-            for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-              allInputRelays[i].write(LOW);
-
             powerLed.writeMin();
-            inputSelectorLed.writeMin();
+
+            inputSelector.writeToAll(LOW,true);
+            inputSelector.writeToLed(LOW);
 
             return false; });
 }
@@ -153,90 +124,43 @@ void onLongPressPowerButtonStart()
   }
 }
 
-bool allInputSelectorsHasState(int state)
-{
-  for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-  {
-    Relay relay = allInputRelays[i];
-    if (relay.read() != state)
-      return false;
-  }
-
-  return true;
-}
-
 void onClickInputSelectorButton()
 {
   Serial.println("InptSelectorButtonCick:SwitcingInputs...");
 
-  if (allInputSelectorsHasState(LOW))
-    currentInputRelay.write(HIGH);
-  else if (allInputSelectorsHasState(HIGH))
-  {
-    for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-    {
-      Relay relay = allInputRelays[i];
-      if (relay.iONumber != currentInputRelay.iONumber)
-        relay.write(LOW);
-    }
-  }
+  if (inputSelector.all(LOW))
+    inputSelector.writeToSeleted(HIGH);
+  else if (inputSelector.all(HIGH))
+    inputSelector.writeToNotSelected(LOW);
   else
-  {
-    for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-    {
-      Relay relay = allInputRelays[i];
-      const bool invertedState = !relay.read();
-      relay.write(invertedState);
-
-      if (invertedState)
-      {
-        currentInputRelay = relay;
-        controlBoardEEPROM.writeCurrentInputRelayIONumber(relay.iONumber);
-      }
-    }
-  }
-  inputSelectorLed.blink(&timer);
-  buzzer.buzzOneTime();
+    inputSelector.swap();
 }
 
 void onDoubleClickInputSelectorButton()
 {
-  Serial.println("InptSelectorButtonLongPressStart:TurnOnInputsOrTurnOnPrevious...");
-
-  bool buzTwoTimes = true;
-
-  for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+  if (inputSelector.all(HIGH))
   {
-    Relay relay = allInputRelays[i];
-    if (relay.read() && relay.iONumber != currentInputRelay.iONumber)
-    {
-      relay.write(LOW);
-      buzTwoTimes = false;
-    }
-    else
-      relay.write(HIGH);
+    Serial.println("InptSelectorButtonLongPressStart:TurnOnCurrentSelectedInput...");
+    inputSelector.writeToNotSelected(LOW);
   }
-
-  if (buzTwoTimes)
-    buzzer.buzzTwoTimes();
   else
-    buzzer.buzzOneTime();
+  {
+    Serial.println("InptSelectorButtonLongPressStart:TurnOnAllInputs...");
+    inputSelector.writeToAll(HIGH);
+  }
 }
 
 void onLongPressInputSelectorButtonStart()
 {
-  Serial.println("InptSelectorButtonLongPressStart:TurnOffInputsOrTurnOnPrevious...");
-
-  for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+  if (inputSelector.all(LOW))
   {
-    Relay relay = allInputRelays[i];
-    if (relay.read())
-      relay.write(LOW);
-    else if (relay.iONumber == currentInputRelay.iONumber)
-    {
-      relay.write(HIGH);
-      buzzer.buzzOneTime();
-    }
+    Serial.println("InptSelectorButtonLongPressStart:TurnOnCurrentSelectedInput...");
+    inputSelector.writeToSeleted(HIGH);
+  }
+  else
+  {
+    Serial.println("InptSelectorButtonLongPressStart:TurnOffAllInputs...");
+    inputSelector.writeToAll(LOW);
   }
 }
 
@@ -261,23 +185,18 @@ void setup()
   Serial.begin(COM_PORT_SPEED);
   Serial.println("OneButton Starting...");
 
-  tryReinitCurrentInputRelayFromEEPROM();
-
   // Setup PULLUPS: INPUT_PULLUP - means pushbutton connected to VCC, INPUT_PULLDOWN - means pushbutton connected to GND
   pinMode(POWER_BUTTON_PIN, INPUT_PULLUP);
-  pinMode(INPUT_SELECTOR_BUTTON_PIN, INPUT_PULLUP);
   pinMode(MAIN_POWER_ON_PIN, INPUT_PULLDOWN);
 
   powerLed.setup();
-  inputSelectorLed.setup();
 
   buzzer.setup();
 
   for (size_t i = 0; i < POWER_RELAY_COUNT; i++)
     allPowerRelays[i].setup();
 
-  for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-    allInputRelays[i].setup();
+  inputSelector.setup();
 
   powerButton.attachClick([]()
                           { withRunningTaskCheck(onClickPowerButton); });
@@ -286,18 +205,17 @@ void setup()
   powerButton.attachLongPressStart([]()
                                    { withPowerCheck(onLongPressPowerButtonStart); });
 
-  inputSelectorButton.attachClick([]()
-                                  { withPowerCheck(onClickInputSelectorButton); });
-  inputSelectorButton.attachLongPressStart([]()
-                                           { withPowerCheck(onLongPressInputSelectorButtonStart); });
-  inputSelectorButton.attachDoubleClick([]()
-                                        { withPowerCheck(onDoubleClickInputSelectorButton); });
+  inputSelector.button.attachClick([]()
+                                   { withPowerCheck(onClickInputSelectorButton); });
+  inputSelector.button.attachLongPressStart([]()
+                                            { withPowerCheck(onLongPressInputSelectorButtonStart); });
+  inputSelector.button.attachDoubleClick([]()
+                                         { withPowerCheck(onDoubleClickInputSelectorButton); });
 
   mainPowerOnButton.attachLongPressStart([]()
                                          { withRunningTaskCheck(onLongPressMainPowerOnButtonStart); });
   mainPowerOnButton.attachLongPressStop([]()
                                         { withRunningTaskCheck(onLongPressMainPowerOnButtonStop); });
-
 }
 
 void loop()
@@ -305,6 +223,6 @@ void loop()
   timer.tick();
   // watching the push buttons:
   powerButton.tick();
-  inputSelectorButton.tick();
+  inputSelector.button.tick();
   mainPowerOnButton.tick();
 }

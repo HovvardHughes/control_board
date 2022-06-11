@@ -7,6 +7,7 @@ class Led
 private:
   uint8_t _channel;
   uint8_t _pin;
+  Timer<> *_timer;
 
   static bool writeInvertedCallback(void *p)
   {
@@ -16,10 +17,12 @@ private:
   }
 
 public:
-  Led(uint8_t channel, uint8_t pin)
+
+  Led(uint8_t channel, uint8_t pin, Timer<> *timer)
   {
     _channel = channel;
     _pin = pin;
+    _timer = timer;
   }
 
   void setup()
@@ -49,11 +52,11 @@ public:
     write(read() == MIN_LED__DUTY ? MAX_LED__DUTY : MIN_LED__DUTY);
   }
 
-  void blink(Timer<> *timer, unsigned long delay = LED_BLINK_DELAY)
+  void blink(unsigned long delay = LED_BLINK_DELAY)
   {
     writeInverted();
 
-    timer->in(delay, writeInvertedCallback, this);
+    _timer->in(delay, writeInvertedCallback, this);
   }
 
   uint32_t read()
