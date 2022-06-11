@@ -1,7 +1,6 @@
 #include <ControlBoardEEPROM.h>
 #include <Led.h>
 #include <Arduino.h>
-#include <OneButton.h>
 
 class InputSelector
 {
@@ -26,7 +25,7 @@ private:
     }
   }
 
-  void writeTo(int ioNumber, int state)
+  void writeToRelay(int ioNumber, int state)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
     {
@@ -45,24 +44,24 @@ public:
     tryReinitCurrentInputRelayFromEEPROM();
   }
 
-  void writeToAll(int state)
+  void writeToAllRelays(int state)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
       _allRelays[i].write(state);
   }
 
   void
-  writeToSeleted(int state)
+  writeToSeletedRelay(int state)
   {
-    writeTo(_selectedRelayIONumber, state);
+    writeToRelay(_selectedRelayIONumber, state);
   }
 
   void writeToNotSelected(int state)
   {
-    writeTo(_notSelectedRelayIONumber, state);
+    writeToRelay(_notSelectedRelayIONumber, state);
   }
 
-  void swap()
+  void swapRelays()
   {
     byte temp = _selectedRelayIONumber;
     _selectedRelayIONumber = _notSelectedRelayIONumber;
@@ -70,11 +69,11 @@ public:
 
     _controlBoardEEPROM.writeCurrentInputRelayIONumber(_selectedRelayIONumber);
 
-    writeTo(_notSelectedRelayIONumber, LOW);
-    writeTo(_selectedRelayIONumber, HIGH);
+    writeToRelay(_notSelectedRelayIONumber, LOW);
+    writeToRelay(_selectedRelayIONumber, HIGH);
   }
 
-  bool all(int state)
+  bool areAllRelays(int state)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
     {

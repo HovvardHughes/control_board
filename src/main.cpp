@@ -1,6 +1,7 @@
 #include "checkers.h"
 #include <InputSelector.h>
 #include <Buzzer.h>
+#include <OneButton.h>
 
 bool power;
 
@@ -38,10 +39,10 @@ void turnOnPower()
             allPowerRelays[4].write(HIGH);
             powerLed.writeMax();
 
-            inputSelector.writeToSeleted(HIGH);
+            inputSelector.writeToSeletedRelay(HIGH);
             inputSelectorLed.writeMax();
 
-            buzzer.buzz(2);
+            buzzer.buzz(4);
 
             return false; });
 }
@@ -60,7 +61,7 @@ void turnOffPower()
             allPowerRelays[3].write(LOW);
             powerLed.writeMin();
 
-            inputSelector.writeToAll(LOW);
+            inputSelector.writeToAllRelays(LOW);
             inputSelectorLed.writeMin();
 
 
@@ -71,7 +72,7 @@ void onClickPowerButton()
 {
   Serial.println("PowerButtonClick:InitialisingPowerSequence...");
 
-  buzzer.buzz(1);
+  buzzer.buzz(2);
 
   if (!power)
     turnOnPower();
@@ -103,7 +104,7 @@ void onDoubleClickPowerButton()
                return false; });
   }
 
-  buzzer.buzz(2);
+  buzzer.buzz(4);
 }
 
 void onLongPressPowerButtonStart()
@@ -114,7 +115,7 @@ void onLongPressPowerButtonStart()
   const bool wasWritable = firstRelay.isWritable();
   if (wasWritable)
   {
-    buzzer.buzz(1, LONG_BUZZ_INTERVAL);
+    buzzer.buzz(2, LONG_BUZZ_INTERVAL);
 
     firstRelay.writeAndForbidWriting(LOW);
 
@@ -131,44 +132,57 @@ void onClickInputSelectorButton()
 {
   Serial.println("InptSelectorButtonCick:SwitcingInputs...");
 
-  if (inputSelector.all(LOW))
-    inputSelector.writeToSeleted(HIGH);
-  else if (inputSelector.all(HIGH))
+  if (inputSelector.areAllRelays(LOW))
+  {
+    inputSelector.writeToSeletedRelay(HIGH);
+    inputSelectorLed.writeMax();
+  }
+  else if (inputSelector.areAllRelays(HIGH))
+  {
     inputSelector.writeToNotSelected(LOW);
+    inputSelectorLed.blink(2);
+  }
   else
-    inputSelector.swap();
+  {
+    inputSelector.swapRelays();
+    inputSelectorLed.blink(2);
+  }
 
-  buzzer.buzz(1);
+  buzzer.buzz(2);
 }
 
 void onDoubleClickInputSelectorButton()
 {
-  if (inputSelector.all(HIGH))
+  if (inputSelector.areAllRelays(HIGH))
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOnCurrentSelectedInput...");
     inputSelector.writeToNotSelected(LOW);
-    buzzer.buzz(1);
+    inputSelectorLed.blink(2);
+    buzzer.buzz(2);
   }
   else
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOnAllInputs...");
-    inputSelector.writeToAll(HIGH);
-    buzzer.buzz(2);
+    inputSelector.writeToAllRelays(HIGH);
+    inputSelectorLed.blink(4, SHORT_LED_BLINK_INTERVAL);
+    buzzer.buzz(4);
   }
 }
 
 void onLongPressInputSelectorButtonStart()
 {
-  if (inputSelector.all(LOW))
+  if (inputSelector.areAllRelays(LOW))
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOnCurrentSelectedInput...");
-    inputSelector.writeToSeleted(HIGH);
-    buzzer.buzz(1);
+    inputSelector.writeToSeletedRelay(HIGH);
+    inputSelectorLed.writeMax();
+    buzzer.buzz(2);
   }
   else
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOffAllInputs...");
-    inputSelector.writeToAll(LOW);
+    inputSelector.writeToAllRelays(LOW);
+    inputSelectorLed.writeMin();
   }
 }
 

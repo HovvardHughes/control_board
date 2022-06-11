@@ -8,16 +8,29 @@ private:
   uint8_t _channel;
   uint8_t _pin;
   Timer<> *_timer;
+  int _scheduledDuty = -1;
+  uint32_t _countToInvertState = 0;
+
+  void write(uint32_t duty)
+  {
+    ledcWrite(_channel, duty);
+  }
+
+  uint32_t read()
+  {
+    return ledcRead(_channel);
+  }
 
   static bool writeInvertedCallback(void *p)
   {
     Led *ptr = (Led *)p;
+
     ptr->writeInverted();
-    return false;
+    ptr->_countToInvertState--;
+    return ptr->_countToInvertState > 0;
   }
 
 public:
-
   Led(uint8_t channel, uint8_t pin, Timer<> *timer)
   {
     _channel = channel;
@@ -30,11 +43,6 @@ public:
     pinMode(_pin, OUTPUT);
     ledcSetup(_channel, FREQUENCY, LED_RESOLUTION);
     ledcAttachPin(_pin, _channel);
-  }
-
-  void write(uint32_t duty)
-  {
-    ledcWrite(_channel, duty);
   }
 
   void writeMax()
@@ -52,15 +60,13 @@ public:
     write(read() == MIN_LED__DUTY ? MAX_LED__DUTY : MIN_LED__DUTY);
   }
 
-  void blink(unsigned long delay = LED_BLINK_DELAY)
+  void blink(uint32_t countToInvertState, unsigned long interval = LONG_LED_BLINK_INTERVAL)
   {
+    _countToInvertState = countToInvertState;
+
     writeInverted();
+    _countToInvertState--;
 
-    _timer->in(delay, writeInvertedCallback, this);
-  }
-
-  uint32_t read()
-  {
-    return ledcRead(_channel);
+    _timer->every(SHORT_LED_BLINK_INTERVAL, writeInvertedCallback, this);
   }
 };

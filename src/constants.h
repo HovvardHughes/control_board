@@ -49,7 +49,8 @@ GPIO      Connected to...
 #define MIN_LED__DUTY 0
 #define MAX_LED__DUTY 255
 
-#define LED_BLINK_DELAY 150 // blink delay in millis
+#define LONG_LED_BLINK_INTERVAL 150 // blink delay in millis
+#define SHORT_LED_BLINK_INTERVAL 50 // blink delay in millis
 
 // BUZZER:
 #define BUZZER_PIN 4

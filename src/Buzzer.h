@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <constants.h>
 
-byte _countToBuzz = 0;
+byte _countToInvertState = 0;
 
 class Buzzer
 {
@@ -19,21 +19,21 @@ public:
     pinMode(BUZZER_PIN, OUTPUT);
   }
 
-  void buzz(byte count, unsigned long interval = SHORT_BUZZ_INTERVAL)
-  {
-    _countToBuzz  = count * 2;
+  void buzz(byte countToInvertState, unsigned long interval = SHORT_BUZZ_INTERVAL)
+  { 
+    _countToInvertState  = countToInvertState;
 
     digitalWrite(BUZZER_PIN, HIGH);
-    _countToBuzz--;
+    _countToInvertState--;
 
-    Serial.println(_countToBuzz);
+    Serial.println(_countToInvertState);
 
     _timer->every(interval, [](void *) -> bool
                {
                 digitalWrite(BUZZER_PIN, !digitalRead(BUZZER_PIN));
-                  _countToBuzz--;
+                  _countToInvertState--;
 
-                _countToBuzz;
-                return _countToBuzz > 0; });
+                _countToInvertState;
+                return _countToInvertState > 0; });
   }
 };
