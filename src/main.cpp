@@ -164,7 +164,7 @@ void onDoubleClickInputSelectorButton()
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOnAllInputs...");
     inputSelector.writeToAllRelays(HIGH);
-    inputSelectorLed.blink(4, SHORT_LED_BLINK_INTERVAL);
+    inputSelectorLed.blink(inputSelectorLed.read() ? 4 : 5, SHORT_LED_BLINK_INTERVAL);
     buzzer.buzz(4);
   }
 }

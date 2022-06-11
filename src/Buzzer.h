@@ -1,12 +1,21 @@
 #include <Arduino.h>
 #include <constants.h>
 
-byte _countToInvertState = 0;
-
 class Buzzer
 {
 private:
   Timer<> *_timer;
+  byte _countToInvertState = 0;
+
+  static bool buzzInvertedCallback(void *p)
+  {
+    Buzzer *ptr = (Buzzer *)p;
+
+    digitalWrite(BUZZER_PIN, !digitalRead(BUZZER_PIN));
+    ptr->_countToInvertState--;
+
+    return ptr->_countToInvertState > 0;
+  }
 
 public:
   Buzzer(Timer<> *timer)
@@ -20,20 +29,12 @@ public:
   }
 
   void buzz(byte countToInvertState, unsigned long interval = SHORT_BUZZ_INTERVAL)
-  { 
-    _countToInvertState  = countToInvertState;
+  {
+    _countToInvertState = countToInvertState;
 
     digitalWrite(BUZZER_PIN, HIGH);
     _countToInvertState--;
 
-    Serial.println(_countToInvertState);
-
-    _timer->every(interval, [](void *) -> bool
-               {
-                digitalWrite(BUZZER_PIN, !digitalRead(BUZZER_PIN));
-                  _countToInvertState--;
-
-                _countToInvertState;
-                return _countToInvertState > 0; });
+    _timer->every(interval, buzzInvertedCallback, this);
   }
 };

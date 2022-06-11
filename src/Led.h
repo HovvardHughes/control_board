@@ -16,11 +16,6 @@ private:
     ledcWrite(_channel, duty);
   }
 
-  uint32_t read()
-  {
-    return ledcRead(_channel);
-  }
-
   static bool writeInvertedCallback(void *p)
   {
     Led *ptr = (Led *)p;
@@ -43,6 +38,11 @@ public:
     pinMode(_pin, OUTPUT);
     ledcSetup(_channel, FREQUENCY, LED_RESOLUTION);
     ledcAttachPin(_pin, _channel);
+  }
+
+  uint32_t read()
+  {
+    return ledcRead(_channel);
   }
 
   void writeMax()
