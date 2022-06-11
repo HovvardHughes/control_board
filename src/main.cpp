@@ -124,8 +124,11 @@ void onLongPressPowerButtonStart()
         {
           allPowerRelays[3].writeAndForbidWriting(LOW);
           digitalWrite(BUZZER_PIN, LOW);
+          powerLed.writeMin();
           return false; });
   }
+
+  powerLed.writeInverted();
 }
 
 void onClickInputSelectorButton()
