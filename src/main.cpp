@@ -135,23 +135,18 @@ void onClickInputSelectorButton()
 {
   Serial.println("InptSelectorButtonCick:SwitcingInputs...");
 
-  if (inputSelector.areAllRelays(LOW))
-  {
-    inputSelector.writeToSeletedRelay(HIGH);
-    inputSelectorLed.writeMax();
-  }
-  else if (inputSelector.areAllRelays(HIGH))
-  {
-    inputSelector.writeToNotSelected(LOW);
-    inputSelectorLed.blink(2);
-  }
-  else
-  {
-    inputSelector.swapRelays();
-    inputSelectorLed.blink(2);
-  }
+  const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
 
-  buzzer.buzz(2);
+  byte invertCount;
+  if (areAllRelaysLow)
+    invertCount = inputSelector.writeToSeletedRelay(HIGH);
+  else if (inputSelector.areAllRelays(HIGH))
+    invertCount = inputSelector.writeToNotSelected(LOW);
+  else
+    invertCount = inputSelector.swapRelays();
+
+  inputSelectorLed.blink(areAllRelaysLow ? invertCount + 1 : invertCount);
+  buzzer.buzz(invertCount);
 }
 
 void onDoubleClickInputSelectorButton()
@@ -159,16 +154,16 @@ void onDoubleClickInputSelectorButton()
   if (inputSelector.areAllRelays(HIGH))
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOnCurrentSelectedInput...");
-    inputSelector.writeToNotSelected(LOW);
-    inputSelectorLed.blink(2);
-    buzzer.buzz(2);
+    const byte invertCount = inputSelector.writeToNotSelected(LOW);
+    inputSelectorLed.blink(invertCount);
+    buzzer.buzz(invertCount);
   }
   else
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOnAllInputs...");
     inputSelector.writeToAllRelays(HIGH);
-    inputSelectorLed.blink(inputSelectorLed.read() ? 4 : 5, SHORT_LED_BLINK_INTERVAL);
-    buzzer.buzz(4);
+    inputSelectorLed.blink(inputSelector.areAllRelays(LOW) ? 3 : 2, LONG_LED_BLINK_INTERVAL);
+    buzzer.buzz(2, LONG_BUZZ_INTERVAL);
   }
 }
 
@@ -177,9 +172,9 @@ void onLongPressInputSelectorButtonStart()
   if (inputSelector.areAllRelays(LOW))
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOnCurrentSelectedInput...");
-    inputSelector.writeToSeletedRelay(HIGH);
-    inputSelectorLed.writeMax();
-    buzzer.buzz(2);
+    const byte responseCount = inputSelector.writeToSeletedRelay(HIGH);
+    inputSelectorLed.blink(responseCount + 1);
+    buzzer.buzz(responseCount);
   }
   else
   {

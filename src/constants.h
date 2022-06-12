@@ -35,12 +35,16 @@ GPIO      Connected to...
 #define POWER_BUTTON_PIN 19
 #define INPUT_SELECTOR_BUTTON_PIN 18
 #define MAIN_POWER_ON_PIN 21
+
 // LEDS:
 #define POWER_BUTTON_LED_PIN 15
-#define INPUT_SELECTOR_BUTTON_LED_PIN 2
-
 #define POWER_BUTTON_LED_CHANNEL 0
+
+#define INPUT_SELECTOR_BUTTON_LED_PIN 2
 #define INPUT_SELECTOR_BUTTON_LED_CHANNEL 1
+
+#define SHORT_LED_BLINK_INTERVAL 75 // blink interval in millis
+#define LONG_LED_BLINK_INTERVAL 150 // blink interval in millis
 
 #define FREQUENCY 25000
 
@@ -49,29 +53,27 @@ GPIO      Connected to...
 #define MIN_LED__DUTY 0
 #define MAX_LED__DUTY 255
 
-#define LONG_LED_BLINK_INTERVAL 150 // blink delay in millis
-#define SHORT_LED_BLINK_INTERVAL 50 // blink delay in millis
-
 // BUZZER:
 #define BUZZER_PIN 4
-#define SHORT_BUZZ_INTERVAL 50 // short buzz delay in millis
-#define LONG_BUZZ_INTERVAL 100 // long buzz delay in millis
+#define SHORT_BUZZ_INTERVAL 50 // short buzz interval in millis
+#define LONG_BUZZ_INTERVAL 100 // long buzz interval in millis
 
 // I2C:
 
 // 1WIRE:
+
+// INPUT RELAYS
+#define INPUT_RELAY_COUNT 2 // Number of power-relays in array
+
+#define MAIN_INPUT_RELAY_IO_NUMBER 32
+#define MAIN_INPUT_RELAY_INVERT_COUNT 2
+
+#define SECONDARY_INPUT_RELAY_IO_NUMBER 33
+#define SECONDARY_INPUT_RELAY_INVERT_COUNT 4
 
 #define COM_PORT_SPEED 115200 // COM Port Baud Rate
 
 #define DELAY_IN_MILLIS 1000 // For Debugging
 //#define DELAY_IN_MILLIS 25000    //For Release - Pre-programmed Heating Filaments Delay
 
-#define DELAY_COMMAND -1
-
 #define POWER_RELAY_COUNT 5 // Number of power-relays in array
-#define INPUT_RELAY_COUNT 2 // Number of power-relays in array
-
-
-
-#define MAIN_INPUT_RELAY_IO_NUMBER 32
-#define SECONDARY_INPUT_RELAY_IO_NUMBER 33

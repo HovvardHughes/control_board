@@ -25,14 +25,19 @@ private:
     }
   }
 
-  void writeToRelay(int ioNumber, int state)
+  byte writeToRelay(int iONumber, int state)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
     {
       Relay relay = _allRelays[i];
-      if (relay.iONumber == ioNumber)
+      if (relay.iONumber == iONumber)
         relay.write(state);
     }
+    return iONumber == MAIN_INPUT_RELAY_IO_NUMBER ? MAIN_INPUT_RELAY_INVERT_COUNT : SECONDARY_INPUT_RELAY_INVERT_COUNT;
+  }
+
+  byte getCountToInvert() {
+
   }
 
 public:
@@ -50,18 +55,17 @@ public:
       _allRelays[i].write(state);
   }
 
-  void
-  writeToSeletedRelay(int state)
+  byte writeToSeletedRelay(int state)
   {
-    writeToRelay(_selectedRelayIONumber, state);
+    return writeToRelay(_selectedRelayIONumber, state);
   }
 
-  void writeToNotSelected(int state)
+  byte writeToNotSelected(int state)
   {
-    writeToRelay(_notSelectedRelayIONumber, state);
+    return writeToRelay(_notSelectedRelayIONumber, state);
   }
 
-  void swapRelays()
+  byte swapRelays()
   {
     byte temp = _selectedRelayIONumber;
     _selectedRelayIONumber = _notSelectedRelayIONumber;
@@ -70,7 +74,7 @@ public:
     _controlBoardEEPROM.writeCurrentInputRelayIONumber(_selectedRelayIONumber);
 
     writeToRelay(_notSelectedRelayIONumber, LOW);
-    writeToRelay(_selectedRelayIONumber, HIGH);
+    return writeToRelay(_selectedRelayIONumber, HIGH);
   }
 
   bool areAllRelays(int state)

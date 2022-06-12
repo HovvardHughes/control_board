@@ -60,13 +60,13 @@ public:
     write(read() == MIN_LED__DUTY ? MAX_LED__DUTY : MIN_LED__DUTY);
   }
 
-  void blink(uint32_t countToInvertState, unsigned long interval = LONG_LED_BLINK_INTERVAL)
+  void blink(uint32_t countToInvertState, unsigned long interval = SHORT_LED_BLINK_INTERVAL)
   {
     _countToInvertState = countToInvertState;
 
     writeInverted();
     _countToInvertState--;
 
-    _timer->every(SHORT_LED_BLINK_INTERVAL, writeInvertedCallback, this);
+    _timer->every(interval, writeInvertedCallback, this);
   }
 };
