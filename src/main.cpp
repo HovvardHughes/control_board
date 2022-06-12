@@ -133,18 +133,26 @@ void onLongPressPowerButtonStart()
 
 void onClickInputSelectorButton()
 {
-  Serial.println("InptSelectorButtonCick:SwitcingInputs...");
 
   const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
 
-  byte invertCount;
   if (areAllRelaysLow)
-    invertCount = inputSelector.writeToSeletedRelay(HIGH);
+  {
+    Serial.println("InputSelectorButtonCick:TurnOnSelectedInput...");
+    inputSelector.writeToSeletedRelay(HIGH);
+  }
   else if (inputSelector.areAllRelays(HIGH))
-    invertCount = inputSelector.writeToNotSelected(LOW);
+  {
+    Serial.println("InputSelectorButtonCick:TurnOnNotSelectedInput...");
+    inputSelector.writeToNotSelected(LOW);
+  }
   else
-    invertCount = inputSelector.swapRelays();
+  {
+    Serial.println("InputSelectorButtonCick:SwapInputs...");
+    inputSelector.swapRelays();
+  }
 
+  const byte invertCount = inputSelector.getCountToInvert();
   inputSelectorLed.blink(areAllRelaysLow ? invertCount + 1 : invertCount);
   buzzer.buzz(invertCount);
 }
@@ -153,16 +161,23 @@ void onDoubleClickInputSelectorButton()
 {
   if (inputSelector.areAllRelays(HIGH))
   {
-    Serial.println("InptSelectorButtonLongPressStart:TurnOnCurrentSelectedInput...");
-    const byte invertCount = inputSelector.writeToNotSelected(LOW);
+    Serial.println("InputSelectorButtonDoubleClick:TurnOnSelectedInput...");
+
+    inputSelector.writeToNotSelected(LOW);
+
+    const byte invertCount = inputSelector.getCountToInvert();
     inputSelectorLed.blink(invertCount);
     buzzer.buzz(invertCount);
   }
   else
   {
-    Serial.println("InptSelectorButtonLongPressStart:TurnOnAllInputs...");
+    Serial.println("InputSelectorButtonDoubleClick:TurnOnAllInputs...");
+
+    const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
+
     inputSelector.writeToAllRelays(HIGH);
-    inputSelectorLed.blink(inputSelector.areAllRelays(LOW) ? 3 : 2, LONG_LED_BLINK_INTERVAL);
+
+    inputSelectorLed.blink(areAllRelaysLow ? 3 : 2, LONG_LED_BLINK_INTERVAL);
     buzzer.buzz(2, LONG_BUZZ_INTERVAL);
   }
 }
@@ -171,14 +186,18 @@ void onLongPressInputSelectorButtonStart()
 {
   if (inputSelector.areAllRelays(LOW))
   {
-    Serial.println("InptSelectorButtonLongPressStart:TurnOnCurrentSelectedInput...");
-    const byte responseCount = inputSelector.writeToSeletedRelay(HIGH);
-    inputSelectorLed.blink(responseCount + 1);
-    buzzer.buzz(responseCount);
+    Serial.println("InptSelectorButtonLongPressStart:TurnOnSelectedInput...");
+
+    inputSelector.writeToSeletedRelay(HIGH);
+
+    const byte invertCount = inputSelector.getCountToInvert();
+    inputSelectorLed.blink(invertCount + 1);
+    buzzer.buzz(invertCount);
   }
   else
   {
     Serial.println("InptSelectorButtonLongPressStart:TurnOffAllInputs...");
+
     inputSelector.writeToAllRelays(LOW);
     inputSelectorLed.writeMin();
   }
