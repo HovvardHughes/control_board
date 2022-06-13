@@ -7,22 +7,49 @@ class Led
 private:
   uint8_t _channel;
   uint8_t _pin;
+
   Timer<> *_timer;
-  int _scheduledDuty = -1;
+
   uint32_t _countToInvertState = 0;
+
+  uintptr_t _currentPwmTask = 0;
+  u_int8_t _dutyCycleInCurrentPwmTask = 0;
+  bool _incrementInCurrentPwmTask = false;
 
   void write(uint32_t duty)
   {
     ledcWrite(_channel, duty);
   }
 
-  static bool writeInvertedCallback(void *p)
+  static bool writeInvertedIteration(void *p)
   {
     Led *ptr = (Led *)p;
 
     ptr->writeInverted();
     ptr->_countToInvertState--;
+
     return ptr->_countToInvertState > 0;
+  }
+
+  static bool pwmIteratation(void *p)
+  {
+    Led *ptr = (Led *)p;
+
+    u_int8_t dutyCycle = ptr->_dutyCycleInCurrentPwmTask;
+
+    ptr->write(dutyCycle);
+
+    if (!ptr->_incrementInCurrentPwmTask || dutyCycle == MAX_LED__DUTY)
+      ptr->_incrementInCurrentPwmTask = false;
+    else if (dutyCycle == MIN_LED__DUTY)
+      ptr->_incrementInCurrentPwmTask = true;
+
+    if (ptr->_incrementInCurrentPwmTask)
+      ptr->_dutyCycleInCurrentPwmTask++;
+    else
+      ptr->_dutyCycleInCurrentPwmTask--;
+
+    return true;
   }
 
 public:
@@ -62,11 +89,45 @@ public:
 
   void blink(uint32_t countToInvertState, unsigned long interval = SHORT_LED_BLINK_INTERVAL)
   {
+    if (_countToInvertState > 0)
+      return;
+
     _countToInvertState = countToInvertState;
 
     writeInverted();
     _countToInvertState--;
 
-    _timer->every(interval, writeInvertedCallback, this);
+    _timer->every(interval, writeInvertedIteration, this);
   }
+
+  void startPwm(unsigned long interval, uint8_t initialDutyCycle, uint8_t increment)
+  {
+    _dutyCycleInCurrentPwmTask = initialDutyCycle;
+    _incrementInCurrentPwmTask = increment;
+
+    pwmIteratation(this);
+
+    _currentPwmTask = _timer->every(interval, pwmIteratation, this);
+  };
+
+  void finishPwm(uint8_t finiteDutyCycle)
+  {
+    uint32_t currentDutyCycle = read();
+
+    if (currentDutyCycle < finiteDutyCycle)
+      for (size_t i = currentDutyCycle + 1; i <= finiteDutyCycle; i++)
+        write(i);
+
+    if (finiteDutyCycle < currentDutyCycle)
+      for (size_t i = currentDutyCycle - 1; i >= finiteDutyCycle; i--)
+      {
+        write(i);
+        if (i == 0)
+          break;
+      }
+
+    _dutyCycleInCurrentPwmTask = 0;
+    _incrementInCurrentPwmTask = false;
+    _timer->cancel(_currentPwmTask);
+  };
 };

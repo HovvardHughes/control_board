@@ -30,6 +30,9 @@ public:
 
   void buzz(byte countToInvertState, unsigned long interval = SHORT_BUZZ_INTERVAL)
   {
+    if (_countToInvertState > 0)
+      return;
+
     _countToInvertState = countToInvertState;
 
     digitalWrite(BUZZER_PIN, HIGH);

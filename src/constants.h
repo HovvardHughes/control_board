@@ -46,6 +46,9 @@ GPIO      Connected to...
 #define SHORT_LED_BLINK_INTERVAL 75 // blink interval in millis
 #define LONG_LED_BLINK_INTERVAL 150 // blink interval in millis
 
+#define SHORT_LED_PWM_INTERVAL 5 // PWM interval in millis
+#define LONG_LED_PWM_INTERVAL 30 // PWM interval in millis
+
 #define FREQUENCY 25000
 
 #define LED_RESOLUTION 8
@@ -73,7 +76,7 @@ GPIO      Connected to...
 
 #define COM_PORT_SPEED 115200 // COM Port Baud Rate
 
-#define DELAY_IN_MILLIS 1000 // For Debugging
-//#define DELAY_IN_MILLIS 25000    //For Release - Pre-programmed Heating Filaments Delay
+// #define DELAY_IN_MILLIS 1000 // For Debugging
+#define DELAY_IN_MILLIS 25000 // For Release - Pre-programmed Heating Filaments Delay
 
 #define POWER_RELAY_COUNT 5 // Number of power-relays in array

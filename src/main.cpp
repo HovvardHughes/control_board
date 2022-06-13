@@ -27,43 +27,46 @@ InputSelector inputSelector = InputSelector();
 
 void turnOnPower()
 {
-  power = true;
-
   allPowerRelays[0].write(HIGH);
   allPowerRelays[1].write(HIGH);
   allPowerRelays[3].write(HIGH);
+
+  powerLed.startPwm(SHORT_LED_PWM_INTERVAL, MIN_LED__DUTY, true);
 
   timer.in(DELAY_IN_MILLIS, [](void *) -> bool
            {  
             allPowerRelays[2].write(HIGH);
             allPowerRelays[4].write(HIGH);
-            powerLed.writeMax();
 
             inputSelector.writeToSeletedRelay(HIGH);
             inputSelectorLed.writeMax();
 
             buzzer.buzz(4);
 
+            powerLed.finishPwm(MAX_LED__DUTY);
+            power = true;
+
             return false; });
 }
 
 void turnOffPower()
 {
-  power = false;
-
   allPowerRelays[2].write(LOW);
   allPowerRelays[4].write(LOW);
+
+  powerLed.startPwm(SHORT_LED_PWM_INTERVAL, MAX_LED__DUTY, false);
 
   timer.in(DELAY_IN_MILLIS, [](void *) -> bool
            {
             allPowerRelays[0].write(LOW);
             allPowerRelays[1].write(LOW);
             allPowerRelays[3].write(LOW);
-            powerLed.writeMin();
 
             inputSelector.writeToAllRelays(LOW);
             inputSelectorLed.writeMin();
 
+            powerLed.finishPwm(MIN_LED__DUTY);
+            power = false;
 
             return false; });
 }
@@ -261,7 +264,7 @@ void setup()
 
 void loop()
 {
-  timer.tick();
+  timer.tick<void>();
   // watching the push buttons:
   powerButton.tick();
   inputSelectorButton.tick();
