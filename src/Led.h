@@ -13,7 +13,7 @@ private:
   uint32_t _countToInvertState = 0;
 
   uintptr_t _currentPwmTask = 0;
-  u_int8_t _dutyCycleInCurrentPwmTask = 0;
+  uint8_t _dutyCycleInCurrentPwmTask = 0;
   bool _incrementInCurrentPwmTask = false;
 
   void write(uint32_t duty)
@@ -35,7 +35,7 @@ private:
   {
     Led *ptr = (Led *)p;
 
-    u_int8_t dutyCycle = ptr->_dutyCycleInCurrentPwmTask;
+    uint8_t dutyCycle = ptr->_dutyCycleInCurrentPwmTask;
 
     ptr->write(dutyCycle);
 
