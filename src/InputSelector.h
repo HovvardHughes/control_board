@@ -72,7 +72,7 @@ public:
     writeToRelay(_selectedRelayIONumber, HIGH);
   }
 
-  byte getCountToInvert()
+  byte getInvertCount()
   {
     byte count = 0;
 

@@ -47,7 +47,7 @@ GPIO      Connected to...
 #define LONG_LED_BLINK_INTERVAL 150 // blink interval in millis
 
 #define SHORT_LED_PWM_INTERVAL 5 // PWM interval in millis
-#define LONG_LED_PWM_INTERVAL 30 // PWM interval in millis
+#define LONG_LED_PWM_INTERVAL 15 // PWM interval in millis
 
 #define FREQUENCY 25000
 

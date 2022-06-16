@@ -1,23 +1,13 @@
 #include "checkers.h"
-#include <InputSelector.h>
-#include <Buzzer.h>
 #include <OneButton.h>
+#include <powerManagement.h>
 
 bool power;
+bool sleepMode;
 
 Timer<> timer = timer_create_default();
 
 Buzzer buzzer = Buzzer(&timer);
-
-Relay allPowerRelays[] = {
-    Relay(25),
-    Relay(26),
-    Relay(27),
-    Relay(14),
-    Relay(12)};
-
-Led powerLed = Led(POWER_BUTTON_LED_CHANNEL, POWER_BUTTON_LED_PIN, &timer);
-Led inputSelectorLed = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUTTON_LED_PIN, &timer);
 
 OneButton powerButton(POWER_BUTTON_PIN);
 OneButton inputSelectorButton = OneButton(INPUT_SELECTOR_BUTTON_PIN);
@@ -25,89 +15,38 @@ OneButton mainPowerOnButton(MAIN_POWER_ON_PIN);
 
 InputSelector inputSelector = InputSelector();
 
-void turnOnPower()
-{
-  allPowerRelays[0].write(HIGH);
-  allPowerRelays[1].write(HIGH);
-  allPowerRelays[3].write(HIGH);
-
-  powerLed.startPwm(SHORT_LED_PWM_INTERVAL, MIN_LED__DUTY, true);
-
-  timer.in(DELAY_IN_MILLIS, [](void *) -> bool
-           {  
-            allPowerRelays[2].write(HIGH);
-            allPowerRelays[4].write(HIGH);
-
-            inputSelector.writeToSeletedRelay(HIGH);
-            inputSelectorLed.writeMax();
-
-            buzzer.buzz(4);
-
-            powerLed.finishPwm(MAX_LED__DUTY);
-            power = true;
-
-            return false; });
-}
-
-void turnOffPower()
-{
-  allPowerRelays[2].write(LOW);
-  allPowerRelays[4].write(LOW);
-
-  powerLed.startPwm(SHORT_LED_PWM_INTERVAL, MAX_LED__DUTY, false);
-
-  timer.in(DELAY_IN_MILLIS, [](void *) -> bool
-           {
-            allPowerRelays[0].write(LOW);
-            allPowerRelays[1].write(LOW);
-            allPowerRelays[3].write(LOW);
-
-            inputSelector.writeToAllRelays(LOW);
-            inputSelectorLed.writeMin();
-
-            powerLed.finishPwm(MIN_LED__DUTY);
-            power = false;
-
-            return false; });
-}
+Led inputSelectorLed = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUTTON_LED_PIN, &timer);
 
 void onClickPowerButton()
 {
-  Serial.println("PowerButtonClick:InitialisingPowerSequence...");
-
   buzzer.buzz(2);
 
   if (!power)
+  {
+    Serial.println("PowerButtonClick:TurnOnPower...");
     turnOnPower();
+  }
   else
+  {
+    Serial.println("PowerButtonClick:TurnOffPower...");
     turnOffPower();
+  }
 }
 
 void onDoubleClickPowerButton()
 {
-  Serial.println("PowerButtonDoubleClick:Stand-bySequenceWasStarting...");
+  buzzer.buzz(4);
 
-  const bool currentState = allPowerRelays[2].read();
-  if (currentState)
+  if (allPowerRelays[2].read())
   {
-    allPowerRelays[2].write(LOW);
-    timer.in(DELAY_IN_MILLIS, [](void *) -> bool
-             {  
-                allPowerRelays[1].write(LOW);
-                allPowerRelays[3].write(LOW); 
-                return false; });
+    Serial.println("PowerButtonDoubleClick:TurnOnSleepMode...");
+    turnOnSleepMode();
   }
   else
   {
-    allPowerRelays[1].write(HIGH);
-    allPowerRelays[3].write(HIGH);
-    timer.in(DELAY_IN_MILLIS, [](void *) -> bool
-             { 
-               allPowerRelays[2].write(HIGH); 
-               return false; });
+    Serial.println("PowerButtonDoubleClick:TurnOffSleepMode...");
+    turnOffSleepMode();
   }
-
-  buzzer.buzz(4);
 }
 
 void onLongPressPowerButtonStart()
@@ -130,13 +69,10 @@ void onLongPressPowerButtonStart()
           powerLed.writeMin();
           return false; });
   }
-
-  powerLed.writeInverted();
 }
 
 void onClickInputSelectorButton()
 {
-
   const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
 
   if (areAllRelaysLow)
@@ -155,7 +91,7 @@ void onClickInputSelectorButton()
     inputSelector.swapRelays();
   }
 
-  const byte invertCount = inputSelector.getCountToInvert();
+  const byte invertCount = inputSelector.getInvertCount();
   inputSelectorLed.blink(areAllRelaysLow ? invertCount + 1 : invertCount);
   buzzer.buzz(invertCount);
 }
@@ -168,7 +104,7 @@ void onDoubleClickInputSelectorButton()
 
     inputSelector.writeToNotSelected(LOW);
 
-    const byte invertCount = inputSelector.getCountToInvert();
+    const byte invertCount = inputSelector.getInvertCount();
     inputSelectorLed.blink(invertCount);
     buzzer.buzz(invertCount);
   }
@@ -193,7 +129,7 @@ void onLongPressInputSelectorButtonStart()
 
     inputSelector.writeToSeletedRelay(HIGH);
 
-    const byte invertCount = inputSelector.getCountToInvert();
+    const byte invertCount = inputSelector.getInvertCount();
     inputSelectorLed.blink(invertCount + 1);
     buzzer.buzz(invertCount);
   }
@@ -237,8 +173,7 @@ void setup()
 
   buzzer.setup();
 
-  for (size_t i = 0; i < POWER_RELAY_COUNT; i++)
-    allPowerRelays[i].setup();
+  setupPowerManagement();
 
   inputSelector.setup();
 
