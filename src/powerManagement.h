@@ -28,7 +28,7 @@ void turnOnSleepMode()
                 allPowerRelays[1].write(LOW);
                 allPowerRelays[3].write(LOW);
 
-                powerLed.startPwm(LONG_LED_PWM_INTERVAL, MAX_LED__DUTY, false); 
+                powerLed.startPwm(LONG_LED_PWM_INTERVAL); 
 
                 sleepMode = true;
 
@@ -57,7 +57,7 @@ void turnOnPower()
   allPowerRelays[1].write(HIGH);
   allPowerRelays[3].write(HIGH);
 
-  powerLed.startPwm(SHORT_LED_PWM_INTERVAL, MIN_LED__DUTY, true);
+  powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
 
   timer.in(DELAY_IN_MILLIS, [](void *) -> bool
            {  
@@ -80,7 +80,7 @@ void turnOffPower()
   allPowerRelays[2].write(LOW);
   allPowerRelays[4].write(LOW);
 
-  powerLed.startPwm(SHORT_LED_PWM_INTERVAL, MAX_LED__DUTY, false);
+  powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
 
   timer.in(DELAY_IN_MILLIS, [](void *) -> bool
            {

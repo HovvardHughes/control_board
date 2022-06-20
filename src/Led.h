@@ -35,19 +35,22 @@ private:
   {
     Led *ptr = (Led *)p;
 
-    uint8_t dutyCycle = ptr->_dutyCycleInCurrentPwmTask;
-
-    ptr->write(dutyCycle);
-
-    if (!ptr->_incrementInCurrentPwmTask || dutyCycle == MAX_LED__DUTY)
+    if (ptr->_dutyCycleInCurrentPwmTask == MAX_LED__DUTY)
+    {
       ptr->_incrementInCurrentPwmTask = false;
-    else if (dutyCycle == MIN_LED__DUTY)
+    }
+
+    if (ptr->_dutyCycleInCurrentPwmTask == MIN_LED__DUTY)
+    {
       ptr->_incrementInCurrentPwmTask = true;
+    }
 
     if (ptr->_incrementInCurrentPwmTask)
       ptr->_dutyCycleInCurrentPwmTask++;
     else
       ptr->_dutyCycleInCurrentPwmTask--;
+
+    ptr->write(ptr->_dutyCycleInCurrentPwmTask);
 
     return true;
   }
@@ -100,10 +103,10 @@ public:
     _timer->every(interval, writeInvertedIteration, this);
   }
 
-  void startPwm(unsigned long interval, uint8_t initialDutyCycle, uint8_t increment)
+  void startPwm(unsigned long interval)
   {
-    _dutyCycleInCurrentPwmTask = initialDutyCycle;
-    _incrementInCurrentPwmTask = increment;
+    _dutyCycleInCurrentPwmTask = read();
+    _incrementInCurrentPwmTask = _dutyCycleInCurrentPwmTask < MAX_LED__DUTY;
 
     pwmIteratation(this);
 
