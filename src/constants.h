@@ -76,7 +76,7 @@ GPIO      Connected to...
 
 #define COM_PORT_SPEED 115200 // COM Port Baud Rate
 
-// #define DELAY_IN_MILLIS 1000 // For Debugging
-#define DELAY_IN_MILLIS 25000 // For Release - Pre-programmed Heating Filaments Delay
+#define DELAY_IN_MILLIS 1000 // For Debugging
+// #define DELAY_IN_MILLIS 25000 // For Release - Pre-programmed Heating Filaments Delay
 
 #define POWER_RELAY_COUNT 5 // Number of power-relays in array
