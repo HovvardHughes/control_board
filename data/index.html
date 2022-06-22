@@ -1,24 +1,66 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>ESP WEB SERVER</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-  </head>
-  <body>
-    <div class="content">
-      <div class="card-grid">
-        <div class="card">
-          <p class="card-title"><i class="fas fa-lightbulb"></i> GPIO 2</p>
-          <p>
-            <a href="on"><button class="button-on">ON</button></a>
-            <a href="off"><button class="button-off">OFF</button></a>
-          </p>
-          <p class="state">State: %STATE%</p>
-        </div>
-      </div>
+
+<head>
+  <title>ESP WEB SERVER</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="topnav">
+    <h1>ESP WebSocket Server</h1>
+  </div>
+  <div class="content">
+    <div class="card">
+      <h2>Output - GPIO 2</h2>
+      <p class="state">state: <span id="state">%STATE%</span></p>
+      <p><button id="button" class="button">Toggle</button></p>
     </div>
-  </body>
+  </div>
+  <script>
+    var gateway = `ws://${window.location.hostname}/ws`;
+    var websocket;
+    window.addEventListener('load', onLoad);
+    function initWebSocket() {
+      console.log('Trying to open a WebSocket connection...');
+      websocket = new WebSocket(gateway);
+      websocket.onopen = onOpen;
+      websocket.onclose = onClose;
+      websocket.onmessage = onMessage;
+    }
+    function onOpen(event) {
+      console.log('Connection opened');
+    }
+    function onClose(event) {
+      console.log('Connection closed');
+      setTimeout(initWebSocket, 2000);
+    }
+    function onMessage(event) {
+      var state;
+      if (event.data == "1") {
+        state = "ON";
+      }
+      else {
+        state = "OFF";
+      }
+      document.getElementById('state').innerHTML = state;
+    }
+    function onLoad(event) {
+      initWebSocket();
+      initButton();
+    }
+    function initButton() {
+      document.getElementById('button').addEventListener('click', toggle);
+    }
+
+    function toggle() {
+      websocket.send('toggle');
+    }
+  </script>
+</body>
+
 </html>

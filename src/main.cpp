@@ -1,5 +1,4 @@
 #include "checkers.h"
-#include "buttonHandlers.h"
 #include <communicator.h>
 
 bool power;
@@ -61,8 +60,10 @@ void setup()
 void loop()
 {
   timer.tick<void>();
-  // watching the push buttons:
+
   powerButton.tick();
   inputSelectorButton.tick();
   mainPowerOnButton.tick();
+
+  tickCommunicator();
 }

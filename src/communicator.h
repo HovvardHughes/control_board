@@ -2,9 +2,11 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 #include <fileUtils.h>
+#include <buttonHandlers.h>
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
+AsyncWebSocket ws("/ws");
 
 // Search for parameter in HTTP POST request
 const char *PARAM_INPUT_1 = "ssid";
@@ -35,9 +37,7 @@ IPAddress subnet(255, 255, 0, 0);
 unsigned long previousMillis = 0;
 const long interval = 10000;
 
-const int ledPin = 2;
-
-String ledState;
+extern bool power;
 
 // Initialize SPIFFS
 void initSPIFFS()
@@ -87,22 +87,49 @@ bool initWiFi()
   return true;
 }
 
-// Replaces placeholder with LED state value
+void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
+{
+  AwsFrameInfo *info = (AwsFrameInfo *)arg;
+  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
+  {
+    data[len] = 0;
+    if (strcmp((char *)data, "toggle") == 0)
+    {
+      onClickPowerButton();
+      ws.textAll(String(power));
+    }
+  }
+}
+
+void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
+             void *arg, uint8_t *data, size_t len)
+{
+  switch (type)
+  {
+  case WS_EVT_CONNECT:
+    Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+    break;
+  case WS_EVT_DISCONNECT:
+    Serial.printf("WebSocket client #%u disconnected\n", client->id());
+    break;
+  case WS_EVT_DATA:
+    handleWebSocketMessage(arg, data, len);
+    break;
+  case WS_EVT_PONG:
+  case WS_EVT_ERROR:
+    break;
+  }
+}
+
 String processor(const String &var)
 {
-  if (var == "STATE")
-  {
-    if (digitalRead(ledPin))
-    {
-      ledState = "ON";
-    }
-    else
-    {
-      ledState = "OFF";
-    }
-    return ledState;
-  }
-  return String();
+  return power ? "1" : 0;
+}
+
+void initWebSocket()
+{
+  ws.onEvent(onEvent);
+  server.addHandler(&ws);
 }
 
 void setupCommunicator()
@@ -129,14 +156,17 @@ void setupCommunicator()
     // Route to set GPIO state to HIGH
     server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-      digitalWrite(ledPin, HIGH);
+      // digitalWrite(ledPin, HIGH);
       request->send(SPIFFS, "/index.html", "text/html", false, processor); });
 
     // Route to set GPIO state to LOW
     server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-      digitalWrite(ledPin, LOW);
+      // digitalWrite(ledPin, LOW);
       request->send(SPIFFS, "/index.html", "text/html", false, processor); });
+
+    initWebSocket();
+
     server.begin();
   }
   else
@@ -203,4 +233,9 @@ void setupCommunicator()
 
     server.begin();
   }
+}
+
+void tickCommunicator()
+{
+  ws.cleanupClients();
 }
