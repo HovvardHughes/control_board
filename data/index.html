@@ -13,7 +13,7 @@
 <body>
   <div class="container">
     <div class="card">
-      <p class="state">state: <span id="state">%STATE%</span></p>
+      <p class="state">Power: <span id="state">%STATE%</span></p>
       <button id="button" class="button">Swtich power</button>
       <button id="input-selector-button" class="button">Swtich input</button>
       <div>
@@ -26,6 +26,9 @@
   <script>
     var gateway = `ws://${window.location.hostname}/ws`;
     var websocket;
+
+    var areAllControlsDisabled = true;
+
     window.addEventListener('load', onLoad);
     function initWebSocket() {
       console.log('Trying to open a WebSocket connection...');
@@ -40,9 +43,10 @@
     function poll() {
       websocket.send(GET_STATE);
     }
-    
+
     function onOpen(event) {
       console.log('Connection opened');
+      poll();
       pollId = setInterval(poll, 500)
     }
 
@@ -57,6 +61,8 @@
     const getBit = (n, bitPosition) => (n >> bitPosition) & 1
 
     function onMessage(event) {
+
+
       var state;
       console.log(event);
 
@@ -67,11 +73,18 @@
       const power = getBit(parsedNumber, 0);
       const mainInputRelay = getBit(parsedNumber, 1);
       const secondaryInputRelay = getBit(parsedNumber, 2);
+      const isRunningTask = getBit(parsedNumber, 3);
 
-      document.getElementById('state').innerHTML = power ? "ON" : false;
+      document.getElementById('state').innerHTML = power ? "ON" : "OFF";
 
-      document.getElementById('main-relay').checked = mainInputRelay;
-      document.getElementById('secondary-relay').checked = secondaryInputRelay;
+      const mainRelayInput = document.getElementById('main-relay');
+      const secondaryRelayInput = document.getElementById('secondary-relay');
+
+      mainRelayInput.checked = mainInputRelay;
+      secondaryRelayInput.checked = secondaryInputRelay;
+
+     // mainRelayInput.disabled = isRunningTask;
+      // secondaryRelayInput.disabled = isRunningTask;
     }
 
 

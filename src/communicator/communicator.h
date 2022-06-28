@@ -94,6 +94,7 @@ void textStateAll()
   res |= power << 0;
   res |= inputSelector.readRelay(MAIN_INPUT_RELAY_IO_NUMBER) << 1;
   res |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_IO_NUMBER) << 2;
+  res |= !timer.empty() << 3;
 
   ws.textAll(String(res));
 }
@@ -108,31 +109,37 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     if (strcmp((char *)data, SWITCH_POWER) == 0)
     {
       onClickHtmlPowerButton();
+        textStateAll();
     }
 
     if (strcmp((char *)data, SWITCH_SLEEP_MODE) == 0)
     {
       onClickSleepButton();
+        textStateAll();
     }
 
     if (strcmp((char *)data, TURN_ON_MAIN_RELAY) == 0)
     {
       onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_IO_NUMBER, HIGH);
+        textStateAll();
     }
 
     if (strcmp((char *)data, TURN_OFF_MAIN_RELAY) == 0)
     {
       onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_IO_NUMBER, LOW);
+        textStateAll();
     }
 
     if (strcmp((char *)data, TURN_ON_SECONDARY_RELAY) == 0)
     {
       onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_IO_NUMBER, HIGH);
+        textStateAll();
     }
 
     if (strcmp((char *)data, TURN_OFF_SECONDARY_RELAY) == 0)
     {
       onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_IO_NUMBER, LOW);
+        textStateAll();
     }
 
     if (strcmp((char *)data, GET_STATE) == 0)
