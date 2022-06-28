@@ -2,7 +2,9 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 #include <fileUtils.h>
-#include <buttonHandlers.h>
+#include <communicator/communicatorHandlers.h>
+#include <arduino-timer.h>
+#include <communicator/communicatorCommands.h>
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -36,8 +38,6 @@ IPAddress subnet(255, 255, 0, 0);
 
 unsigned long previousMillis = 0;
 const long interval = 10000;
-
-extern bool power;
 
 // Initialize SPIFFS
 void initSPIFFS()
@@ -87,16 +87,57 @@ bool initWiFi()
   return true;
 }
 
+void textStateAll()
+{
+  int res = 0;
+
+  res |= power << 0;
+  res |= inputSelector.readRelay(MAIN_INPUT_RELAY_IO_NUMBER) << 1;
+  res |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_IO_NUMBER) << 2;
+
+  ws.textAll(String(res));
+}
+
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 {
   AwsFrameInfo *info = (AwsFrameInfo *)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
   {
     data[len] = 0;
-    if (strcmp((char *)data, "toggle") == 0)
+
+    if (strcmp((char *)data, SWITCH_POWER) == 0)
     {
-      onClickPowerButton();
-      ws.textAll(String(power));
+      onClickHtmlPowerButton();
+    }
+
+    if (strcmp((char *)data, SWITCH_SLEEP_MODE) == 0)
+    {
+      onClickSleepButton();
+    }
+
+    if (strcmp((char *)data, TURN_ON_MAIN_RELAY) == 0)
+    {
+      onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_IO_NUMBER, HIGH);
+    }
+
+    if (strcmp((char *)data, TURN_OFF_MAIN_RELAY) == 0)
+    {
+      onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_IO_NUMBER, LOW);
+    }
+
+    if (strcmp((char *)data, TURN_ON_SECONDARY_RELAY) == 0)
+    {
+      onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_IO_NUMBER, HIGH);
+    }
+
+    if (strcmp((char *)data, TURN_OFF_SECONDARY_RELAY) == 0)
+    {
+      onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_IO_NUMBER, LOW);
+    }
+
+    if (strcmp((char *)data, GET_STATE) == 0)
+    {
+      textStateAll();
     }
   }
 }
@@ -123,7 +164,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 
 String processor(const String &var)
 {
-  return power ? "1" : 0;
+  return power ? "1" : "0";
 }
 
 void initWebSocket()
@@ -137,10 +178,15 @@ void setupCommunicator()
   initSPIFFS();
 
   // Load values saved in SPIFFS
-  ssid = readFile(SPIFFS, ssidPath);
-  pass = readFile(SPIFFS, passPath);
-  ip = readFile(SPIFFS, ipPath);
-  gateway = readFile(SPIFFS, gatewayPath);
+  // ssid = readFile(SPIFFS, ssidPath);
+  // pass = readFile(SPIFFS, passPath);
+  // ip = readFile(SPIFFS, ipPath);
+  // gateway = readFile(SPIFFS, gatewayPath);
+
+  ssid = "Begemot";
+  pass = "19411945";
+  ip = "192.168.1.200";
+  gateway = "192.168.1.1";
   Serial.println(ssid);
   Serial.println(pass);
   Serial.println(ip);

@@ -25,16 +25,6 @@ private:
     }
   }
 
-  void writeToRelay(int iONumber, int state)
-  {
-    for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-    {
-      Relay relay = _allRelays[i];
-      if (relay.iONumber == iONumber)
-        relay.write(state);
-    }
-  }
-
 public:
   void setup()
   {
@@ -44,10 +34,32 @@ public:
     tryReinitCurrentInputRelayFromEEPROM();
   }
 
+  bool readRelay(int iONumber)
+  {
+    for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+    {
+      Relay relay = _allRelays[i];
+      if (relay.iONumber == iONumber)
+        return relay.read();
+    }
+
+    return false;
+  }
+
   void writeToAllRelays(int state)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
       _allRelays[i].write(state);
+  }
+
+  void writeToRelay(int iONumber, int state)
+  {
+    for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
+    {
+      Relay relay = _allRelays[i];
+      if (relay.iONumber == iONumber)
+        relay.write(state);
+    }
   }
 
   void writeToSeletedRelay(int state)
@@ -72,6 +84,11 @@ public:
     writeToRelay(_selectedRelayIONumber, HIGH);
   }
 
+  byte getInvertCount(int iOUnumber)
+  {
+    return iOUnumber == MAIN_INPUT_RELAY_IO_NUMBER ? MAIN_INPUT_RELAY_INVERT_COUNT : SECONDARY_INPUT_RELAY_INVERT_COUNT;
+  }
+
   byte getInvertCount()
   {
     byte count = 0;
@@ -80,7 +97,8 @@ public:
     {
       Relay relay = _allRelays[i];
       if (relay.read())
-        count += relay.iONumber == MAIN_INPUT_RELAY_IO_NUMBER ? MAIN_INPUT_RELAY_INVERT_COUNT : SECONDARY_INPUT_RELAY_INVERT_COUNT;
+        count += getInvertCount(relay.iONumber);
+      ;
     }
 
     return count;

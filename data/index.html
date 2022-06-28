@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>ESP WEB SERVER</title>
+  <title>Control board</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" href="style.css">
   <link rel="icon" type="image/png" href="favicon.png">
@@ -11,14 +11,16 @@
 </head>
 
 <body>
-  <div class="topnav">
-    <h1>ESP WebSocket Server</h1>
-  </div>
-  <div class="content">
+  <div class="container">
     <div class="card">
-      <h2>Output - GPIO 2</h2>
       <p class="state">state: <span id="state">%STATE%</span></p>
-      <p><button id="button" class="button">Toggle</button></p>
+      <button id="button" class="button">Swtich power</button>
+      <button id="input-selector-button" class="button">Swtich input</button>
+      <div>
+        <label><input id="main-relay" type='checkbox' value="0" onclick='handleClick(this);'>I</label>
+        <label><input id="secondary-relay" type='checkbox' value="1" onclick='handleClick(this);'>II</label>
+      </div>
+      <div class="log">Hello</div>
     </div>
   </div>
   <script>
@@ -32,34 +34,91 @@
       websocket.onclose = onClose;
       websocket.onmessage = onMessage;
     }
+
+    var pollId;
+
+    function poll() {
+      websocket.send(GET_STATE);
+    }
+    
     function onOpen(event) {
       console.log('Connection opened');
+      pollId = setInterval(poll, 500)
     }
+
     function onClose(event) {
       console.log('Connection closed');
+      if (pollId)
+        clearInterval(pollId);
+
       setTimeout(initWebSocket, 2000);
     }
+
+    const getBit = (n, bitPosition) => (n >> bitPosition) & 1
+
     function onMessage(event) {
       var state;
-      if (event.data == "1") {
-        state = "ON";
-      }
-      else {
-        state = "OFF";
-      }
-      document.getElementById('state').innerHTML = state;
+      console.log(event);
+
+      const parsedNumber = Number(event.data);
+      if (isNaN(parsedNumber))
+        return;
+
+      const power = getBit(parsedNumber, 0);
+      const mainInputRelay = getBit(parsedNumber, 1);
+      const secondaryInputRelay = getBit(parsedNumber, 2);
+
+      document.getElementById('state').innerHTML = power ? "ON" : false;
+
+      document.getElementById('main-relay').checked = mainInputRelay;
+      document.getElementById('secondary-relay').checked = secondaryInputRelay;
     }
+
+
     function onLoad(event) {
       initWebSocket();
       initButton();
-    }
-    function initButton() {
-      document.getElementById('button').addEventListener('click', toggle);
+      initCheckboxes();
     }
 
-    function toggle() {
-      websocket.send('toggle');
+    function initButton() {
+      document.getElementById('button').addEventListener('click', switchPower);
     }
+
+
+    const SWITCH_POWER = "0";
+    const SWITCH_SLEEP_MODE = "1";
+
+    const TURN_ON_MAIN_RELAY = "2";
+    const TURN_OFF_MAIN_RELAY = "3";
+
+    const TURN_ON_SECONDARY_RELAY = "4";
+    const TURN_OFF_SECONDARY_RELAY = "5";
+
+    const GET_STATE = "255";
+
+
+
+    function handleClick(cb) {
+      const { value, checked } = cb;
+
+      if (checked)
+        websocket.send(value === "0" ? TURN_ON_MAIN_RELAY : TURN_ON_SECONDARY_RELAY);
+      else
+        websocket.send(value === "0" ? TURN_OFF_MAIN_RELAY : TURN_OFF_SECONDARY_RELAY);
+    }
+
+
+    function initCheckboxes() {
+      document.getElementById('button').addEventListener('click', handleClick);
+
+    }
+
+    function switchPower() {
+      websocket.send(0);
+    }
+
+
   </script>
 </body>
 

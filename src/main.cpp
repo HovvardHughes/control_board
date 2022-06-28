@@ -1,5 +1,5 @@
 #include "checkers.h"
-#include <communicator.h>
+#include <communicator/communicator.h>
 
 bool power;
 bool sleepMode;
