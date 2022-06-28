@@ -38,23 +38,13 @@
       websocket.onmessage = onMessage;
     }
 
-    var pollId;
-
-    function poll() {
-      websocket.send(GET_STATE);
-    }
-
     function onOpen(event) {
       console.log('Connection opened');
-      poll();
-      pollId = setInterval(poll, 500)
+      websocket.send(GET_STATE);
     }
 
     function onClose(event) {
       console.log('Connection closed');
-      if (pollId)
-        clearInterval(pollId);
-
       setTimeout(initWebSocket, 2000);
     }
 
@@ -83,7 +73,7 @@
       mainRelayInput.checked = mainInputRelay;
       secondaryRelayInput.checked = secondaryInputRelay;
 
-     // mainRelayInput.disabled = isRunningTask;
+      // mainRelayInput.disabled = isRunningTask;
       // secondaryRelayInput.disabled = isRunningTask;
     }
 
