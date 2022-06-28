@@ -109,37 +109,37 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     if (strcmp((char *)data, SWITCH_POWER) == 0)
     {
       onClickHtmlPowerButton();
-        textStateAll();
+      textStateAll();
     }
 
     if (strcmp((char *)data, SWITCH_SLEEP_MODE) == 0)
     {
       onClickSleepButton();
-        textStateAll();
+      textStateAll();
     }
 
     if (strcmp((char *)data, TURN_ON_MAIN_RELAY) == 0)
     {
       onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_IO_NUMBER, HIGH);
-        textStateAll();
+      textStateAll();
     }
 
     if (strcmp((char *)data, TURN_OFF_MAIN_RELAY) == 0)
     {
       onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_IO_NUMBER, LOW);
-        textStateAll();
+      textStateAll();
     }
 
     if (strcmp((char *)data, TURN_ON_SECONDARY_RELAY) == 0)
     {
       onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_IO_NUMBER, HIGH);
-        textStateAll();
+      textStateAll();
     }
 
     if (strcmp((char *)data, TURN_OFF_SECONDARY_RELAY) == 0)
     {
       onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_IO_NUMBER, LOW);
-        textStateAll();
+      textStateAll();
     }
 
     if (strcmp((char *)data, GET_STATE) == 0)
@@ -155,6 +155,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   switch (type)
   {
   case WS_EVT_CONNECT:
+    textStateAll();
     Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
     break;
   case WS_EVT_DISCONNECT:

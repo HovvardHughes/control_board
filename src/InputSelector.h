@@ -34,6 +34,11 @@ public:
     tryReinitCurrentInputRelayFromEEPROM();
   }
 
+  void setSelectedRelayIONumber(int iONumber)
+  {
+    _selectedRelayIONumber = iONumber;
+  }
+
   bool readRelay(int iONumber)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)

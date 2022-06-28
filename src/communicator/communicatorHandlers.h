@@ -30,6 +30,10 @@ void onClickInputSelectorCheckbox(int relayIONumber, int state)
 
   if (state == HIGH)
   {
+
+    if(!inputSelector.areAllRelays(HIGH)) 
+      inputSelector.setSelectedRelayIONumber(relayIONumber);
+
     byte invertCount = inputSelector.getInvertCount(relayIONumber);
     {
       inputSelectorLed.blink(wereTurnedOff ? invertCount + 1 : invertCount);
