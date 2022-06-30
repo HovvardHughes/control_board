@@ -1,73 +1,44 @@
 #include <OneButton.h>
-#include <powerManagement.h>
+#include <PowerController.h>
 
-extern bool power;
-extern bool sleepMode;
+extern PowerController powerController;
 
-extern Timer<> timer ;
-
-extern Buzzer buzze;
-
-extern OneButton powerButton;
-extern OneButton inputSelectorButton;
-extern OneButton mainPowerOnButton;
-
+extern Buzzer buzzer;
 extern InputSelector inputSelector;
-
 extern Led inputSelectorLed;
 
 void onClickPowerButton()
 {
-  buzzer.buzz(2);
-
-  if (!power)
+  if (powerController.isPowerOn())
   {
-    Serial.println("PowerButtonClick:TurnOnPower...");
-    turnOnPower();
+    Serial.println("TurnOffPower...");
+    powerController.turnOffPower();
   }
   else
   {
-    Serial.println("PowerButtonClick:TurnOffPower...");
-    turnOffPower();
+    Serial.println("TurnOnPower...");
+    powerController.turnOnPower();
   }
 }
 
 void onDoubleClickPowerButton()
 {
-  buzzer.buzz(4);
-
-  if (allPowerRelays[2].read())
+  if (powerController.isSleepModeOn())
   {
-    Serial.println("PowerButtonDoubleClick:TurnOnSleepMode...");
-    turnOnSleepMode();
+    Serial.println("TurnOffSleepMode...");
+    powerController.turnOffSleepMode();
   }
   else
   {
-    Serial.println("PowerButtonDoubleClick:TurnOffSleepMode...");
-    turnOffSleepMode();
+    Serial.println("TurnOnSleepMode...");
+    powerController.turnOnSleepMode();
   }
 }
 
 void onLongPressPowerButtonStart()
 {
-  Serial.println("PowerButtonLongPressStart:PoweringOffVU's...");
-
-  Relay firstRelay = allPowerRelays[4];
-  const bool wasWritable = firstRelay.isWritable();
-  if (wasWritable)
-  {
-    buzzer.buzz(2, LONG_BUZZ_INTERVAL);
-
-    firstRelay.writeAndForbidWriting(LOW);
-
-    timer.in(
-        DELAY_IN_MILLIS, [](void *) -> bool
-        {
-          allPowerRelays[3].writeAndForbidWriting(LOW);
-          digitalWrite(BUZZER_PIN, LOW);
-          powerLed.writeMin();
-          return false; });
-  }
+  Serial.println("PoweringOffVU's...");
+  powerController.turnOffVUOnce();
 }
 
 void onClickInputSelectorButton()
@@ -76,17 +47,17 @@ void onClickInputSelectorButton()
 
   if (areAllRelaysLow)
   {
-    Serial.println("InputSelectorButtonCick:TurnOnSelectedInput...");
+    Serial.println("TurnOnSelectedInput...");
     inputSelector.writeToSeletedRelay(HIGH);
   }
   else if (inputSelector.areAllRelays(HIGH))
   {
-    Serial.println("InputSelectorButtonCick:TurnOnNotSelectedInput...");
+    Serial.println("TurnOnNotSelectedInput...");
     inputSelector.writeToNotSelected(LOW);
   }
   else
   {
-    Serial.println("InputSelectorButtonCick:SwapInputs...");
+    Serial.println("SwapInputs...");
     inputSelector.swapRelays();
   }
 
@@ -99,7 +70,7 @@ void onDoubleClickInputSelectorButton()
 {
   if (inputSelector.areAllRelays(HIGH))
   {
-    Serial.println("InputSelectorButtonDoubleClick:TurnOnSelectedInput...");
+    Serial.println("TurnOnSelectedInput...");
 
     inputSelector.writeToNotSelected(LOW);
 
@@ -109,7 +80,7 @@ void onDoubleClickInputSelectorButton()
   }
   else
   {
-    Serial.println("InputSelectorButtonDoubleClick:TurnOnAllInputs...");
+    Serial.println("TurnOnAllInputs...");
 
     const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
 
@@ -124,7 +95,7 @@ void onLongPressInputSelectorButtonStart()
 {
   if (inputSelector.areAllRelays(LOW))
   {
-    Serial.println("InptSelectorButtonLongPressStart:TurnOnSelectedInput...");
+    Serial.println("TurnOnSelectedInput...");
 
     inputSelector.writeToSeletedRelay(HIGH);
 
@@ -134,7 +105,7 @@ void onLongPressInputSelectorButtonStart()
   }
   else
   {
-    Serial.println("InptSelectorButtonLongPressStart:TurnOffAllInputs...");
+    Serial.println("TurnOffAllInputs...");
 
     inputSelector.writeToAllRelays(LOW);
     inputSelectorLed.writeMin();
@@ -143,16 +114,18 @@ void onLongPressInputSelectorButtonStart()
 
 void onLongPressMainPowerOnButtonStart()
 {
-  Serial.println("MasterDeviceOff:PowerSequenceWasStopping...");
-
-  if (power)
-    turnOffPower();
+  if (powerController.isPowerOn())
+  {
+    powerController.turnOffPower();
+    Serial.println("MainPowerOnSequenceWasStopping...");
+  }
 }
 
 void onLongPressMainPowerOnButtonStop()
 {
-  Serial.println("MasterDeviceOn:MainPowerOnSequenceWasStarting...");
-
-  if (!power)
-    turnOnPower();
+  if (!powerController.isPowerOn())
+  {
+    Serial.println("MainPowerOnSequenceWasStarting...");
+    powerController.turnOnPower();
+  }
 }

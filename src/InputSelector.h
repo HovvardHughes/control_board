@@ -5,7 +5,7 @@
 class InputSelector
 {
 private:
-  Relay _allRelays[2] = {
+  Relay _allRelays[INPUT_RELAY_COUNT] = {
       Relay(MAIN_INPUT_RELAY_IO_NUMBER),
       Relay(SECONDARY_INPUT_RELAY_IO_NUMBER)};
 

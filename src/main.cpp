@@ -1,8 +1,5 @@
-#include "checkers.h"
 #include <communicator/communicator.h>
-
-bool power;
-bool sleepMode;
+#include <TaskController.h>
 
 Timer<> timer = timer_create_default();
 
@@ -16,6 +13,10 @@ InputSelector inputSelector = InputSelector();
 
 Led inputSelectorLed = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUTTON_LED_PIN, &timer);
 
+PowerController powerController = PowerController(&timer, &inputSelector, &inputSelectorLed, &buzzer);
+
+TaskController taskController = TaskController(&timer, &powerController);
+
 void setup()
 {
   Serial.begin(COM_PORT_SPEED);
@@ -26,33 +27,34 @@ void setup()
   pinMode(INPUT_SELECTOR_BUTTON_PIN, INPUT_PULLUP);
   pinMode(MAIN_POWER_ON_PIN, INPUT_PULLDOWN);
 
-  powerLed.setup();
   inputSelectorLed.setup();
 
   buzzer.setup();
 
-  setupPowerManagement();
-
   inputSelector.setup();
 
+  powerController.setup();
+
   powerButton.attachClick([]()
-                          { withRunningTaskCheck(onClickPowerButton); });
+                          { taskController.runTask(onClickPowerButton, "Handle power button click", 2000); });
   powerButton.attachDoubleClick([]()
-                                { withPowerCheck(onDoubleClickPowerButton); });
+                                { taskController.runTaskWithPowerCheck(onDoubleClickPowerButton, "Handle power button double click", 2000); });
   powerButton.attachLongPressStart([]()
-                                   { withPowerCheck(onLongPressPowerButtonStart); });
+                                   { taskController.runTaskWithPowerCheck(onLongPressPowerButtonStart, "Handle power button long press start", 2000); });
 
   inputSelectorButton.attachClick([]()
-                                  { withPowerCheck(onClickInputSelectorButton); });
-  inputSelectorButton.attachLongPressStart([]()
-                                           { withPowerCheck(onLongPressInputSelectorButtonStart); });
+                                  { taskController.runTaskWithPowerCheck(onClickInputSelectorButton, "Handle input selector button click", 200 + 30); });
+
   inputSelectorButton.attachDoubleClick([]()
-                                        { withPowerCheck(onDoubleClickInputSelectorButton); });
+                                        { taskController.runTaskWithPowerCheck(onDoubleClickInputSelectorButton, "Handle input selector button double click", 2000); });
+
+  inputSelectorButton.attachLongPressStart([]()
+                                           { taskController.runTaskWithPowerCheck(onLongPressInputSelectorButtonStart, "Handle input selector button long press start", 2000); });
 
   mainPowerOnButton.attachLongPressStart([]()
-                                         { withRunningTaskCheck(onLongPressMainPowerOnButtonStart); });
+                                         { taskController.runTask(onLongPressMainPowerOnButtonStart, "Handle main power on button long press start ", 2000); });
   mainPowerOnButton.attachLongPressStop([]()
-                                        { withRunningTaskCheck(onLongPressMainPowerOnButtonStop); });
+                                        { taskController.runTask(onLongPressMainPowerOnButtonStop, "Handle main power on button long press stop", 2000); });
 
   setupCommunicator();
 }

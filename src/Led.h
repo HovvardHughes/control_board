@@ -56,6 +56,10 @@ private:
   }
 
 public:
+  Led()
+  {
+  }
+
   Led(uint8_t channel, uint8_t pin, Timer<> *timer)
   {
     _channel = channel;

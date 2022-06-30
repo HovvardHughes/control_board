@@ -6,6 +6,7 @@
 #include <arduino-timer.h>
 #include <communicator/communicatorCommands.h>
 
+
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
@@ -38,6 +39,8 @@ IPAddress subnet(255, 255, 0, 0);
 
 unsigned long previousMillis = 0;
 const long interval = 10000;
+
+extern PowerController powerController;
 
 // Initialize SPIFFS
 void initSPIFFS()
@@ -91,10 +94,10 @@ void textStateAll()
 {
   int res = 0;
 
-  res |= power << 0;
+  res |= powerController.isPowerOn() << 0;
   res |= inputSelector.readRelay(MAIN_INPUT_RELAY_IO_NUMBER) << 1;
   res |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_IO_NUMBER) << 2;
-  res |= !timer.empty() << 3;
+  res |= 0 << 3;
 
   ws.textAll(String(res));
 }
@@ -172,7 +175,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 
 String processor(const String &var)
 {
-  return power ? "1" : "0";
+  return powerController.isPowerOn() ? "1" : "0";
 }
 
 void initWebSocket()
