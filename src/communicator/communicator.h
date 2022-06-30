@@ -6,7 +6,6 @@
 #include <arduino-timer.h>
 #include <communicator/communicatorCommands.h>
 
-
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
@@ -109,6 +108,11 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
   {
     data[len] = 0;
 
+    if (strcmp((char *)data, GET_STATE) == 0)
+    {
+      textStateAll();
+    }
+
     if (strcmp((char *)data, SWITCH_POWER) == 0)
     {
       onClickHtmlPowerButton();
@@ -118,6 +122,12 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     if (strcmp((char *)data, SWITCH_SLEEP_MODE) == 0)
     {
       onClickSleepButton();
+      textStateAll();
+    }
+
+    if (strcmp((char *)data, POWER_OFF_VU) == 0)
+    {
+      onLongPressPowerButtonStart();
       textStateAll();
     }
 
@@ -142,11 +152,6 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     if (strcmp((char *)data, TURN_OFF_SECONDARY_RELAY) == 0)
     {
       onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_IO_NUMBER, LOW);
-      textStateAll();
-    }
-
-    if (strcmp((char *)data, GET_STATE) == 0)
-    {
       textStateAll();
     }
   }
