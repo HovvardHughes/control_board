@@ -40,7 +40,6 @@
 
     function onOpen(event) {
       console.log('Connection opened');
-      websocket.send(GET_STATE);
     }
 
     function onClose(event) {
@@ -51,8 +50,6 @@
     const getBit = (n, bitPosition) => (n >> bitPosition) & 1
 
     function onMessage(event) {
-
-
       var state;
       console.log(event);
 
