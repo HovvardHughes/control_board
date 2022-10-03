@@ -4,73 +4,75 @@ html {
   height: 100%;
 }
 
-p {
-  font-size: 1.4rem;
-}
-
 body {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
   overflow: hidden;
+  background-color: #2d2e32;
+  color: #ccc;
+  box-sizing: border-box;
 }
 
 .container {
   height: 70%;
-  width: 18%;
+  min-width: 300px;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+}
+
+.left :not(:last-child) {
+  margin-bottom: 16px;
+}
+
+.right {
+
 }
 
 .card {
-  padding: 16px;
+  background-color: #25262a;
+  box-shadow: rgb(0 0 0 / 20%) 0px 2px 1px -1px,
+    rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px;
+  padding: 16px 16px;
   display: flex;
   flex-direction: column;
   height: 100%;
   flex-grow: 1 1;
-  justify-content: stretch;
+  justify-content: center;
   align-items: center;
-  border-radius: 0ch;
-  box-shadow: 2px 2px 12px 1px rgba(140, 140, 140, .5);
-}
-
-.card :not(*:last-child) {
-  margin-bottom: 16px;
-}
-
-.state {
-  font-size: 1.2rem;
-  color: #1282A2;
-}
-
-button {
-  border: none;
-  color: #FEFCFB;
-  padding: 15px 32px;
-  text-align: center;
-  font-size: 16px;
-  width: 100px;
   border-radius: 4px;
-  transition-duration: 0.4s;
-}
-
-.button-on {
-  background-color: #034078;
-}
-
-.button-on:hover {
-  background-color: #1282A2;
-}
-
-.button-off {
-  background-color: #858585;
-}
-
-.button-off:hover {
-  background-color: #252524;
 }
 
 .log {
-  justify-self: flex-end;
   width: 70%;
   border: solid;
+}
+
+.btn {
+  background-color: DodgerBlue; /* Blue background */
+  border: none;
+  /* color: white;  */
+  padding: 12px 16px; /* Some padding */
+  font-size: 16px; /* Set a font size */
+  cursor: pointer; /* Mouse pointer on hover */
+  border-radius: 4px;
+  width: 64px;
+}
+
+.btn:hover {
+  background-color: RoyalBlue;
+}
+
+.expander {
+  flex-grow: 1;
 }

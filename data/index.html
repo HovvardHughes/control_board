@@ -1,130 +1,62 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <title>Control board</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="volume-slider.css" />
+    <link rel="stylesheet" type="text/css" href="input-selector.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <!--Import Pure Css files-->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <script src="./control_board.js"></script>
+  </head>
 
-<head>
-  <title>Control board</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-</head>
-
-<body>
-  <div class="container">
-    <div class="card">
-      <p class="state">Power: <span id="state">%STATE%</span></p>
-      <button id="power-button" class="button">Swtich power</button>
-      <button id="sleep-mode-button" class="button">Swtich sleep</button>
-      <button id="power-off-vu-button" class="button">Power off VU</button>
-      <div>
-        <label><input id="main-relay" type='checkbox' value="0" onclick='handleClick(this);'>I</label>
-        <label><input id="secondary-relay" type='checkbox' value="1" onclick='handleClick(this);'>II</label>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="expander"></div>
+        <div class="content">
+          <div class="left">
+            <button class="btn" id="power-button">
+              <i class="fa fa-power-off" aria-hidden="true"></i>
+            </button>
+            <button class="btn" id="sleep-mode-button">
+              <i class="fa fa-moon-o" aria-hidden="true"></i>
+            </button>
+            <button class="btn" id="power-off-vu-button">
+              <i class="fa fa-music" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="right">
+            <div class="slider-container">
+              <input id="volume-slider-input" type="range" value="0" oninput='handleVolumeSliderChanged(this)' onmouseup='handleVolumeSliderMouseUp(this);' />
+            </div>
+          </div>
+        </div>
+        <div class="input-selector">
+          <label class="switch">
+            <div class="input-number">I</div>
+            <input id="main-relay" type='checkbox' value="0" onclick='handleInputSwitchClicked(this);'/>
+            <div>
+              <span></span>
+            </div>
+          </label>
+          <label class="switch">
+            <div class="input-number">II</div>
+            <input id="secondary-relay" type='checkbox' value="1" onclick='handleInputSwitchClicked(this);'/>
+            <div>
+              <span></span>
+            </div>
+          </label>
+        </div>
+        <div class="expander"></div>
+        <div class="log">Hello</div>
       </div>
-      <div class="log">Hello</div>
     </div>
-  </div>
-  <script>
-    var gateway = `ws://${window.location.hostname}/ws`;
-    var websocket;
-
-    var areAllControlsDisabled = true;
-
-    window.addEventListener('load', onLoad);
-    function initWebSocket() {
-      console.log('Trying to open a WebSocket connection...');
-      websocket = new WebSocket(gateway);
-      websocket.onopen = onOpen;
-      websocket.onclose = onClose;
-      websocket.onmessage = onMessage;
-    }
-
-    function onOpen(event) {
-      console.log('Connection opened');
-    }
-
-    function onClose(event) {
-      console.log('Connection closed');
-      setTimeout(initWebSocket, 2000);
-    }
-
-    const getBit = (n, bitPosition) => (n >> bitPosition) & 1
-
-    function onMessage(event) {
-      var state;
-      console.log(event);
-
-      const parsedNumber = Number(event.data);
-      if (isNaN(parsedNumber))
-        return;
-
-      const power = getBit(parsedNumber, 0);
-      const mainInputRelay = getBit(parsedNumber, 1);
-      const secondaryInputRelay = getBit(parsedNumber, 2);
-      const isRunningTask = getBit(parsedNumber, 3);
-
-      document.getElementById('state').innerHTML = power ? "ON" : "OFF";
-
-      const mainRelayInput = document.getElementById('main-relay');
-      const secondaryRelayInput = document.getElementById('secondary-relay');
-
-      mainRelayInput.checked = mainInputRelay;
-      secondaryRelayInput.checked = secondaryInputRelay;
-
-      // mainRelayInput.disabled = isRunningTask;
-      // secondaryRelayInput.disabled = isRunningTask;
-    }
-
-
-    function onLoad(event) {
-      initWebSocket();
-      initButtons();
-    }
-
-    function initButtons() {
-      document.getElementById('power-button').addEventListener('click', switchPower);
-      document.getElementById('sleep-mode-button').addEventListener('click', switchSleepMode);
-      document.getElementById('power-off-vu-button').addEventListener('click', powerOffVu);
-    }
-
-
-    function switchPower() {
-      websocket.send(SWITCH_POWER);
-    }
-
-
-    function switchSleepMode() {
-      websocket.send(SWITCH_SLEEP_MODE);
-    }
-
-    function powerOffVu() {
-      websocket.send(POWER_OFF_VU);
-    }
-
-    const GET_STATE = "0";
-
-    const SWITCH_POWER = "1";
-    const SWITCH_SLEEP_MODE = "2";
-    const POWER_OFF_VU = "3";
-
-    const TURN_ON_MAIN_RELAY = "4";
-    const TURN_OFF_MAIN_RELAY = "5";
-
-    const TURN_ON_SECONDARY_RELAY = "6";
-    const TURN_OFF_SECONDARY_RELAY = "7";
-
-
-    function handleClick(cb) {
-      const { value, checked } = cb;
-
-      if (checked)
-        websocket.send(value === "0" ? TURN_ON_MAIN_RELAY : TURN_ON_SECONDARY_RELAY);
-      else
-        websocket.send(value === "0" ? TURN_OFF_MAIN_RELAY : TURN_OFF_SECONDARY_RELAY);
-    }
-
-
-  </script>
-</body>
-
+  </body>
 </html>
+      </div>
