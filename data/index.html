@@ -17,7 +17,9 @@
     <div class="container">
       <div class="card">
         <div class="card-content">
-        <div class="expander"></div>
+        <div class="log">
+          <span>No active tasks<span class="loading"></span></span>
+        </div>
         <div class="content">
           <div class="left">
             <button class="btn" id="power-button">
@@ -37,6 +39,8 @@
           </div>
         </div>
         <div class="input-selector">
+          <div class='legend'><span>Inputs</span></div>
+          <div>
           <label class="switch">
             <div class="input-number">I</div>
             <input id="main-relay" type='checkbox' value="0" onclick='handleInputSwitchClicked(this);'/>
@@ -51,9 +55,9 @@
               <span></span>
             </div>
           </label>
+          </div>
         </div>
-        <div class="expander"></div>
-        <div class="log">Hello</div>
+      </div>
       </div>
     </div>
     </div>

@@ -31,13 +31,11 @@
   --s: 0;
   left: 0;
   transform-origin: 0 50%;
-  border-radius: 2px 0 0 2px;
 }
 
 .switch input + div:after {
   left: 28px;
   transform-origin: 100% 50%;
-  border-radius: 0 2px 2px 0;
 }
 .switch input + div span {
   padding-left: 56px;
@@ -78,11 +76,6 @@
   --b: var(--dot);
 }
 
-.input-selector {
-  display: flex;
-  flex-direction: row;
-  margin-top: 32px;
-}
 
 .input-selector > *:first-child{
   margin-right: 8px;
@@ -115,6 +108,13 @@ body .dribbble {
 body .dribbble img {
   display: block;
   height: 28px;
+}
+
+
+.input-selector {
+  display: flex;
+  flex-direction: row;
+  margin-top: 32px;
 }
 
 .input-number {
