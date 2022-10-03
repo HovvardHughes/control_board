@@ -22,7 +22,7 @@ body {
   background-color: #25262a;
   box-shadow: rgb(0 0 0 / 20%) 0px 2px 1px -1px,
     rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px;
-  padding: 16px 16px;
+  padding: 20px 20px;
   display: flex;
   flex-direction: column;
   justify-content: stretch;
@@ -30,23 +30,15 @@ body {
   height: 100%;
   flex-grow: 1 1;
   justify-content: center;
-  align-items: center;
   border-radius: 4px;
 }
 
-.card-content {
-  flex-grow: 1;
-  align-self: stretch;
-  border: 0.5px solid;
-  border-radius: 4px;
-  border-color: lightgray;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px;
+.card > :not(:last-child) {
+  margin-bottom: 32px;
 }
 
 .content {
+  align-self: center;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -66,7 +58,6 @@ body {
 
 .log {
   height: 100px;
-  width: 90%;
   border: 0.5px solid #6d4;
   box-shadow: rgb(0 0 0 / 20%) 0px 2px 1px -1px,
     rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px;
@@ -76,7 +67,6 @@ body {
   align-items: center;
   justify-content: center;
   position: relative;
-  margin-bottom: 96px;
 }
 
 .loading:after {
@@ -120,3 +110,4 @@ body {
 .expander {
   flex-grow: 1;
 }
+
