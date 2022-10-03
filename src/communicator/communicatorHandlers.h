@@ -1,10 +1,13 @@
 #include <buttonHandlers.h>
+#include <VolumeEngine.h>
 
 extern Buzzer buzzer;
 
 extern InputSelector inputSelector;
 
 extern Led inputSelectorLed;
+
+extern VolumeEngine volumeEngine;
 
 void onClickHtmlPowerButton()
 {
@@ -31,7 +34,7 @@ void onClickInputSelectorCheckbox(int relayIONumber, int state)
   if (state == HIGH)
   {
 
-    if(!inputSelector.areAllRelays(HIGH))
+    if (!inputSelector.areAllRelays(HIGH))
       inputSelector.setSelectedRelayIONumber(relayIONumber);
 
     byte invertCount = inputSelector.getInvertCount(relayIONumber);
@@ -40,4 +43,9 @@ void onClickInputSelectorCheckbox(int relayIONumber, int state)
       buzzer.buzz(invertCount);
     }
   }
+}
+
+void onVolumeChanged(u_int8_t *commmand)
+{
+  volumeEngine.handleServerCommand(commmand);
 }

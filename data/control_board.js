@@ -37,8 +37,6 @@ function onMessage(event) {
   const secondaryInputRelay = getBit(parsedNumber, 2);
   const isRunningTask = getBit(parsedNumber, 3);
 
-  console.log("Main :: " + mainInputRelay);
-  console.log("Secondary :: " + secondaryInputRelay);
 
   const mainRelayInput = document.getElementById('main-relay');
   const secondaryRelayInput = document.getElementById('secondary-relay');
@@ -88,10 +86,11 @@ const TURN_OFF_MAIN_RELAY = "5";
 const TURN_ON_SECONDARY_RELAY = "6";
 const TURN_OFF_SECONDARY_RELAY = "7";
 
-const VOLUME_PWM_0 = "8";
-const VOLUME_PWM_33 = "9";
-const VOLUME_PWM_66 = "10";
-const VOLUME_PWM_100 = "11";
+const TURN_OFF_VOLUME_PWM = "8";
+const REVERSE_LOW_VOLUME_PWM = "9";
+const REVERSE_HIGH_VOLUME_PWM = "10";
+const FORWARD_LOW_VOLUME_PWM = "11";
+const FORWARD_HIGH_VOLUME_PWM = "12";
 
 function handleInputSwitchClicked(element) {
   const {value, checked} = element;
@@ -105,15 +104,26 @@ function handleInputSwitchClicked(element) {
 
 function handleVolumeSliderChanged(element) {
   const {value} = element;
-  if(value <= 33) 
-    websocket.send(VOLUME_PWM_33);
-  else if(value <= 66) 
-    websocket.send(VOLUME_PWM_66);
-  else 
-    websocket.send(VOLUME_PWM_100);
+
+  if(value <= 25) {
+    console.log("REVERSE_HIGH_VOLUME_PWM")
+    websocket.send(REVERSE_HIGH_VOLUME_PWM);
+  }
+  else if(value > 25 && value <= 50) {
+    console.log("REVERSE_LOW_VOLUME_PWM")
+    websocket.send(REVERSE_LOW_VOLUME_PWM);
+  }
+  else if(value > 50 && value <= 75) {
+    console.log("FORWARD_LOW_VOLUME_PWM")
+    websocket.send(FORWARD_LOW_VOLUME_PWM);
+  }
+  else if(value > 75 && value <= 100) {
+    console.log("FORWARD_HIGH_VOLUME_PWM")
+    websocket.send(FORWARD_HIGH_VOLUME_PWM);
+  }
 }
 
 function handleVolumeSliderMouseUp() {
-  document.getElementById("volume-slider-input").value = 0;
-  websocket.send(VOLUME_PWM_0);
+  document.getElementById("volume-slider-input").value = 50;
+  websocket.send(TURN_OFF_VOLUME_PWM);
 }

@@ -17,6 +17,16 @@ PowerController powerController = PowerController(&timer, &inputSelector, &input
 
 TaskController taskController = TaskController(&timer, &powerController);
 
+VolumeEngine volumeEngine = VolumeEngine();
+
+// the number of the LED pin
+const int ledPin = 16; // 16 corresponds to GPIO16
+
+// setting PWM properties
+const int freq = 5000;
+const int ledChannel = 6;
+const int resolution = 8;
+
 void setup()
 {
   Serial.begin(COM_PORT_SPEED);
@@ -55,6 +65,8 @@ void setup()
                                          { taskController.runTask(onLongPressMainPowerOnButtonStart, "Handle main power on button long press start ", 2000); });
   mainPowerOnButton.attachLongPressStop([]()
                                         { taskController.runTask(onLongPressMainPowerOnButtonStop, "Handle main power on button long press stop", 2000); });
+
+  volumeEngine.setup();
 
   setupCommunicator();
 }
