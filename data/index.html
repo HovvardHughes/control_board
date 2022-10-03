@@ -7,17 +7,16 @@
     <link rel="stylesheet" type="text/css" href="volume-slider.css" />
     <link rel="stylesheet" type="text/css" href="input-selector.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
-    <!--Import Pure Css files-->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     />
     <script src="./control_board.js"></script>
   </head>
-
   <body>
     <div class="container">
       <div class="card">
+        <div class="card-content">
         <div class="expander"></div>
         <div class="content">
           <div class="left">
@@ -33,7 +32,7 @@
           </div>
           <div class="right">
             <div class="slider-container">
-              <input id="volume-slider-input" type="range" value="50" oninput='handleVolumeSliderChanged(this)' onmouseup='handleVolumeSliderMouseUp(this);' />
+              <input id="volume-slider-input" type="range" value="50" oninput='handleVolumeSliderChanged(this)' onmouseup='handleVolumeSliderMouseUpped(this);' />
             </div>
           </div>
         </div>
@@ -56,6 +55,7 @@
         <div class="expander"></div>
         <div class="log">Hello</div>
       </div>
+    </div>
     </div>
   </body>
 </html>
