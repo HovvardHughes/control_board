@@ -1,5 +1,4 @@
 #include <communicator/communicator.h>
-#include <TaskController.h>
 
 Timer<> timer = timer_create_default();
 
@@ -15,7 +14,7 @@ Led inputSelectorLed = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUT
 
 PowerController powerController = PowerController(&timer, &inputSelector, &inputSelectorLed, &buzzer);
 
-TaskController taskController = TaskController(&timer, &powerController);
+TaskController taskController = TaskController(&timer);
 
 VolumeEngine volumeEngine = VolumeEngine();
 
@@ -36,26 +35,16 @@ void setup()
 
   powerController.setup();
 
-  powerButton.attachClick([]()
-                          { taskController.runTask(onClickPowerButton, "Handle power button click", 2000); });
-  powerButton.attachDoubleClick([]()
-                                { taskController.runTaskWithPowerCheck(onDoubleClickPowerButton, "Handle power button double click", 2000); });
-  powerButton.attachLongPressStart([]()
-                                   { taskController.runTaskWithPowerCheck(onLongPressPowerButtonStart, "Handle power button long press start", 2000); });
+  powerButton.attachClick(onClickPowerButton);
+  powerButton.attachDoubleClick(onDoubleClickPowerButton);
+  powerButton.attachLongPressStart(onLongPressPowerButtonStart);
 
-  inputSelectorButton.attachClick([]()
-                                  { taskController.runTaskWithPowerCheck(onClickInputSelectorButton, "Handle input selector button click", 200 + 30); });
+  inputSelectorButton.attachClick(onClickInputSelectorButton);
+  inputSelectorButton.attachDoubleClick(onDoubleClickInputSelectorButton);
+  inputSelectorButton.attachLongPressStart(onLongPressInputSelectorButtonStart);
 
-  inputSelectorButton.attachDoubleClick([]()
-                                        { taskController.runTaskWithPowerCheck(onDoubleClickInputSelectorButton, "Handle input selector button double click", 2000); });
-
-  inputSelectorButton.attachLongPressStart([]()
-                                           { taskController.runTaskWithPowerCheck(onLongPressInputSelectorButtonStart, "Handle input selector button long press start", 2000); });
-
-  mainPowerOnButton.attachLongPressStart([]()
-                                         { taskController.runTask(onLongPressMainPowerOnButtonStart, "Handle main power on button long press start ", 2000); });
-  mainPowerOnButton.attachLongPressStop([]()
-                                        { taskController.runTask(onLongPressMainPowerOnButtonStop, "Handle main power on button long press stop", 2000); });
+  mainPowerOnButton.attachLongPressStart(onClickPowerButton);
+  mainPowerOnButton.attachLongPressStop(onClickPowerButton);
 
   volumeEngine.setup();
 

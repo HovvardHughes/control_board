@@ -1,4 +1,4 @@
-#include "SPIFFS.h"
+#include <SPIFFS.h>
 
 // Write file to SPIFFS
 void writeFile(fs::FS &fs, const char *path, const char *message)

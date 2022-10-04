@@ -2,9 +2,9 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 #include <fileUtils.h>
-#include <communicator/communicatorHandlers.h>
 #include <arduino-timer.h>
 #include <communicator/communicatorCommands.h>
+#include <handlers.h>
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -115,13 +115,13 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 
     if (strcmp((char *)data, SWITCH_POWER) == 0)
     {
-      onClickHtmlPowerButton();
+      onClickPowerButton();
       textStateAll();
     }
 
     if (strcmp((char *)data, SWITCH_SLEEP_MODE) == 0)
     {
-      onClickSleepButton();
+      onDoubleClickPowerButton();
       textStateAll();
     }
 

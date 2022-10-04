@@ -1,6 +1,16 @@
 #include <Arduino.h>
 #include <timer.h>
 
+enum TaskType
+{
+    POWER_ON,
+    POWER_OFF,
+
+    TURN_ON_SLEEP_MODE,
+    TURN_OFF_SLEEP_MODE,
+
+    TURN_OFF_VU
+};
 
 class TaskController
 {
@@ -8,7 +18,6 @@ private:
     bool _isRunningTask;
 
     Timer<> *_timer;
-    PowerController *_powerController;
 
     static bool finishTask(void *p)
     {
@@ -20,13 +29,12 @@ private:
     }
 
 public:
-    TaskController(Timer<> *timer, PowerController *powerController)
+    TaskController(Timer<> *timer)
     {
         _timer = timer;
-        _powerController = powerController;
     }
 
-    void runTask(void (*action)(), String taskTitle, unsigned long estimatedTime)
+    void runTask(void (*action)(), TaskType taskType, unsigned long estimatedTime)
     {
         Serial.println("Check that previous task is completed to run new");
 
@@ -36,24 +44,20 @@ public:
             return;
         }
 
+        _isRunningTask = true;
+
         Serial.println("Run task :: ");
-        Serial.print(taskTitle);
+        Serial.print(taskType);
 
         action();
 
         _timer->in(estimatedTime, finishTask, this);
+
+        return;
     }
 
-    void runTaskWithPowerCheck(void (*action)(), String taskTitle, unsigned long estimatedTime)
+    bool isRunningTask()
     {
-        Serial.println("Check power to run task");
-
-        if (!_powerController->isPowerOn())
-        {
-            Serial.println("Cannot run task, because power is off");
-            return;
-        }
-
-        runTask(action,  taskTitle, estimatedTime);
+        return _isRunningTask;
     }
 };
