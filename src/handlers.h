@@ -29,6 +29,8 @@ void onClickInputSelectorCheckbox(int relayIONumber, int state)
   if (!powerController.isPowerOn())
     return;
 
+  taskController.forbidTaskRunning(500);
+
   const bool wereTurnedOff = inputSelector.areAllRelays(LOW);
   inputSelector.writeToRelay(relayIONumber, state);
 
@@ -110,6 +112,8 @@ void onClickInputSelectorButton()
   if (!powerController.isPowerOn() || taskController.isRunningTask())
     return;
 
+  taskController.forbidTaskRunning(500);
+
   const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
 
   if (areAllRelaysLow)
@@ -129,6 +133,8 @@ void onDoubleClickInputSelectorButton()
   if (!powerController.isPowerOn() || taskController.isRunningTask())
     return;
 
+  taskController.forbidTaskRunning(500);
+
   if (inputSelector.areAllRelays(HIGH))
   {
     inputSelector.writeToNotSelected(LOW);
@@ -138,7 +144,6 @@ void onDoubleClickInputSelectorButton()
   }
   else
   {
-
     const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
     inputSelector.writeToAllRelays(HIGH);
     inputSelectorLed.blink(areAllRelaysLow ? 3 : 2, LONG_LED_BLINK_INTERVAL);
@@ -150,6 +155,8 @@ void onLongPressInputSelectorButtonStart()
 {
   if (!powerController.isPowerOn() || taskController.isRunningTask())
     return;
+
+  taskController.forbidTaskRunning(500);
 
   if (inputSelector.areAllRelays(LOW))
   {

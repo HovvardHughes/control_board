@@ -14,7 +14,7 @@ Led inputSelectorLed = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUT
 
 PowerController powerController = PowerController(&timer, &inputSelector, &inputSelectorLed, &buzzer);
 
-TaskController taskController = TaskController(&timer);
+TaskController taskController = TaskController(&timer, textStateAll);
 
 VolumeEngine volumeEngine = VolumeEngine();
 

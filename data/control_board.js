@@ -40,7 +40,8 @@ function onClose(event) {
 const getBit = (n, bitPosition) => (n >> bitPosition) & 1
 
 function onMessage(event) {
-  const parsedNumber = Number(event.data);
+  const [parsedNumber, title] = event.data.split("|");
+
   if (isNaN(parsedNumber))
     return;
 
@@ -55,6 +56,16 @@ function onMessage(event) {
 
   mainRelayInput.checked = mainInputRelay;
   secondaryRelayInput.checked = secondaryInputRelay;
+
+  const log = document.getElementById("log-message")
+  log.innerText = title;
+
+  const progressElipsis = document.getElementsByClassName("progress-ellipsis")
+
+  if(isRunningTask)
+    progressElipsis.classList.add("loading")
+  else 
+    progressElipsis.classList.remove("loading")
 
   // mainRelayInput.disabled = isRunningTask;
   // secondaryRelayInput.disabled = isRunningTask;

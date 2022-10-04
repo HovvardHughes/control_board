@@ -6,6 +6,7 @@
 #include <communicator/communicatorCommands.h>
 #include <handlers.h>
 
+extern TaskController taskController;
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
@@ -88,7 +89,6 @@ bool initWiFi()
   Serial.println(WiFi.localIP());
   return true;
 }
-
 void textStateAll()
 {
   int res = 0;
@@ -96,9 +96,9 @@ void textStateAll()
   res |= powerController.isPowerOn() << 0;
   res |= inputSelector.readRelay(MAIN_INPUT_RELAY_IO_NUMBER) << 1;
   res |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_IO_NUMBER) << 2;
-  res |= 0 << 3;
+  res |= 0 << taskController.isRunningTask();
 
-  ws.textAll(String(res));
+  ws.textAll(String(res) + "|" + taskController.getRunningTaskTitle());
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
@@ -109,61 +109,35 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     data[len] = 0;
 
     if (strcmp((char *)data, GET_STATE) == 0)
-    {
       textStateAll();
-    }
 
     if (strcmp((char *)data, SWITCH_POWER) == 0)
-    {
       onClickPowerButton();
-      textStateAll();
-    }
 
     if (strcmp((char *)data, SWITCH_SLEEP_MODE) == 0)
-    {
       onDoubleClickPowerButton();
-      textStateAll();
-    }
 
     if (strcmp((char *)data, POWER_OFF_VU) == 0)
-    {
       onLongPressPowerButtonStart();
-      textStateAll();
-    }
 
     if (strcmp((char *)data, TURN_ON_MAIN_RELAY) == 0)
-    {
       onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_IO_NUMBER, HIGH);
-      textStateAll();
-    }
 
     if (strcmp((char *)data, TURN_OFF_MAIN_RELAY) == 0)
-    {
       onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_IO_NUMBER, LOW);
-      textStateAll();
-    }
 
     if (strcmp((char *)data, TURN_ON_SECONDARY_RELAY) == 0)
-    {
       onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_IO_NUMBER, HIGH);
-      textStateAll();
-    }
 
     if (strcmp((char *)data, TURN_OFF_SECONDARY_RELAY) == 0)
-    {
       onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_IO_NUMBER, LOW);
-      textStateAll();
-    }
 
     if (strcmp((char *)data, TURN_OFF_VOLUME_PWM) == 0 ||
         strcmp((char *)data, REVERSE_LOW_VOLUME_PWM) == 0 ||
         strcmp((char *)data, REVERSE_HIGH_VOLUME_PWM) == 0 ||
         strcmp((char *)data, FORWARD_LOW_VOLUME_PWM) == 0 ||
         strcmp((char *)data, FORWARD_HIGH_VOLUME_PWM) == 0)
-    {
       onVolumeChanged(data);
-      textStateAll();
-    }
   }
 }
 
@@ -186,11 +160,6 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   case WS_EVT_ERROR:
     break;
   }
-}
-
-String processor(const String &var)
-{
-  return powerController.isPowerOn() ? "1" : "0";
 }
 
 void initWebSocket()
@@ -222,20 +191,20 @@ void setupCommunicator()
   {
     // Route for root / web page
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(SPIFFS, "/index.html", "text/html", false, processor); });
+              { request->send(SPIFFS, "/index.html", "text/html", false); });
     server.serveStatic("/", SPIFFS, "/");
 
     // Route to set GPIO state to HIGH
     server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request)
               {
       // digitalWrite(ledPin, HIGH);
-      request->send(SPIFFS, "/index.html", "text/html", false, processor); });
+      request->send(SPIFFS, "/index.html", "text/html", false); });
 
     // Route to set GPIO state to LOW
     server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request)
               {
       // digitalWrite(ledPin, LOW);
-      request->send(SPIFFS, "/index.html", "text/html", false, processor); });
+      request->send(SPIFFS, "/index.html", "text/html", false); });
 
     initWebSocket();
 
