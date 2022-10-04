@@ -66,8 +66,6 @@ public:
     void forbidTaskRunning(unsigned long time)
     {
         _isRunningTaskForbidden = true;
-        _prePostTaskAction();
-
         _timer->in(time, finishTask, this);
     }
 
@@ -87,7 +85,9 @@ public:
         case TaskType::TURN_ON_SLEEP_MODE:
             return "Turn on sleep mode";
         case TaskType::TURN_OFF_SLEEP_MODE:
-            return "Turn of sleep mode";
+            return "Turn off sleep mode";
+        case TaskType::TURN_OFF_VU:
+            return "Turn off VU";
         default:
             return "No active tasks";
         }

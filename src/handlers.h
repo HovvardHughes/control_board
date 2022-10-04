@@ -26,10 +26,10 @@ bool wasSleepModeTurnedOn()
 
 void onClickInputSelectorCheckbox(int relayIONumber, int state)
 {
+  taskController.forbidTaskRunning(500);
+
   if (!powerController.isPowerOn())
     return;
-
-  taskController.forbidTaskRunning(500);
 
   const bool wereTurnedOff = inputSelector.areAllRelays(LOW);
   inputSelector.writeToRelay(relayIONumber, state);
@@ -109,10 +109,10 @@ void onLongPressPowerButtonStart()
 
 void onClickInputSelectorButton()
 {
+  taskController.forbidTaskRunning(500);
+
   if (!powerController.isPowerOn() || taskController.isRunningTask())
     return;
-
-  taskController.forbidTaskRunning(500);
 
   const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
 
@@ -130,10 +130,10 @@ void onClickInputSelectorButton()
 
 void onDoubleClickInputSelectorButton()
 {
+  taskController.forbidTaskRunning(500);
+
   if (!powerController.isPowerOn() || taskController.isRunningTask())
     return;
-
-  taskController.forbidTaskRunning(500);
 
   if (inputSelector.areAllRelays(HIGH))
   {
@@ -153,10 +153,10 @@ void onDoubleClickInputSelectorButton()
 
 void onLongPressInputSelectorButtonStart()
 {
+  taskController.forbidTaskRunning(500);
+
   if (!powerController.isPowerOn() || taskController.isRunningTask())
     return;
-
-  taskController.forbidTaskRunning(500);
 
   if (inputSelector.areAllRelays(LOW))
   {

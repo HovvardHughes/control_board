@@ -96,7 +96,7 @@ void textStateAll()
   res |= powerController.isPowerOn() << 0;
   res |= inputSelector.readRelay(MAIN_INPUT_RELAY_IO_NUMBER) << 1;
   res |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_IO_NUMBER) << 2;
-  res |= 0 << taskController.isRunningTask();
+  res |= taskController.isRunningTask() << 3;
 
   ws.textAll(String(res) + "|" + taskController.getRunningTaskTitle());
 }
@@ -141,8 +141,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
   }
 }
 
-void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
-             void *arg, uint8_t *data, size_t len)
+void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
 {
   switch (type)
   {

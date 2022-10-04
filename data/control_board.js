@@ -57,15 +57,13 @@ function onMessage(event) {
   mainRelayInput.checked = mainInputRelay;
   secondaryRelayInput.checked = secondaryInputRelay;
 
-  const log = document.getElementById("log-message")
-  log.innerText = title;
-
-  const progressElipsis = document.getElementsByClassName("progress-ellipsis")
+  const logMessage = document.getElementById("log-message")
+  logMessage.innerText = title;
 
   if(isRunningTask)
-    progressElipsis.classList.add("loading")
+    logMessage.classList.add("progress-ellipsis")
   else 
-    progressElipsis.classList.remove("loading")
+    logMessage.classList.remove("progress-ellipsis")
 
   // mainRelayInput.disabled = isRunningTask;
   // secondaryRelayInput.disabled = isRunningTask;
