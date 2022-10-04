@@ -19,20 +19,11 @@ TaskController taskController = TaskController(&timer, &powerController);
 
 VolumeEngine volumeEngine = VolumeEngine();
 
-// the number of the LED pin
-const int ledPin = 16; // 16 corresponds to GPIO16
-
-// setting PWM properties
-const int freq = 5000;
-const int ledChannel = 6;
-const int resolution = 8;
-
 void setup()
 {
   Serial.begin(COM_PORT_SPEED);
   Serial.println("OneButton Starting...");
 
-  // Setup PULLUPS: INPUT_PULLUP - means pushbutton connected to VCC, INPUT_PULLDOWN - means pushbutton connected to GND
   pinMode(POWER_BUTTON_PIN, INPUT_PULLUP);
   pinMode(INPUT_SELECTOR_BUTTON_PIN, INPUT_PULLUP);
   pinMode(MAIN_POWER_ON_PIN, INPUT_PULLDOWN);

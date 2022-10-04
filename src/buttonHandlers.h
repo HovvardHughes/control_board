@@ -9,15 +9,23 @@ extern Led inputSelectorLed;
 
 void onClickPowerButton()
 {
-  if (powerController.isPowerOn())
+  if (powerController.isSleepModeOn())
   {
-    Serial.println("TurnOffPower...");
-    powerController.turnOffPower();
+    Serial.println("TurnOffSleepMode...");
+    powerController.turnOffSleepMode();
   }
   else
   {
-    Serial.println("TurnOnPower...");
-    powerController.turnOnPower();
+    if (powerController.isPowerOn())
+    {
+      Serial.println("TurnOffPower...");
+      powerController.turnOffPower();
+    }
+    else
+    {
+      Serial.println("TurnOnPower...");
+      powerController.turnOnPower();
+    }
   }
 }
 
@@ -37,8 +45,16 @@ void onDoubleClickPowerButton()
 
 void onLongPressPowerButtonStart()
 {
-  Serial.println("PoweringOffVU's...");
-  powerController.turnOffVUOnce();
+  if (powerController.isSleepModeOn())
+  {
+    Serial.println("TurnOffSleepMode...");
+    powerController.turnOffSleepMode();
+  }
+  else
+  {
+    Serial.println("PoweringOffVU's...");
+    powerController.turnOffVUOnce();
+  }
 }
 
 void onClickInputSelectorButton()
