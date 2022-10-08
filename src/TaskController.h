@@ -3,12 +3,12 @@
 
 enum TaskType
 {
+    NONE,
     POWER_ON,
     POWER_OFF,
     TURN_ON_SLEEP_MODE,
     TURN_OFF_SLEEP_MODE,
     TURN_OFF_VU,
-    NONE
 };
 
 class TaskController
@@ -33,6 +33,19 @@ private:
         return false;
     }
 
+    bool checkRunningTask()
+    {
+        Serial.println("Check that previous task is completed to run new");
+
+        if (_isRunningTask || _isRunningTaskForbidden)
+        {
+            Serial.println("Cannot run task, because previous is not completed");
+            return true;
+        }
+
+        return false;
+    }
+
 public:
     TaskController(Timer<> *timer, void (*prePostTaskAction)())
     {
@@ -40,15 +53,10 @@ public:
         _prePostTaskAction = prePostTaskAction;
     }
 
-    void runTask(void (*action)(), TaskType taskType, unsigned long estimatedTime)
+    void runTask(std::function < void() > action, TaskType taskType, unsigned long estimatedTime)
     {
-        Serial.println("Check that previous task is completed to run new");
-
-        if (_isRunningTask)
-        {
-            Serial.println("Cannot run task, because previous is not completed");
+        if (checkRunningTask())
             return;
-        }
 
         _runningTaskType = taskType;
         _isRunningTask = true;
@@ -91,5 +99,19 @@ public:
         default:
             return "No active tasks";
         }
+    }
+
+    void runFastTask(std::function < void() > action)
+    {
+        forbidTaskRunning(500);
+
+        if (checkRunningTask())
+            return;
+
+        _isRunningTaskForbidden = true;
+
+        _timer->in(500, finishTask, this);
+
+        action();
     }
 };

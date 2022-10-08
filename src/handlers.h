@@ -10,48 +10,31 @@ extern Led inputSelectorLed;
 extern TaskController taskController;
 extern VolumeEngine volumeEngine;
 
-bool wasSleepModeTurnedOn()
-{
-  if (powerController.isSleepModeOn())
-  {
-    taskController.runTask([]()
-                           { powerController.turnOffSleepMode(); },
-                           TaskType::TURN_OFF_SLEEP_MODE,
-                           2000);
-    return true;
-  }
-
-  return false;
-}
-
 void onClickInputSelectorCheckbox(int relayIONumber, int state)
 {
-  taskController.forbidTaskRunning(500);
-
   if (!powerController.isPowerOn())
     return;
 
-  const bool wereTurnedOff = inputSelector.areAllRelays(LOW);
-  inputSelector.writeToRelay(relayIONumber, state);
+  taskController.runFastTask([relayIONumber, state]()
+                             {
+                           const bool wereTurnedOff = inputSelector.areAllRelays(LOW);
+                           inputSelector.writeToRelay(relayIONumber, state);
 
-  if (inputSelector.areAllRelays(LOW))
-  {
-    inputSelectorLed.writeMin();
-    return;
-  }
+                           if (inputSelector.areAllRelays(LOW))
+                           {
+                             inputSelectorLed.writeMin();
+                             return;
+                           }
 
-  if (state == HIGH)
-  {
+                           if (state == HIGH)
+                           {
+                             inputSelector.setSelectedRelayIONumber(relayIONumber);
 
-    if (!inputSelector.areAllRelays(HIGH))
-      inputSelector.setSelectedRelayIONumber(relayIONumber);
-
-    byte invertCount = inputSelector.getInvertCount(relayIONumber);
-    {
-      inputSelectorLed.blink(wereTurnedOff ? invertCount + 1 : invertCount);
-      buzzer.buzz(invertCount);
-    }
-  }
+                             byte invertCount = inputSelector.getInvertCount(relayIONumber);
+                             {
+                               inputSelectorLed.blink(wereTurnedOff ? invertCount + 1 : invertCount);
+                               buzzer.buzz(invertCount);
+                             }} });
 }
 
 void onVolumeChanged(u_int8_t *commmand)
@@ -59,10 +42,27 @@ void onVolumeChanged(u_int8_t *commmand)
   volumeEngine.handleServerCommand(commmand);
 }
 
+void onDoubleClickPowerButton()
+{
+  if (powerController.isSleepModeOn())
+    taskController.runTask([]()
+                           { powerController.turnOffSleepMode(); },
+                           TaskType::TURN_OFF_SLEEP_MODE,
+                           2000);
+  else
+    taskController.runTask([]()
+                           { powerController.turnOnSleepMode(); },
+                           TaskType::TURN_ON_SLEEP_MODE,
+                           2000);
+}
+
 void onClickPowerButton()
 {
-  if (wasSleepModeTurnedOn())
+  if (powerController.isSleepModeOn())
+  {
+    onDoubleClickPowerButton();
     return;
+  }
 
   if (powerController.isPowerOn())
     taskController.runTask([]()
@@ -76,30 +76,16 @@ void onClickPowerButton()
                            5000);
 }
 
-void onDoubleClickPowerButton()
-{
-  if (!powerController.isPowerOn())
-    return;
-
-  if (powerController.isSleepModeOn())
-    taskController.runTask([]()
-                           { powerController.turnOffSleepMode(); },
-                           TaskType::TURN_OFF_SLEEP_MODE,
-                           2000);
-  else
-    taskController.runTask([]()
-                           { powerController.turnOnSleepMode(); },
-                           TaskType::TURN_ON_SLEEP_MODE,
-                           2000);
-}
-
 void onLongPressPowerButtonStart()
 {
   if (!powerController.isPowerOn())
     return;
 
-  if (wasSleepModeTurnedOn())
+  if (powerController.isSleepModeOn())
+  {
+    onDoubleClickPowerButton();
     return;
+  }
 
   taskController.runTask([]()
                          { powerController.turnOffVUOnce(); },
@@ -109,65 +95,68 @@ void onLongPressPowerButtonStart()
 
 void onClickInputSelectorButton()
 {
-  taskController.forbidTaskRunning(500);
-
-  if (!powerController.isPowerOn() || taskController.isRunningTask())
+  if (!powerController.isPowerOn())
     return;
 
-  const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
+  taskController.runTask([]()
+                         {
+                           const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
 
-  if (areAllRelaysLow)
-    inputSelector.writeToSeletedRelay(HIGH);
-  else if (inputSelector.areAllRelays(HIGH))
-    inputSelector.writeToNotSelected(LOW);
-  else
-    inputSelector.swapRelays();
+                           if (areAllRelaysLow)
+                             inputSelector.writeToSeletedRelay(HIGH);
+                           else if (inputSelector.areAllRelays(HIGH))
+                             inputSelector.writeToNotSelected(LOW);
+                           else
+                             inputSelector.swapRelays();
 
-  const byte invertCount = inputSelector.getInvertCount();
-  inputSelectorLed.blink(areAllRelaysLow ? invertCount + 1 : invertCount);
-  buzzer.buzz(invertCount);
+                           const byte invertCount = inputSelector.getInvertCount();
+                           inputSelectorLed.blink(areAllRelaysLow ? invertCount + 1 : invertCount);
+                           buzzer.buzz(invertCount); },
+                         TaskType::TURN_OFF_VU, 2000);
 }
 
 void onDoubleClickInputSelectorButton()
 {
-  taskController.forbidTaskRunning(500);
-
-  if (!powerController.isPowerOn() || taskController.isRunningTask())
+  if (!powerController.isPowerOn())
     return;
 
-  if (inputSelector.areAllRelays(HIGH))
-  {
-    inputSelector.writeToNotSelected(LOW);
-    const byte invertCount = inputSelector.getInvertCount();
-    inputSelectorLed.blink(invertCount);
-    buzzer.buzz(invertCount);
-  }
-  else
-  {
-    const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
-    inputSelector.writeToAllRelays(HIGH);
-    inputSelectorLed.blink(areAllRelaysLow ? 3 : 2, LONG_LED_BLINK_INTERVAL);
-    buzzer.buzz(2, LONG_BUZZ_INTERVAL);
-  }
+  taskController.runTask([]()
+                         {
+                           if (inputSelector.areAllRelays(HIGH))
+                           {
+                             inputSelector.writeToNotSelected(LOW);
+                             const byte invertCount = inputSelector.getInvertCount();
+                             inputSelectorLed.blink(invertCount);
+                             buzzer.buzz(invertCount);
+                           }
+                           else
+                           {
+                             const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
+                             inputSelector.writeToAllRelays(HIGH);
+                             inputSelectorLed.blink(areAllRelaysLow ? 3 : 2, LONG_LED_BLINK_INTERVAL);
+                             buzzer.buzz(2, LONG_BUZZ_INTERVAL);
+                           } },
+                         TaskType::TURN_OFF_VU, 2000);
 }
 
 void onLongPressInputSelectorButtonStart()
 {
-  taskController.forbidTaskRunning(500);
-
-  if (!powerController.isPowerOn() || taskController.isRunningTask())
+  if (!powerController.isPowerOn())
     return;
 
-  if (inputSelector.areAllRelays(LOW))
-  {
-    inputSelector.writeToSeletedRelay(HIGH);
-    const byte invertCount = inputSelector.getInvertCount();
-    inputSelectorLed.blink(invertCount + 1);
-    buzzer.buzz(invertCount);
-  }
-  else
-  {
-    inputSelector.writeToAllRelays(LOW);
-    inputSelectorLed.writeMin();
-  }
+  taskController.runTask([]()
+                         {
+                           if (inputSelector.areAllRelays(LOW))
+                           {
+                             inputSelector.writeToSeletedRelay(HIGH);
+                             const byte invertCount = inputSelector.getInvertCount();
+                             inputSelectorLed.blink(invertCount + 1);
+                             buzzer.buzz(invertCount);
+                           }
+                           else
+                           {
+                             inputSelector.writeToAllRelays(LOW);
+                             inputSelectorLed.writeMin();
+                           } },
+                         TaskType::TURN_OFF_VU, 2000);
 }

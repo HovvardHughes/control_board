@@ -76,10 +76,7 @@ GPIO      Connected to...
 #define INPUT_RELAY_COUNT 2 // Number of power-relays in array
 
 #define MAIN_INPUT_RELAY_IO_NUMBER 32
-#define MAIN_INPUT_RELAY_INVERT_COUNT 2
-
 #define SECONDARY_INPUT_RELAY_IO_NUMBER 33
-#define SECONDARY_INPUT_RELAY_INVERT_COUNT 4
 
 #define COM_PORT_SPEED 115200 // COM Port Baud Rate
 

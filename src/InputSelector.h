@@ -7,8 +7,7 @@ class InputSelector
 private:
   Relay _allRelays[INPUT_RELAY_COUNT] = {
       Relay(MAIN_INPUT_RELAY_IO_NUMBER),
-      Relay(SECONDARY_INPUT_RELAY_IO_NUMBER)
- };
+      Relay(SECONDARY_INPUT_RELAY_IO_NUMBER)};
 
   byte _selectedRelayIONumber = _allRelays[0].iONumber;
   byte _notSelectedRelayIONumber = _allRelays[1].iONumber;
@@ -63,6 +62,12 @@ public:
     writeToRelay(_notSelectedRelayIONumber, state);
   }
 
+  void writeToNotSelectedAndSetSelected(int state)
+  {
+    writeToRelay(_notSelectedRelayIONumber, state);
+    _selectedRelayIONumber = _notSelectedRelayIONumber;
+  }
+
   void swapRelays()
   {
     byte temp = _selectedRelayIONumber;
@@ -75,7 +80,7 @@ public:
 
   byte getInvertCount(int iOUnumber)
   {
-    return iOUnumber == MAIN_INPUT_RELAY_IO_NUMBER ? MAIN_INPUT_RELAY_INVERT_COUNT : SECONDARY_INPUT_RELAY_INVERT_COUNT;
+    return iOUnumber == MAIN_INPUT_RELAY_IO_NUMBER ? 2 : 4;
   }
 
   byte getInvertCount()
