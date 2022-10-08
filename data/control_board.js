@@ -79,6 +79,11 @@ function initButtons() {
   document.getElementById('power-button').addEventListener('click', switchPower);
   document.getElementById('sleep-mode-button').addEventListener('click', switchSleepMode);
   document.getElementById('power-off-vu-button').addEventListener('click', powerOffVU);
+  document.getElementById('main-relay').addEventListener('click', handleInputSwitchClicked);
+  document.getElementById('secondary-relay').addEventListener('click', handleInputSwitchClicked);
+  const volumeSlider = document.getElementById("volume-slider-input");
+  volumeSlider.addEventListener("mouseup", handleVolumeSliderMouseUpped);
+  volumeSlider.addEventListener("input", handleVolumeSliderChanged);
 }
 
 function switchPower() {
@@ -93,8 +98,8 @@ function powerOffVU() {
   websocket.send(POWER_OFF_VU);
 }
 
-function handleInputSwitchClicked(element) {
-  const {value, checked} = element;
+function handleInputSwitchClicked(event) {
+  const {value, checked} = event.target;
   if (checked)
     websocket.send(value === "0" ? TURN_ON_MAIN_RELAY : TURN_ON_SECONDARY_RELAY);
   else
@@ -102,8 +107,8 @@ function handleInputSwitchClicked(element) {
 }
 
 
-function handleVolumeSliderChanged(element) {
-  const {value} = element;
+function handleVolumeSliderChanged(event) {
+  const {value} = event.target;
   if(value <= 16) 
     websocket.send(REVERSE_HIGH_VOLUME_PWM);
 

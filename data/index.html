@@ -21,19 +21,22 @@
         </div>
         <div class="content">
           <div class="left">
-            <button class="btn" id="power-button">
+            <input disabled class="button-controller" id="power-button" type="checkbox">
+            <label tabindex="0" for="power-button" class="button">
               <i class="fa fa-power-off" aria-hidden="true"></i>
-            </button>
-            <button class="btn" id="sleep-mode-button">
+          </label>
+            <input class="button-controller" id="sleep-mode-button" type="checkbox">
+            <label tabindex="0" for="sleep-mode-button" class="button">
               <i class="fa fa-moon-o" aria-hidden="true"></i>
-            </button>
-            <button class="btn" id="power-off-vu-button">
+          </label>
+            <input class="button-controller" id="power-off-vu-button" type="checkbox">
+            <label tabindex="0" for="power-off-vu-button" class="button">
               <i class="fa fa-music" aria-hidden="true"></i>
-            </button>
+          </label>
           </div>
           <div class="right">
             <div class="slider-container">
-              <input id="volume-slider-input" type="range" value="50" oninput='handleVolumeSliderChanged(this)' onmouseup='handleVolumeSliderMouseUpped(this);' />
+              <input id="volume-slider-input" type="range" value="50"/>
             </div>
           </div>
         </div>
@@ -42,14 +45,14 @@
           <div class="switch-container">
           <label class="switch">
             <div class="input-number">I</div>
-            <input id="main-relay" type='checkbox' value="0" onclick='handleInputSwitchClicked(this);'/>
+            <input id="main-relay" type='checkbox' value="0"/>
             <div>
               <span></span>
             </div>
           </label>
           <label class="switch">
             <div class="input-number">II</div>
-            <input id="secondary-relay" type='checkbox' value="1" onclick='handleInputSwitchClicked(this);'/>
+            <input id="secondary-relay" type='checkbox' value="1"/>
             <div>
               <span></span>
             </div>

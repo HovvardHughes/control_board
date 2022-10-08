@@ -45,14 +45,9 @@ input[type="range"]::-webkit-slider-runnable-track {
 input[type="range"]:disabled::-webkit-slider-thumb {
   cursor: default;
 }
-/* 
-input[type="range"]:disabled:hover::-webkit-slider-thumb {
-  border-color: unset;
-} */
 
 input[type="range"]:disabled {
   opacity: 0.2;
-  cursor: default;
 }
 
 .slider-container {
