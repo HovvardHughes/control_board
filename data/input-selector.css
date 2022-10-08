@@ -78,35 +78,6 @@
   --b: var(--dot);
 }
 
-
-
-
-html {
-  box-sizing: border-box;
-  -webkit-font-smoothing: antialiased;
-}
-
-* {
-  box-sizing: inherit;
-}
-
-*:before, *:after {
-  box-sizing: inherit;
-}
-
-body .dribbble {
-  position: fixed;
-  display: block;
-  right: 20px;
-  bottom: 20px;
-}
-
-body .dribbble img {
-  display: block;
-  height: 28px;
-}
-
-
 .input-selector {
   display: flex;
   flex-direction: column;
@@ -115,6 +86,7 @@ body .dribbble img {
 
 .input-number {
   margin-bottom: 4px;
+  cursor: default;
 }
 
 
@@ -151,4 +123,16 @@ body .dribbble img {
 
 .input-selector .switch-container > *:last-child {
   margin-left: 16px;
+}
+
+.switch input:disabled + div:after {
+  opacity: 0.2;
+}
+
+.switch input:disabled + div span:before {
+  opacity: 0.2;
+}
+
+.switch input:disabled + div{
+  cursor: default;
 }
