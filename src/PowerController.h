@@ -3,6 +3,8 @@
 #include <InputSelector.h>
 #include <Buzzer.h>
 
+#define POWER_VU_INDEX 3
+
 class PowerController
 {
 
@@ -93,7 +95,7 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        ptr->_allPowerRelays[3].writeAndForbidWriting(LOW);
+        ptr->_allPowerRelays[POWER_VU_INDEX].writeAndForbidWriting(LOW);
 
         return false;
     }
@@ -182,5 +184,10 @@ public:
     bool isSleepModeOn()
     {
         return _isSleepModeOn;
+    }
+
+    bool isPowerVUOn()
+    {
+        return _allPowerRelays[POWER_VU_INDEX].read();
     }
 };

@@ -48,12 +48,12 @@ void onDoubleClickPowerButton()
     taskController.runTask([]()
                            { powerController.turnOffSleepMode(); },
                            TaskType::TURN_OFF_SLEEP_MODE,
-                           2000);
+                           LONG_TASK_RUNTIME_IN_MILLIS);
   else
     taskController.runTask([]()
                            { powerController.turnOnSleepMode(); },
                            TaskType::TURN_ON_SLEEP_MODE,
-                           2000);
+                           LONG_TASK_RUNTIME_IN_MILLIS);
 }
 
 void onClickPowerButton()
@@ -68,12 +68,12 @@ void onClickPowerButton()
     taskController.runTask([]()
                            { powerController.turnOffPower(); },
                            TaskType::POWER_OFF,
-                           5000);
+                           LONG_TASK_RUNTIME_IN_MILLIS);
   else
     taskController.runTask([]()
                            { powerController.turnOnPower(); },
                            TaskType::POWER_ON,
-                           5000);
+                           LONG_TASK_RUNTIME_IN_MILLIS);
 }
 
 void onLongPressPowerButtonStart()
@@ -90,7 +90,7 @@ void onLongPressPowerButtonStart()
   taskController.runTask([]()
                          { powerController.turnOffVUOnce(); },
                          TaskType::TURN_OFF_VU,
-                         2000);
+                         LONG_TASK_RUNTIME_IN_MILLIS);
 }
 
 void onClickInputSelectorButton()
@@ -112,7 +112,7 @@ void onClickInputSelectorButton()
                            const byte invertCount = inputSelector.getInvertCount();
                            inputSelectorLed.blink(areAllRelaysLow ? invertCount + 1 : invertCount);
                            buzzer.buzz(invertCount); },
-                         TaskType::TURN_OFF_VU, 2000);
+                         TaskType::TURN_OFF_VU, LONG_TASK_RUNTIME_IN_MILLIS);
 }
 
 void onDoubleClickInputSelectorButton()
@@ -136,7 +136,7 @@ void onDoubleClickInputSelectorButton()
                              inputSelectorLed.blink(areAllRelaysLow ? 3 : 2, LONG_LED_BLINK_INTERVAL);
                              buzzer.buzz(2, LONG_BUZZ_INTERVAL);
                            } },
-                         TaskType::TURN_OFF_VU, 2000);
+                         TaskType::TURN_OFF_VU, LONG_TASK_RUNTIME_IN_MILLIS);
 }
 
 void onLongPressInputSelectorButtonStart()
@@ -158,5 +158,5 @@ void onLongPressInputSelectorButtonStart()
                              inputSelector.writeToAllRelays(LOW);
                              inputSelectorLed.writeMin();
                            } },
-                         TaskType::TURN_OFF_VU, 2000);
+                         TaskType::TURN_OFF_VU, LONG_TASK_RUNTIME_IN_MILLIS);
 }

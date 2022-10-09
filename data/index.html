@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
     <link rel="stylesheet" type="text/css" href="volume-slider.css" />
     <link rel="stylesheet" type="text/css" href="input-selector.css" />
+    <link rel="stylesheet" type="text/css" href="button.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link
       rel="stylesheet"
@@ -21,7 +22,7 @@
         </div>
         <div class="content">
           <div class="left">
-            <input disabled class="button-controller" id="power-button" type="checkbox">
+            <input class="button-controller" id="power-button" type="checkbox">
             <label tabindex="0" for="power-button" class="button">
               <i class="fa fa-power-off" aria-hidden="true"></i>
           </label>
@@ -36,7 +37,7 @@
           </div>
           <div class="right">
             <div class="slider-container">
-              <input id="volume-slider-input" type="range" value="50"/>
+              <input id="volume-slider" type="range" value="50"/>
             </div>
           </div>
         </div>
@@ -59,7 +60,6 @@
           </label>
           </div>
         </div>
-    
       </div>
     </div>
     </div>

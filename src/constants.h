@@ -83,4 +83,7 @@ GPIO      Connected to...
 #define DELAY_IN_MILLIS 1000 // For Debugging
 // #define DELAY_IN_MILLIS 25000 // For Release - Pre-programmed Heating Filaments Delay
 
+#define LONG_TASK_RUNTIME_IN_MILLIS DELAY_IN_MILLIS + 500
+#define FAST_TASK_RUNTIME_IN_MILLIS 500
+
 #define POWER_RELAY_COUNT 5 // Number of power-relays in array

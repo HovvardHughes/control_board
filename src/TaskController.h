@@ -53,7 +53,7 @@ public:
         _prePostTaskAction = prePostTaskAction;
     }
 
-    void runTask(std::function < void() > action, TaskType taskType, unsigned long estimatedTime)
+    void runTask(std::function<void()> action, TaskType taskType, unsigned long estimatedTime)
     {
         if (checkRunningTask())
             return;
@@ -71,10 +71,16 @@ public:
         _timer->in(estimatedTime, finishTask, this);
     }
 
-    void forbidTaskRunning(unsigned long time)
+
+    void runFastTask(std::function<void()> action)
     {
+        if (checkRunningTask())
+            return;
+
         _isRunningTaskForbidden = true;
-        _timer->in(time, finishTask, this);
+        _timer->in(FAST_TASK_RUNTIME_IN_MILLIS, finishTask, this);
+
+        action();
     }
 
     bool isRunningTask()
@@ -82,36 +88,8 @@ public:
         return _isRunningTask;
     }
 
-    String getRunningTaskTitle()
+    TaskType getRunningTaskType()
     {
-        switch (_runningTaskType)
-        {
-        case TaskType::POWER_ON:
-            return "Power on";
-        case TaskType::POWER_OFF:
-            return "Power off";
-        case TaskType::TURN_ON_SLEEP_MODE:
-            return "Turn on sleep mode";
-        case TaskType::TURN_OFF_SLEEP_MODE:
-            return "Turn off sleep mode";
-        case TaskType::TURN_OFF_VU:
-            return "Turn off VU";
-        default:
-            return "No active tasks";
-        }
-    }
-
-    void runFastTask(std::function < void() > action)
-    {
-        forbidTaskRunning(500);
-
-        if (checkRunningTask())
-            return;
-
-        _isRunningTaskForbidden = true;
-
-        _timer->in(500, finishTask, this);
-
-        action();
+        return _runningTaskType;
     }
 };

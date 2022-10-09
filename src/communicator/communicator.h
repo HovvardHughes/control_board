@@ -94,11 +94,13 @@ void textStateAll()
   int res = 0;
 
   res |= powerController.isPowerOn() << 0;
-  res |= inputSelector.readRelay(MAIN_INPUT_RELAY_IO_NUMBER) << 1;
-  res |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_IO_NUMBER) << 2;
-  res |= taskController.isRunningTask() << 3;
+  res |= powerController.isSleepModeOn() << 1;
+  res |= powerController.isPowerVUOn() << 2;
+  res |= inputSelector.readRelay(MAIN_INPUT_RELAY_IO_NUMBER) << 3;
+  res |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_IO_NUMBER) << 4;
+  res |= taskController.isRunningTask() << 5;
 
-  ws.textAll(String(res) + "|" + taskController.getRunningTaskTitle());
+  ws.textAll(String(res) + "|" + taskController.getRunningTaskType());
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
