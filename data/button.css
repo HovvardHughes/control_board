@@ -1,97 +1,75 @@
 .button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #424246;
   color: #fff;
+  border: none;
+  outline: none;
   cursor: pointer;
-  padding: 1rem 3rem;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  position: relative;
+  width: 60px;
+  height: 60px;
   border-radius: 10px;
-  background-color: #5c6370;
+  border: 1px solid #9e9e9e;
+  position: relative;
 }
 
-input:disabled + .button {
+button:disabled {
   opacity: 0.2;
   cursor: default;
 }
 
-input:not(:disabled) .button:hover {
+button:not(:disabled):hover {
   background-color: #697181;
 }
-input:not(:disabled) .button:active, .button:focus {
+button:not(:disabled):active {
   background-color: #555d6d;
 }
 
-.button::before {
-  left: 0;
-  z-index: 2;
-  opacity: 0;
-  width: 100%;
-  visibility: hidden;
-  text-align: center;
-  position: absolute;
-  content: "\f1ce";
-  transition: opacity 1s;
-  font-family: "FontAwesome";
-  -webkit-animation: loading-animation 1s linear;
-          animation: loading-animation 1s linear;
-  -webkit-animation-iteration-count: infinite;
-          animation-iteration-count: infinite;
-  -webkit-animation-delay: 1s;
-          animation-delay: 1s;
+.button[class*=enabled] {
+  border-color: #61eca5;
 }
 
-.button::after {
+.button svg {
+  /* filter: invert(92%) sepia(76%) saturate(0%) hue-rotate(177deg) brightness(115%) contrast(90%); */
+}
+
+.button[class*=enabled] svg {
+  filter: invert(47%) sepia(20%) saturate(3295%) hue-rotate(132deg) brightness(93%) contrast(87%);
+}
+
+.button[class*=progress] svg {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.button[class*=progress]:after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
   top: 0;
   left: 0;
-  opacity: 0;
-  z-index: 1;
-  content: "";
-  width: 100%;
-  height: 100%;
-  visibility: hidden;
-  position: absolute;
-  transition: opacity 0.5s;
-  border-radius: 10px;
-  background-color: #5c6370;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  border: 4px solid transparent;
+  border-top-color: #9e9e9e;
+  border-radius: 50%;
+  animation: button-loading-spinner 1s ease infinite;
 }
 
-.button-controller {
-  display: none;
-}
-.button-controller[class~=progress] + .button::before,
-.button-controller[class~=progress] + .button::after {
-  opacity: 1;
-  visibility: visible;
-}
-@-webkit-keyframes loading-animation {
-  0% {
-    opacity: 1;
-    transform: rotate(0deg);
+@keyframes button-loading-spinner {
+  from {
+    transform: rotate(0turn);
   }
-  50% {
-    opacity: 0.1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    transform: rotate(359deg);
+  to {
+    transform: rotate(1turn);
   }
 }
-@keyframes loading-animation {
-  0% {
-    opacity: 1;
-    transform: rotate(0deg);
-  }
-  50% {
-    opacity: 0.1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    transform: rotate(359deg);
-  }
+
+.button[class*=progress] {
+  animation: blink 2s ease infinite;
+  border-color:#9e9e9e ;
 }
+@keyframes blink { 50% { border-color:#61eca5 ; }  }

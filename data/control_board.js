@@ -52,7 +52,7 @@ function onMessage(event) {
 
   const isPowerOn = getBit(state, 0);
   const isSleepModeOn = getBit(state, 1);
-  const isPowerVUOn = getBit(state, 2);
+  const isVUOn = getBit(state, 2);
   const mainInputRelay = getBit(state, 3);
   const secondaryInputRelay = getBit(state, 4);
   const isRunningTask = getBit(state, 5);
@@ -70,7 +70,7 @@ function onMessage(event) {
   const powerOffButtonVUButton = document.getElementById('power-off-vu-button');
   powerButton.disabled = isRunningTask || isSleepModeOn;
   sleepModeButton.disabled = isRunningTask || !isPowerOn;
-  powerOffButtonVUButton.disabled = isRunningTask || !isPowerOn || isSleepModeOn | !isPowerVUOn;
+  powerOffButtonVUButton.disabled = isRunningTask || !isPowerOn || isSleepModeOn | !isVUOn;
 
   if(runningTaskType === TaskType.POWER_ON || runningTaskType === TaskType.POWER_OFF)
     powerButton.classList.add("progress")
@@ -86,6 +86,22 @@ function onMessage(event) {
     powerOffButtonVUButton.classList.add("progress")
   else
     powerOffButtonVUButton.classList.remove("progress")
+
+
+    if(isPowerOn)
+    powerButton.classList.add("enabled")
+  else 
+    powerButton.classList.remove("enabled")
+
+  if(isSleepModeOn)
+    sleepModeButton.classList.add("enabled")
+  else 
+    sleepModeButton.classList.remove("enabled")
+
+  if(isVUOn)
+    powerOffButtonVUButton.classList.add("enabled")
+  else
+    powerOffButtonVUButton.classList.remove("enabled")
 
   document.getElementById('volume-slider').disabled = isRunningTask || !isPowerOn;
 

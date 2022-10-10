@@ -22,18 +22,19 @@
         </div>
         <div class="content">
           <div class="left">
-            <input class="button-controller" id="power-button" type="checkbox">
-            <label tabindex="0" for="power-button" class="button">
-              <i class="fa fa-power-off" aria-hidden="true"></i>
-          </label>
-            <input class="button-controller" id="sleep-mode-button" type="checkbox">
-            <label tabindex="0" for="sleep-mode-button" class="button">
-              <i class="fa fa-moon-o" aria-hidden="true"></i>
-          </label>
-            <input class="button-controller" id="power-off-vu-button" type="checkbox">
-            <label tabindex="0" for="power-off-vu-button" class="button">
-              <i class="fa fa-music" aria-hidden="true"></i>
-          </label>
+            <button type="button" class="button" id="power-button">
+              <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13" />
+            </svg>
+            </button>
+            <button type="button" class="button" id="sleep-mode-button">
+              <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M18.73,18C15.4,21.69 9.71,22 6,18.64C2.33,15.31 2.04,9.62 5.37,5.93C6.9,4.25 9,3.2 11.27,3C7.96,6.7 8.27,12.39 12,15.71C13.63,17.19 15.78,18 18,18C18.25,18 18.5,18 18.73,18Z" />
+            </svg>
+            </button>
+            <button type="button" class="button" id="power-off-vu-button"><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M10,20H14V4H10V20M4,20H8V12H4V20M16,9V20H20V9H16Z" />
+          </svg></button>
           </div>
           <div class="right">
             <div class="slider-container">
