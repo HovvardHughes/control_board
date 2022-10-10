@@ -89,19 +89,19 @@ function onMessage(event) {
 
 
     if(isPowerOn)
-    powerButton.classList.add("enabled")
+    powerButton.classList.add("enabled-power-button")
   else 
-    powerButton.classList.remove("enabled")
+    powerButton.classList.remove("enabled-power-button")
 
   if(isSleepModeOn)
-    sleepModeButton.classList.add("enabled")
+    sleepModeButton.classList.add("enabled-sleep-mode-button")
   else 
-    sleepModeButton.classList.remove("enabled")
+    sleepModeButton.classList.remove("enabled-sleep-mode-button")
 
   if(isVUOn)
-    powerOffButtonVUButton.classList.add("enabled")
+    powerOffButtonVUButton.classList.add("enabled-vu-button")
   else
-    powerOffButtonVUButton.classList.remove("enabled")
+    powerOffButtonVUButton.classList.remove("enabled-vu-button")
 
   document.getElementById('volume-slider').disabled = isRunningTask || !isPowerOn;
 

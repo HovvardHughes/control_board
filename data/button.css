@@ -10,8 +10,8 @@
   width: 60px;
   height: 60px;
   border-radius: 10px;
-  border: 1px solid #9e9e9e;
   position: relative;
+  box-shadow: rgb(0 0 0 / 20%) 0px 2px 1px -1px, rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px;
 }
 
 button:disabled {
@@ -26,17 +26,19 @@ button:not(:disabled):active {
   background-color: #555d6d;
 }
 
-.button[class*=enabled] {
-  border-color: #61eca5;
+.button[class*=enabled-power-button] svg {
+  filter: brightness(0) saturate(100%) invert(44%) sepia(98%) saturate(506%) hue-rotate(110deg) brightness(93%) contrast(93%);
 }
 
-.button svg {
-  /* filter: invert(92%) sepia(76%) saturate(0%) hue-rotate(177deg) brightness(115%) contrast(90%); */
+.button[class*=enabled-sleep-mode-button] svg {
+  filter: brightness(0) saturate(100%) invert(80%) sepia(20%) saturate(826%) hue-rotate(1deg) brightness(106%) contrast(92%);
 }
 
-.button[class*=enabled] svg {
-  filter: invert(47%) sepia(20%) saturate(3295%) hue-rotate(132deg) brightness(93%) contrast(87%);
+.button[class*=enabled-vu-button] svg {
+  filter: brightness(0) saturate(100%) invert(36%) sepia(30%) saturate(1765%) hue-rotate(173deg) brightness(97%) contrast(95%);
 }
+
+
 
 .button[class*=progress] svg {
   visibility: hidden;
@@ -67,9 +69,3 @@ button:not(:disabled):active {
     transform: rotate(1turn);
   }
 }
-
-.button[class*=progress] {
-  animation: blink 2s ease infinite;
-  border-color:#9e9e9e ;
-}
-@keyframes blink { 50% { border-color:#61eca5 ; }  }
