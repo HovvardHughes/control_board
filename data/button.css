@@ -27,15 +27,15 @@ button:not(:disabled):active {
 }
 
 .button[class*=enabled-power-button] svg {
-  filter: brightness(0) saturate(100%) invert(44%) sepia(98%) saturate(506%) hue-rotate(110deg) brightness(93%) contrast(93%);
+  filter: brightness(0) saturate(100%) invert(94%) sepia(3%) saturate(5511%) hue-rotate(70deg) brightness(88%) contrast(76%);
 }
 
 .button[class*=enabled-sleep-mode-button] svg {
-  filter: brightness(0) saturate(100%) invert(80%) sepia(20%) saturate(826%) hue-rotate(1deg) brightness(106%) contrast(92%);
+  filter: brightness(0) saturate(100%) invert(92%) sepia(87%) saturate(630%) hue-rotate(320deg) brightness(92%) contrast(120%);
 }
 
 .button[class*=enabled-vu-button] svg {
-  filter: brightness(0) saturate(100%) invert(36%) sepia(30%) saturate(1765%) hue-rotate(173deg) brightness(97%) contrast(95%);
+  filter: brightness(0) saturate(100%) invert(46%) sepia(46%) saturate(3495%) hue-rotate(201deg) brightness(100%) contrast(92%);
 }
 
 .button[class*=progress] svg {

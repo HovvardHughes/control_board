@@ -48,12 +48,12 @@ void onDoubleClickPowerButton()
     taskController.runTask([]()
                            { powerController.turnOffSleepMode(); },
                            TaskType::TURN_OFF_SLEEP_MODE,
-                           LONG_TASK_RUNTIME_IN_MILLIS);
+                           LONG_TASK_RUNTIME);
   else
     taskController.runTask([]()
                            { powerController.turnOnSleepMode(); },
                            TaskType::TURN_ON_SLEEP_MODE,
-                           LONG_TASK_RUNTIME_IN_MILLIS);
+                           LONG_TASK_RUNTIME);
 }
 
 void onClickPowerButton()
@@ -68,12 +68,12 @@ void onClickPowerButton()
     taskController.runTask([]()
                            { powerController.turnOffPower(); },
                            TaskType::POWER_OFF,
-                           LONG_TASK_RUNTIME_IN_MILLIS);
+                           LONG_TASK_RUNTIME);
   else
     taskController.runTask([]()
                            { powerController.turnOnPower(); },
                            TaskType::POWER_ON,
-                           LONG_TASK_RUNTIME_IN_MILLIS);
+                           LONG_TASK_RUNTIME);
 }
 
 void onLongPressPowerButtonStart()
@@ -90,7 +90,7 @@ void onLongPressPowerButtonStart()
   taskController.runTask([]()
                          { powerController.turnOffVUOnce(); },
                          TaskType::TURN_OFF_VU,
-                         LONG_TASK_RUNTIME_IN_MILLIS);
+                         LONG_TASK_RUNTIME);
 }
 
 void onClickInputSelectorButton()

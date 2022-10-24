@@ -56,12 +56,12 @@ GPIO      Connected to...
 #define SHORT_LED_PWM_INTERVAL 5 // PWM interval in millis
 #define LONG_LED_PWM_INTERVAL 15 // PWM interval in millis
 
-#define FREQUENCY 25000
+#define PWM_FREQUENCY 25000
 
-#define LED_RESOLUTION 8
+#define PWM_RESOLUTION 8
 
-#define MIN_LED__DUTY 0
-#define MAX_LED__DUTY 255
+#define MIN_PWM_DUTY 0
+#define MAX_PWM_DUTY 255
 
 // BUZZER:
 #define BUZZER_PIN 4
@@ -80,10 +80,8 @@ GPIO      Connected to...
 
 #define COM_PORT_SPEED 115200 // COM Port Baud Rate
 
-#define DELAY_IN_MILLIS 1000 // For Debugging
-// #define DELAY_IN_MILLIS 25000 // For Release - Pre-programmed Heating Filaments Delay
+#define LONG_TASK_DELAY 1000 // For Debugging
+// #define LONG_TASK_DELAY 25000 // For Release - Pre-programmed Heating Filaments Delay
 
-#define LONG_TASK_RUNTIME_IN_MILLIS DELAY_IN_MILLIS + 500
-#define FAST_TASK_RUNTIME_IN_MILLIS 500
-
-#define POWER_RELAY_COUNT 5 // Number of power-relays in array
+#define LONG_TASK_RUNTIME LONG_TASK_DELAY + 500
+#define FAST_TASK_RUNTIME 500

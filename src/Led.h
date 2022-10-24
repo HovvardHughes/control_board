@@ -35,12 +35,12 @@ private:
   {
     Led *ptr = (Led *)p;
 
-    if (ptr->_dutyCycleInCurrentPwmTask == MAX_LED__DUTY)
+    if (ptr->_dutyCycleInCurrentPwmTask == MAX_PWM_DUTY)
     {
       ptr->_incrementInCurrentPwmTask = false;
     }
 
-    if (ptr->_dutyCycleInCurrentPwmTask == MIN_LED__DUTY)
+    if (ptr->_dutyCycleInCurrentPwmTask == MIN_PWM_DUTY)
     {
       ptr->_incrementInCurrentPwmTask = true;
     }
@@ -70,7 +70,7 @@ public:
   void setup()
   {
     pinMode(_pin, OUTPUT);
-    ledcSetup(_channel, FREQUENCY, LED_RESOLUTION);
+    ledcSetup(_channel, PWM_FREQUENCY, PWM_RESOLUTION);
     ledcAttachPin(_pin, _channel);
   }
 
@@ -81,17 +81,17 @@ public:
 
   void writeMax()
   {
-    ledcWrite(_channel, MAX_LED__DUTY);
+    ledcWrite(_channel, MAX_PWM_DUTY);
   }
 
   void writeMin()
   {
-    ledcWrite(_channel, MIN_LED__DUTY);
+    ledcWrite(_channel, MIN_PWM_DUTY);
   }
 
   void writeInverted()
   {
-    write(read() == MIN_LED__DUTY ? MAX_LED__DUTY : MIN_LED__DUTY);
+    write(read() == MIN_PWM_DUTY ? MAX_PWM_DUTY : MIN_PWM_DUTY);
   }
 
   void blink(uint32_t countToInvertState, unsigned long interval = SHORT_LED_BLINK_INTERVAL)
@@ -110,7 +110,7 @@ public:
   void startPwm(unsigned long interval)
   {
     _dutyCycleInCurrentPwmTask = read();
-    _incrementInCurrentPwmTask = _dutyCycleInCurrentPwmTask < MAX_LED__DUTY;
+    _incrementInCurrentPwmTask = _dutyCycleInCurrentPwmTask < MAX_PWM_DUTY;
 
     pwmIteratation(this);
 

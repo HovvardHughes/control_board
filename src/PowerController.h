@@ -3,6 +3,7 @@
 #include <InputSelector.h>
 #include <Buzzer.h>
 
+#define POWER_RELAY_COUNT 5
 #define POWER_VU_INDEX 3
 
 class PowerController
@@ -47,7 +48,7 @@ private:
 
         ptr->_allPowerRelays[2].write(HIGH);
 
-        ptr->_powerLed.finishPwm(MAX_LED__DUTY);
+        ptr->_powerLed.finishPwm(MAX_PWM_DUTY);
 
         ptr->_isSleepModeOn = false;
 
@@ -66,7 +67,7 @@ private:
 
         ptr->_buzzer->buzz(4);
 
-        ptr->_powerLed.finishPwm(MAX_LED__DUTY);
+        ptr->_powerLed.finishPwm(MAX_PWM_DUTY);
 
         ptr->_isPowerOn = true;
 
@@ -84,7 +85,7 @@ private:
         ptr->_inputSelector->writeToAllRelays(LOW);
         ptr->_inputSelectorLed->writeMin();
 
-        ptr->_powerLed.finishPwm(MIN_LED__DUTY);
+        ptr->_powerLed.finishPwm(MIN_PWM_DUTY);
 
         ptr->_isPowerOn = false;
 
@@ -115,7 +116,7 @@ public:
         _buzzer->buzz(4);
 
         _allPowerRelays[2].write(LOW);
-        _timer->in(DELAY_IN_MILLIS, turnOnSleepModeInternal, this);
+        _timer->in(LONG_TASK_DELAY, turnOnSleepModeInternal, this);
     }
 
     void turnOffSleepMode()
@@ -125,7 +126,7 @@ public:
         _allPowerRelays[1].write(HIGH);
         _allPowerRelays[3].write(HIGH);
 
-        _timer->in(DELAY_IN_MILLIS, turnOffSleepModeInternal, this);
+        _timer->in(LONG_TASK_DELAY, turnOffSleepModeInternal, this);
     }
 
     void turnOnPower()
@@ -138,7 +139,7 @@ public:
 
         _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
 
-        _timer->in(DELAY_IN_MILLIS, turnOnPowerInternal, this);
+        _timer->in(LONG_TASK_DELAY, turnOnPowerInternal, this);
     }
 
     void turnOffPower()
@@ -151,7 +152,7 @@ public:
 
         _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
 
-        _timer->in(DELAY_IN_MILLIS, turnOffPowerInternal, this);
+        _timer->in(LONG_TASK_DELAY, turnOffPowerInternal, this);
     }
 
     void turnOffVUOnce()
@@ -165,7 +166,7 @@ public:
             firstRelay.writeAndForbidWriting(LOW);
 
             _timer->in(
-                DELAY_IN_MILLIS, turnOffVUOnceInternal, this);
+                LONG_TASK_DELAY, turnOffVUOnceInternal, this);
         }
     }
 

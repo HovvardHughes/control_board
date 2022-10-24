@@ -1,4 +1,4 @@
-#include <communicator/communicator.h>
+#include <communicator.h>
 
 Timer<> timer = timer_create_default();
 
@@ -58,6 +58,7 @@ void loop()
   powerButton.tick();
   inputSelectorButton.tick();
   mainPowerOnButton.tick();
+  volumeEngine.disableIfActiveForLongTime();
 
   tickCommunicator();
 }

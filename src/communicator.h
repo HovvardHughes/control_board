@@ -3,7 +3,7 @@
 #include <AsyncTCP.h>
 #include <fileUtils.h>
 #include <arduino-timer.h>
-#include <communicator/communicatorCommands.h>
+#include <communicatorCommands.h>
 #include <handlers.h>
 
 extern TaskController taskController;

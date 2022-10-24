@@ -14,7 +14,7 @@ enum TaskType
 class TaskController
 {
 private:
-    bool _isRunningTaskForbidden;
+    bool _isTaskRunningForbidden;
     bool _isRunningTask;
     TaskType _runningTaskType;
 
@@ -27,7 +27,7 @@ private:
         TaskController *ptr = (TaskController *)p;
         ptr->_runningTaskType = TaskType::NONE;
         ptr->_isRunningTask = false;
-        ptr->_isRunningTaskForbidden = false;
+        ptr->_isTaskRunningForbidden = false;
         ptr->_prePostTaskAction();
 
         return false;
@@ -37,7 +37,7 @@ private:
     {
         Serial.println("Check that previous task is completed to run new");
 
-        if (_isRunningTask || _isRunningTaskForbidden)
+        if (_isRunningTask || _isTaskRunningForbidden)
         {
             Serial.println("Cannot run task, because previous is not completed");
             return true;
@@ -77,8 +77,8 @@ public:
         if (checkRunningTask())
             return;
 
-        _isRunningTaskForbidden = true;
-        _timer->in(FAST_TASK_RUNTIME_IN_MILLIS, finishTask, this);
+        _isTaskRunningForbidden = true;
+        _timer->in(FAST_TASK_RUNTIME, finishTask, this);
 
         action();
     }

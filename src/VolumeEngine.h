@@ -1,4 +1,10 @@
-#include <communicator/communicatorCommands.h>
+#include <communicatorCommands.h>
+
+#define MAX_NOT_ZERO_DUTY_TIME 1000 * 15
+
+#define MIN_VOLUME_DUTY 150
+#define MIDDLE_VOLUME_DUTY 200
+#define MAX_VOLUME_DUTY 255
 
 class VolumeEngine
 {
@@ -7,54 +13,67 @@ private:
   const int ledChannel = 0;
   const int resolution = 8;
 
-  int lastForwardVolumeChannelDuty = -1;
-  int lastReverseVolumeChannelDuty = -1;
+  int lastForwardChannelDuty = -1;
+  int lastReverseChannelDuty = -1;
+  unsigned long notZeroForwardChannelDutyDuration;
+  unsigned long notZeroReverseChannelDutyDuration;
 
-  void write(uint32_t forwardVolumeChannelDuty, uint32_t reverseVolumeChannelDuty)
+  void write(uint32_t forwardChannelDuty, uint32_t reverseChannelDuty)
   {
-    if (forwardVolumeChannelDuty != lastForwardVolumeChannelDuty)
+    if (forwardChannelDuty != lastForwardChannelDuty)
     {
-      ledcWrite(FORWARD_VOLUME_CHANNEL, forwardVolumeChannelDuty);
-      lastForwardVolumeChannelDuty = forwardVolumeChannelDuty;
+      ledcWrite(FORWARD_VOLUME_CHANNEL, forwardChannelDuty);
+      lastForwardChannelDuty = forwardChannelDuty;
     }
 
-    if (reverseVolumeChannelDuty != lastReverseVolumeChannelDuty)
+    if (reverseChannelDuty != lastReverseChannelDuty)
     {
-      ledcWrite(REVERSE_VOLUME_CHANNEL, reverseVolumeChannelDuty);
-      lastReverseVolumeChannelDuty = reverseVolumeChannelDuty;
+      ledcWrite(REVERSE_VOLUME_CHANNEL, reverseChannelDuty);
+      lastReverseChannelDuty = reverseChannelDuty;
     }
+
+    notZeroForwardChannelDutyDuration = millis();
+    notZeroReverseChannelDutyDuration = millis();
   }
 
 public:
   void setup()
   {
-    ledcSetup(REVERSE_VOLUME_CHANNEL, FREQUENCY, LED_RESOLUTION);
+    ledcSetup(REVERSE_VOLUME_CHANNEL, PWM_FREQUENCY, PWM_RESOLUTION);
     ledcAttachPin(REVERSE_VOLUME_PIN, REVERSE_VOLUME_CHANNEL);
-    ledcSetup(FORWARD_VOLUME_CHANNEL, FREQUENCY, LED_RESOLUTION);
+    ledcSetup(FORWARD_VOLUME_CHANNEL, PWM_FREQUENCY, PWM_RESOLUTION);
     ledcAttachPin(FORWARD_VOLUME_PIN, FORWARD_VOLUME_CHANNEL);
   }
 
-  void handleServerCommand(u_int8_t *commmand)
+  void disableIfActiveForLongTime()
+  {
+    if ((lastForwardChannelDuty > MIN_PWM_DUTY && (millis() - notZeroForwardChannelDutyDuration > MAX_NOT_ZERO_DUTY_TIME)) ||
+        (lastReverseChannelDuty > MIN_PWM_DUTY && (millis() - notZeroReverseChannelDutyDuration > MAX_NOT_ZERO_DUTY_TIME)))
+      write(MIN_PWM_DUTY, MIN_PWM_DUTY);
+  }
+
+  void
+  handleServerCommand(u_int8_t *commmand)
   {
     if (strcmp((char *)commmand, REVERSE_LOW_VOLUME_PWM) == 0)
-      write(0, 150);
+      write(MIN_PWM_DUTY, MIN_VOLUME_DUTY);
 
     if (strcmp((char *)commmand, REVERSE_MEDIUM_VOLUME_PWM) == 0)
-      write(0, 200);
+      write(MIN_PWM_DUTY, MIDDLE_VOLUME_DUTY);
 
     if (strcmp((char *)commmand, REVERSE_HIGH_VOLUME_PWM) == 0)
-      write(0, 255);
+      write(MIN_PWM_DUTY, MAX_VOLUME_DUTY);
 
     if (strcmp((char *)commmand, FORWARD_LOW_VOLUME_PWM) == 0)
-      write(150, 0);
+      write(MIN_VOLUME_DUTY, MIN_PWM_DUTY);
 
     if (strcmp((char *)commmand, FORWARD_MEDIUM_VOLUME_PWM) == 0)
-      write(200, 0);
+      write(MIDDLE_VOLUME_DUTY, MIN_PWM_DUTY);
 
     if (strcmp((char *)commmand, FORWARD_HIGH_VOLUME_PWM) == 0)
-      write(255, 0);
+      write(MAX_VOLUME_DUTY, MIN_PWM_DUTY);
 
     if (strcmp((char *)commmand, TURN_OFF_VOLUME_PWM) == 0)
-      write(0, 0);
+      write(MIN_PWM_DUTY, MIN_PWM_DUTY);
   }
 };
