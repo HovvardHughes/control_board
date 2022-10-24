@@ -98,21 +98,20 @@ void onClickInputSelectorButton()
   if (!powerController.isPowerOn())
     return;
 
-  taskController.runTask([]()
-                         {
-                           const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
+  taskController.runFastTask([]()
+                             {
+    const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
 
-                           if (areAllRelaysLow)
-                             inputSelector.writeToSeletedRelay(HIGH);
-                           else if (inputSelector.areAllRelays(HIGH))
-                             inputSelector.writeToNotSelected(LOW);
-                           else
-                             inputSelector.swapRelays();
+    if (areAllRelaysLow)
+      inputSelector.writeToSeletedRelay(HIGH);
+    else if (inputSelector.areAllRelays(HIGH))
+      inputSelector.writeToNotSelected(LOW);
+    else
+      inputSelector.swapRelays();
 
-                           const byte invertCount = inputSelector.getInvertCount();
-                           inputSelectorLed.blink(areAllRelaysLow ? invertCount + 1 : invertCount);
-                           buzzer.buzz(invertCount); },
-                         TaskType::TURN_OFF_VU, LONG_TASK_RUNTIME_IN_MILLIS);
+    const byte invertCount = inputSelector.getInvertCount();
+    inputSelectorLed.blink(areAllRelaysLow ? invertCount + 1 : invertCount);
+    buzzer.buzz(invertCount); });
 }
 
 void onDoubleClickInputSelectorButton()
@@ -120,8 +119,8 @@ void onDoubleClickInputSelectorButton()
   if (!powerController.isPowerOn())
     return;
 
-  taskController.runTask([]()
-                         {
+  taskController.runFastTask([]()
+                             {
                            if (inputSelector.areAllRelays(HIGH))
                            {
                              inputSelector.writeToNotSelected(LOW);
@@ -135,8 +134,7 @@ void onDoubleClickInputSelectorButton()
                              inputSelector.writeToAllRelays(HIGH);
                              inputSelectorLed.blink(areAllRelaysLow ? 3 : 2, LONG_LED_BLINK_INTERVAL);
                              buzzer.buzz(2, LONG_BUZZ_INTERVAL);
-                           } },
-                         TaskType::TURN_OFF_VU, LONG_TASK_RUNTIME_IN_MILLIS);
+                           } });
 }
 
 void onLongPressInputSelectorButtonStart()
@@ -144,8 +142,8 @@ void onLongPressInputSelectorButtonStart()
   if (!powerController.isPowerOn())
     return;
 
-  taskController.runTask([]()
-                         {
+  taskController.runFastTask([]()
+                             {
                            if (inputSelector.areAllRelays(LOW))
                            {
                              inputSelector.writeToSeletedRelay(HIGH);
@@ -157,6 +155,5 @@ void onLongPressInputSelectorButtonStart()
                            {
                              inputSelector.writeToAllRelays(LOW);
                              inputSelectorLed.writeMin();
-                           } },
-                         TaskType::TURN_OFF_VU, LONG_TASK_RUNTIME_IN_MILLIS);
+                           } });
 }

@@ -38,8 +38,6 @@ button:not(:disabled):active {
   filter: brightness(0) saturate(100%) invert(36%) sepia(30%) saturate(1765%) hue-rotate(173deg) brightness(97%) contrast(95%);
 }
 
-
-
 .button[class*=progress] svg {
   visibility: hidden;
   opacity: 0;

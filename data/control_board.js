@@ -127,8 +127,9 @@ function initButtons() {
   document.getElementById('main-relay').addEventListener('click', handleInputSwitchClicked);
   document.getElementById('secondary-relay').addEventListener('click', handleInputSwitchClicked);
   const volumeSlider = document.getElementById("volume-slider");
-  volumeSlider.addEventListener("mouseup", handleVolumeSliderMouseUpped);
+  volumeSlider.addEventListener("mouseup", handleVolumeSliderMouseUp);
   volumeSlider.addEventListener("input", handleVolumeSliderChanged);
+  volumeSlider.addEventListener("keydown", handleVolumeSliderKeyDown);
 }
 
 function switchPower() {
@@ -171,12 +172,15 @@ function handleVolumeSliderChanged(event) {
 
   if (value > 82 && value <= 100)
     websocket.send(Command.FORWARD_HIGH_VOLUME_PWM);
-  
 }
 
-function handleVolumeSliderMouseUpped() {
+function handleVolumeSliderMouseUp() {
   document.getElementById("volume-slider").value = 50;
   websocket.send(Command.TURN_OFF_VOLUME_PWM);
+}
+
+function handleVolumeSliderKeyDown(event) {
+  event.preventDefault();
 }
 
 function getRunningTaskTitle(taskType) {  

@@ -1,7 +1,28 @@
+.slider-container {
+  display: inline-block;
+  width: 24px;
+  height: 200px;
+}
+
+.volume-up-icon {
+  margin-bottom: 4px;
+}
+
+.volume-low-icon {
+  margin-top: 4px;
+}
+
 input[type="range"] {
+  position: relative;
+  right: 3px;
   background-color: transparent;
   cursor: pointer;
   -webkit-appearance: none;
+  width: 200px;
+  height: 20px;
+  margin: 0;
+  transform-origin: 100px 100px;
+  transform: rotate(-90deg);
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -50,6 +71,3 @@ input[type="range"]:disabled {
   opacity: 0.2;
 }
 
-.slider-container {
-    transform: rotate(270deg);
-}
