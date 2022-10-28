@@ -134,13 +134,14 @@ function onLoad(event) {
 }
 
 function initButtons() {
-  document.getElementById('power-button').addEventListener('click', switchPower);
-  document.getElementById('sleep-mode-button').addEventListener('click', switchSleepMode);
-  document.getElementById('power-off-vu-button').addEventListener('click', powerOffVU);
-  document.getElementById('main-relay').addEventListener('click', handleInputSwitchClicked);
-  document.getElementById('secondary-relay').addEventListener('click', handleInputSwitchClicked);
-  const volumeSlider = document.getElementById("volume-slider");
+  document.getElementById(IDs.POWER_BUTTON).addEventListener('click', switchPower);
+  document.getElementById(IDs.SLEEP_MODE_BUTTON).addEventListener('click', switchSleepMode);
+  document.getElementById(IDs.POWER_OFF_VU__BUTTON).addEventListener('click', powerOffVU);
+  document.getElementById(IDs.MAIN_INPUT).addEventListener('click', handleInputSwitchClicked);
+  document.getElementById(IDs.SECONDARY_INPUT).addEventListener('click', handleInputSwitchClicked);
+  const volumeSlider = document.getElementById(IDs.VOLUME_SLIDER);
   volumeSlider.addEventListener("mouseup", handleVolumeSliderMouseUp);
+  volumeSlider.addEventListener("touchend", handleVolumeSliderMouseUp);
   volumeSlider.addEventListener("input", handleVolumeSliderChanged);
   volumeSlider.addEventListener("keydown", handleVolumeSliderKeyDown);
 }
@@ -191,7 +192,7 @@ function handleVolumeSliderChanged(event) {
 }
 
 function handleVolumeSliderMouseUp() {
-  document.getElementById("volume-slider").value = 50;
+  document.getElementById(IDs.VOLUME_SLIDER).value = 50;
   websocket.send(Commands.TURN_OFF_VOLUME_PWM);
 }
 
