@@ -1,20 +1,16 @@
 #include <communicatorCommands.h>
 
-#define MAX_NOT_ZERO_DUTY_TIME 1000 * 15
+#define MAX_NOT_ZERO_DUTY_TIME 1000 * 20
 
-#define MIN_VOLUME_DUTY 150
-#define MIDDLE_VOLUME_DUTY 200
+#define MIN_VOLUME_DUTY 175
+#define MIDDLE_VOLUME_DUTY 225
 #define MAX_VOLUME_DUTY 255
 
 class VolumeEngine
 {
 private:
-  const int freq = 5000;
-  const int ledChannel = 0;
-  const int resolution = 8;
-
-  int lastForwardChannelDuty = -1;
-  int lastReverseChannelDuty = -1;
+  int lastForwardChannelDuty;
+  int lastReverseChannelDuty;
   unsigned long notZeroForwardChannelDutyDuration;
   unsigned long notZeroReverseChannelDutyDuration;
 
@@ -52,8 +48,7 @@ public:
       write(MIN_PWM_DUTY, MIN_PWM_DUTY);
   }
 
-  void
-  handleServerCommand(u_int8_t *commmand)
+  void handleServerCommand(u_int8_t *commmand)
   {
     if (strcmp((char *)commmand, REVERSE_LOW_VOLUME_PWM) == 0)
       write(MIN_PWM_DUTY, MIN_VOLUME_DUTY);

@@ -167,46 +167,27 @@ function handleInputSwitchClicked(event) {
 
 function handleVolumeSliderChanged(event) {
   const value = parseInt(event.target.value);
-  console.log(value);
-  console.log(value === 50);
 
- 
-
-  if(value === 99) {
-    console.log("REVERSE :: HIGH")
+  if(value === 99)
     websocket.send(Commands.FORWARD_HIGH_VOLUME_PWM);
-  }
 
-  if(value === 83) {
-    console.log("REVERSE :: MEDIUM")
+  if(value === 83)
     websocket.send(Commands.FORWARD_MEDIUM_VOLUME_PWM);
-  }
 
-  if(value === 66){
-    console.log("REVERSE :: LOW")
+  if(value === 66)
     websocket.send(Commands.FORWARD_LOW_VOLUME_PWM);
-  }
 
-  if (value === 50){
-    console.log("TURN_OFF")
+  if (value === 50)
     websocket.send(Commands.TURN_OFF_VOLUME_PWM);
-  }
 
-  if (value === 33){
-    console.log("FORWARD :: LOW")
+  if (value === 33)
     websocket.send(Commands.REVERSE_LOW_VOLUME_PWM);
-  }
 
-  if (value === 16){
-    console.log("FORWARD :: MEDIUM")
+  if (value === 16)
     websocket.send(Commands.REVERSE_MEDIUM_VOLUME_PWM);
-  }
 
-  if (value === 0) {
-    console.log("FORWARD :: HIGH")
+  if (value === 0)
     websocket.send(Commands.REVERSE_HIGH_VOLUME_PWM);
-  }
-
 }
 
 function handleVolumeSliderMouseUp() {

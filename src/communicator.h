@@ -131,8 +131,10 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 
     if (strcmp((char *)data, TURN_OFF_VOLUME_PWM) == 0 ||
         strcmp((char *)data, REVERSE_LOW_VOLUME_PWM) == 0 ||
+        strcmp((char *)data, REVERSE_MEDIUM_VOLUME_PWM) == 0 ||
         strcmp((char *)data, REVERSE_HIGH_VOLUME_PWM) == 0 ||
         strcmp((char *)data, FORWARD_LOW_VOLUME_PWM) == 0 ||
+        strcmp((char *)data, FORWARD_MEDIUM_VOLUME_PWM) == 0 ||
         strcmp((char *)data, FORWARD_HIGH_VOLUME_PWM) == 0)
       onVolumeChanged(data);
   }
