@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Wi-Fi credentials</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" type="text/css" href="wi-fi-settings.css" />
+  </head>
+  <body>
+    <div>
+      <form action="/" method="POST">
+        <h1>Wi-Fi settings</h1>
+        <label for="ssid">SSID</label>
+        <input type="text" id="ssid" name="ssid" autocomplete="off" />
+        <label for="pass">Password</label>
+        <input type="password" id="pass" name="pass" autocomplete="off" />
+        <label for="ip">IP address</label>
+        <input
+          type="text"
+          id="ip"
+          name="ip"
+          placeholder="192.168.1.200"
+          autocomplete="off"
+        />
+        <label for="gateway">Gateway address</label>
+        <input
+          type="text"
+          id="gateway"
+          name="gateway"
+          placeholder="192.168.1.1"
+          autocomplete="off"
+        />
+        <input type="submit" value="Save" />
+      </form>
+    </div>
+  </body>
+</html>
