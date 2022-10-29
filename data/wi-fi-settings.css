@@ -14,10 +14,9 @@ body {
   font-family: 'Courier New';
 }
 
-form {
+#form {
   display: grid;
-  width: 300px;
-  min-width: auto;
+  width: 500px;
 }
 
 h1 {
@@ -33,7 +32,7 @@ label {
   font-size: 14px;
 }
 
-input[type=text], input[type=password]{
+input{
   font-family: 'Courier New';
   font-size: 14px;
   height: 55px;
@@ -41,15 +40,15 @@ input[type=text], input[type=password]{
   border-radius: 14px;
   background-color: #25262a;
   padding: 0 10px 0 25px;
-  margin-bottom: 24px;
   color: #fff;
 }
 
-input[type=submit] {
+button {
   justify-self: center;
   width: 50%;
   height: 50px;
   margin-top: 20px;
+  margin-bottom: 44px;
   border: none;
   border-radius: 18px;
   font-family: 'Courier New';
@@ -57,7 +56,8 @@ input[type=submit] {
   background-color: #25262a;
   color: #5ad898;
 }
-input[type=submit]:hover {
+
+button:not(:disabled):hover {
   background-color: #fecd1a;
   color: #1a1a1d;
   cursor: pointer;
@@ -66,4 +66,29 @@ input[type=submit]:hover {
 
 *:focus {
   outline: none;
+}
+
+#save-result {
+  justify-self: center;
+  color: #64f4ab;
+  text-align: center;
+}
+
+.error {
+  color: #f44336;
+  border-color: #f44336;
+}
+
+.success {
+  color: #64f4ab;
+}
+
+*[disabled] {
+  opacity: 0.5;
+}
+
+.helper-text {
+  margin-left: 16px;
+  padding: 4px 0;
+  font-size: 14px;
 }

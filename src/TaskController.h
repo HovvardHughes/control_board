@@ -71,7 +71,6 @@ public:
         _timer->in(estimatedTime, finishTask, this);
     }
 
-
     void runFastTask(std::function<void()> action)
     {
         if (checkRunningTask())

@@ -13,7 +13,7 @@ AsyncWebSocket ws("/ws");
 
 // Search for parameter in HTTP POST request
 const char *PARAM_INPUT_1 = "ssid";
-const char *PARAM_INPUT_2 = "pass";
+const char *PARAM_INPUT_2 = "password";
 const char *PARAM_INPUT_3 = "ip";
 const char *PARAM_INPUT_4 = "gateway";
 
@@ -25,7 +25,7 @@ String gateway;
 
 // File paths to save input values permanently
 const char *ssidPath = "/ssid.txt";
-const char *passPath = "/pass.txt";
+const char *passPath = "/password.txt";
 const char *ipPath = "/ip.txt";
 const char *gatewayPath = "/gateway.txt";
 
@@ -164,6 +164,27 @@ void initWebSocket()
   server.addHandler(&ws);
 }
 
+String processor(const String &var)
+{
+  if (var == "ssid")
+  {
+    return ssid;
+  }
+  if (var == "password")
+  {
+    return pass;
+  }
+  if (var == "ip")
+  {
+    return ip;
+  }
+  if (var == "gateway")
+  {
+    return gateway;
+  }
+  return String();
+}
+
 void setupCommunicator()
 {
   initSPIFFS();
@@ -177,7 +198,7 @@ void setupCommunicator()
   ssid = "Begemot";
   pass = "19411945";
   ip = "192.168.1.200";
-  gateway = "192.168.1.1";
+  gateway = "192.168.4.1";
   Serial.println(ssid);
   Serial.println(pass);
   Serial.println(ip);
@@ -187,42 +208,35 @@ void setupCommunicator()
   {
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
               { request->send(SPIFFS, "/control-board.html", "text/html", false); });
-
     server.on("/wi-fi-settings", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(SPIFFS, "/wi-fi-settings.html", "text/html"); });
-
-    server.serveStatic("/", SPIFFS, "/");
+              { request->send(SPIFFS, "/wi-fi-settings.html", "text/html", false, processor); });
     initWebSocket();
-    server.begin();
-  }
-  else
-  {
-    WiFi.softAP("ESP-WIFI-MANAGER", NULL);
 
-    IPAddress IP = WiFi.softAPIP();
-
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(SPIFFS, "/wi-fi-settings.html", "text/html"); });
-
-    server.on("/", HTTP_POST, [](AsyncWebServerRequest *request)
+    server.on("/wi-fi-settings", HTTP_POST, [](AsyncWebServerRequest *request)
               {
       int params = request->params();
-      for(int i=0;i<params;i++){
-        AsyncWebParameter* p = request->getParam(i);
-        if(p->isPost()){
-          if (p->name() == PARAM_INPUT_1) {
+      for (int i = 0; i < params; i++)
+      {
+        AsyncWebParameter *p = request->getParam(i);
+        if (p->isPost())
+        {
+          if (p->name() == PARAM_INPUT_1)
+          {
             ssid = p->value().c_str();
             writeFile(SPIFFS, ssidPath, ssid.c_str());
           }
-          if (p->name() == PARAM_INPUT_2) {
+          if (p->name() == PARAM_INPUT_2)
+          {
             pass = p->value().c_str();
             writeFile(SPIFFS, passPath, pass.c_str());
           }
-          if (p->name() == PARAM_INPUT_3) {
+          if (p->name() == PARAM_INPUT_3)
+          {
             ip = p->value().c_str();
             writeFile(SPIFFS, ipPath, ip.c_str());
           }
-          if (p->name() == PARAM_INPUT_4) {
+          if (p->name() == PARAM_INPUT_4)
+          {
             gateway = p->value().c_str();
             writeFile(SPIFFS, gatewayPath, gateway.c_str());
           }
@@ -232,6 +246,53 @@ void setupCommunicator()
       delay(3000);
       ESP.restart(); });
   }
+  else
+  {
+    WiFi.softAP("ESP-WIFI-MANAGER", NULL);
+
+    IPAddress IP = WiFi.softAPIP();
+
+    server.on(
+        "/", HTTP_GET, [](AsyncWebServerRequest *request)
+        { request->send(SPIFFS, "/wi-fi-settings.html", "text/html", false, processor); }),
+
+        server.on("/", HTTP_POST, [](AsyncWebServerRequest *request)
+                  {
+      int params = request->params();
+      for (int i = 0; i < params; i++)
+      {
+        AsyncWebParameter *p = request->getParam(i);
+        if (p->isPost())
+        {
+          if (p->name() == PARAM_INPUT_1)
+          {
+            ssid = p->value().c_str();
+            writeFile(SPIFFS, ssidPath, ssid.c_str());
+          }
+          if (p->name() == PARAM_INPUT_2)
+          {
+            pass = p->value().c_str();
+            writeFile(SPIFFS, passPath, pass.c_str());
+          }
+          if (p->name() == PARAM_INPUT_3)
+          {
+            ip = p->value().c_str();
+            writeFile(SPIFFS, ipPath, ip.c_str());
+          }
+          if (p->name() == PARAM_INPUT_4)
+          {
+            gateway = p->value().c_str();
+            writeFile(SPIFFS, gatewayPath, gateway.c_str());
+          }
+        }
+      }
+      request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + ip);
+      delay(3000);
+      ESP.restart(); });
+  }
+
+  server.serveStatic("/", SPIFFS, "/");
+  server.begin();
 }
 
 void tickCommunicator()
