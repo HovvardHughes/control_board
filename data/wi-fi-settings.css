@@ -3,7 +3,6 @@ html {
 }
 
 body {
-  box-sizing: border-box;
   display: grid;
   place-content: center center;
   height: 100%;
@@ -12,11 +11,27 @@ body {
   color: #9e9e9e;
   margin: 0;
   font-family: 'Courier New';
+  grid-auto-columns: 500px;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 #form {
+  position: relative;
   display: grid;
-  width: 500px;
+  padding: 16px;
+}
+
+@media only screen and (max-width:550px) {
+  body {
+    grid-auto-columns: 100%;
+  }
+}
+
+#form > div {
+  display: grid;
 }
 
 h1 {
@@ -43,6 +58,25 @@ input{
   color: #fff;
 }
 
+input:focus {
+  outline: none;
+}
+
+.error > *:not(input){
+  color: #f44336;
+  border-color: #f44336;
+}
+
+.error > input {
+  border-color: #f44336;
+}
+
+.helper-text {
+  margin-left: 16px;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
 button {
   justify-self: center;
   width: 50%;
@@ -64,8 +98,8 @@ button:not(:disabled):hover {
   transition: 0.5s;
 }
 
-*:focus {
-  outline: none;
+button[disabled] {
+  opacity: 0.5;
 }
 
 #save-result {
@@ -74,21 +108,10 @@ button:not(:disabled):hover {
   text-align: center;
 }
 
-.error {
+#save-result[class*=error] {
   color: #f44336;
-  border-color: #f44336;
 }
 
-.success {
+#save-result[class*=success] {
   color: #64f4ab;
-}
-
-*[disabled] {
-  opacity: 0.5;
-}
-
-.helper-text {
-  margin-left: 16px;
-  padding: 4px 0;
-  font-size: 14px;
 }
