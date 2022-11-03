@@ -46,12 +46,12 @@ void onDoubleClickPowerButton()
 {
   if (powerController.isSleepModeOn())
     taskController.runTask([]()
-                           { powerController.turnOffSleepMode(); },
+                           { powerController.setSleepMode(false); },
                            TaskType::TURN_OFF_SLEEP_MODE,
                            LONG_TASK_RUNTIME);
   else
     taskController.runTask([]()
-                           { powerController.turnOnSleepMode(); },
+                           { powerController.setSleepMode(true); },
                            TaskType::TURN_ON_SLEEP_MODE,
                            LONG_TASK_RUNTIME);
 }
@@ -66,12 +66,12 @@ void onClickPowerButton()
 
   if (powerController.isPowerOn())
     taskController.runTask([]()
-                           { powerController.turnOffPower(); },
+                           { powerController.setPower(false); },
                            TaskType::POWER_OFF,
                            LONG_TASK_RUNTIME);
   else
     taskController.runTask([]()
-                           { powerController.turnOnPower(); },
+                           { powerController.setPower(true); },
                            TaskType::POWER_ON,
                            LONG_TASK_RUNTIME);
 }
@@ -87,10 +87,16 @@ void onLongPressPowerButtonStart()
     return;
   }
 
-  taskController.runTask([]()
-                         { powerController.turnOffVUOnce(); },
-                         TaskType::TURN_OFF_VU,
-                         LONG_TASK_RUNTIME);
+  if (powerController.isVUOn())
+    taskController.runTask([]()
+                           { powerController.setVU(false); },
+                           TaskType::TURN_OFF_VU,
+                           LONG_TASK_RUNTIME);
+  else
+    taskController.runTask([]()
+                           { powerController.setVU(true); },
+                           TaskType::TURN_ON_VU,
+                           LONG_TASK_RUNTIME);
 }
 
 void onClickInputSelectorButton()

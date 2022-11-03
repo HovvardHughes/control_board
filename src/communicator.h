@@ -5,29 +5,19 @@
 #include <arduino-timer.h>
 #include <communicatorCommands.h>
 #include <handlers.h>
+#include <WiFiSettings.h>
 
 extern TaskController taskController;
+WiFiSettings wiFiSettings = WiFiSettings();
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
 // Search for parameter in HTTP POST request
-const char *PARAM_INPUT_1 = "ssid";
-const char *PARAM_INPUT_2 = "password";
-const char *PARAM_INPUT_3 = "ip";
-const char *PARAM_INPUT_4 = "gateway";
-
-// Variables to save values from HTML form
-String ssid;
-String pass;
-String ip;
-String gateway;
-
-// File paths to save input values permanently
-const char *ssidPath = "/ssid.txt";
-const char *passPath = "/password.txt";
-const char *ipPath = "/ip.txt";
-const char *gatewayPath = "/gateway.txt";
+const char *SSID_PARAM = "ssid";
+const char *PASSWORD_PARAM = "password";
+const char *IP_PARAM = "ip";
+const char *GATEWAY_PARAM = "gateway";
 
 IPAddress localIP;
 IPAddress localGateway;
@@ -38,35 +28,20 @@ const long interval = 10000;
 
 extern PowerController powerController;
 
-void initSPIFFS()
-{
-  if (!SPIFFS.begin(true))
-  {
-    Serial.println("An error has occurred while mounting SPIFFS");
-  }
-  Serial.println("SPIFFS mounted successfully");
-}
-
 // Initialize WiFi
 bool initWiFi()
 {
-  if (ssid == "" || ip == "")
-  {
-    Serial.println("Undefined SSID or IP address.");
+  if (wiFiSettings.getSSID() == "" || wiFiSettings.getIP() == "")
     return false;
-  }
 
   WiFi.mode(WIFI_STA);
-  localIP.fromString(ip.c_str());
-  localGateway.fromString(gateway.c_str());
+  localIP.fromString(wiFiSettings.getIP().c_str());
+  localGateway.fromString(wiFiSettings.getGateway().c_str());
 
   if (!WiFi.config(localIP, localGateway, subnet))
-  {
-    Serial.println("STA Failed to configure");
     return false;
-  }
-  WiFi.begin(ssid.c_str(), pass.c_str());
-  Serial.println("Connecting to WiFi...");
+
+  WiFi.begin(wiFiSettings.getSSID().c_str(), wiFiSettings.getPassword().c_str());
 
   unsigned long currentMillis = millis();
   previousMillis = currentMillis;
@@ -75,22 +50,19 @@ bool initWiFi()
   {
     currentMillis = millis();
     if (currentMillis - previousMillis >= interval)
-    {
-      Serial.println("Failed to connect.");
       return false;
-    }
   }
 
-  Serial.println(WiFi.localIP());
   return true;
 }
+
 void textStateAll()
 {
   int state = 0;
 
   state |= powerController.isPowerOn() << 0;
   state |= powerController.isSleepModeOn() << 1;
-  state |= powerController.isPowerVUOn() << 2;
+  state |= powerController.isVUOn() << 2;
   state |= inputSelector.readRelay(MAIN_INPUT_RELAY_IO_NUMBER) << 3;
   state |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_IO_NUMBER) << 4;
   state |= taskController.isRunningTask() << 5;
@@ -114,7 +86,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     if (strcmp((char *)data, SWITCH_SLEEP_MODE) == 0)
       onDoubleClickPowerButton();
 
-    if (strcmp((char *)data, POWER_OFF_VU) == 0)
+    if (strcmp((char *)data, SWITCH_VU) == 0)
       onLongPressPowerButtonStart();
 
     if (strcmp((char *)data, TURN_ON_MAIN_RELAY) == 0)
@@ -147,13 +119,8 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   case WS_EVT_CONNECT:
     textStateAll();
     break;
-  case WS_EVT_DISCONNECT:
-    break;
   case WS_EVT_DATA:
     handleWebSocketMessage(arg, data, len);
-    break;
-  case WS_EVT_PONG:
-  case WS_EVT_ERROR:
     break;
   }
 }
@@ -164,131 +131,66 @@ void initWebSocket()
   server.addHandler(&ws);
 }
 
-String processor(const String &var)
+String wiFiSettingsProcessor(const String &var)
 {
   if (var == "ssid")
-  {
-    return ssid;
-  }
+    return wiFiSettings.getSSID();
+
   if (var == "password")
-  {
-    return pass;
-  }
+    return wiFiSettings.getPassword();
+
   if (var == "ip")
-  {
-    return ip;
-  }
+    return wiFiSettings.getIP();
+
   if (var == "gateway")
-  {
-    return gateway;
-  }
+    return wiFiSettings.getGateway();
+
   return String();
 }
+void handleWi(AsyncWebServerRequest *request)
+{
+  int params = request->params();
+  for (int i = 0; i < params; i++)
+  {
+    AsyncWebParameter *p = request->getParam(i);
+    if (p->isPost())
+    {
+      if (p->name() == SSID_PARAM)
+        wiFiSettings.setSSID(p->value().c_str());
+      if (p->name() == PASSWORD_PARAM)
+        wiFiSettings.setPassword(p->value().c_str());
+      if (p->name() == IP_PARAM)
+        wiFiSettings.setIP(p->value().c_str());
+      if (p->name() == GATEWAY_PARAM)
+        wiFiSettings.setGateway(p->value().c_str());
+    }
+  }
+  request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + wiFiSettings.getIP());
+  delay(3000);
+  ESP.restart();
+};
 
 void setupCommunicator()
 {
-  initSPIFFS();
-
-  // Load values saved in SPIFFS
-  // ssid = readFile(SPIFFS, ssidPath);
-  // pass = readFile(SPIFFS, passPath);
-  // ip = readFile(SPIFFS, ipPath);
-  // gateway = readFile(SPIFFS, gatewayPath);
-
-  ssid = "Begemot";
-  pass = "19411945";
-  ip = "192.168.1.200";
-  gateway = "192.168.4.1";
-  Serial.println(ssid);
-  Serial.println(pass);
-  Serial.println(ip);
-  Serial.println(gateway);
+  SPIFFS.begin(true);
 
   if (initWiFi())
   {
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
               { request->send(SPIFFS, "/control-board.html", "text/html", false); });
     server.on("/wi-fi-settings", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(SPIFFS, "/wi-fi-settings.html", "text/html", false, processor); });
-    initWebSocket();
+              { request->send(SPIFFS, "/wi-fi-settings.html", "text/html", false, wiFiSettingsProcessor); });
 
-    server.on("/wi-fi-settings", HTTP_POST, [](AsyncWebServerRequest *request)
-              {
-      int params = request->params();
-      for (int i = 0; i < params; i++)
-      {
-        AsyncWebParameter *p = request->getParam(i);
-        if (p->isPost())
-        {
-          if (p->name() == PARAM_INPUT_1)
-          {
-            ssid = p->value().c_str();
-            writeFile(SPIFFS, ssidPath, ssid.c_str());
-          }
-          if (p->name() == PARAM_INPUT_2)
-          {
-            pass = p->value().c_str();
-            writeFile(SPIFFS, passPath, pass.c_str());
-          }
-          if (p->name() == PARAM_INPUT_3)
-          {
-            ip = p->value().c_str();
-            writeFile(SPIFFS, ipPath, ip.c_str());
-          }
-          if (p->name() == PARAM_INPUT_4)
-          {
-            gateway = p->value().c_str();
-            writeFile(SPIFFS, gatewayPath, gateway.c_str());
-          }
-        }
-      }
-      request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + ip);
-      delay(3000);
-      ESP.restart(); });
+    initWebSocket();
   }
   else
   {
     WiFi.softAP("ESP-WIFI-MANAGER", NULL);
-
     IPAddress IP = WiFi.softAPIP();
 
-    server.on(
-        "/", HTTP_GET, [](AsyncWebServerRequest *request)
-        { request->send(SPIFFS, "/wi-fi-settings.html", "text/html", false, processor); }),
-
-        server.on("/", HTTP_POST, [](AsyncWebServerRequest *request)
-                  {
-      int params = request->params();
-      for (int i = 0; i < params; i++)
-      {
-        AsyncWebParameter *p = request->getParam(i);
-        if (p->isPost())
-        {
-          if (p->name() == PARAM_INPUT_1)
-          {
-            ssid = p->value().c_str();
-            writeFile(SPIFFS, ssidPath, ssid.c_str());
-          }
-          if (p->name() == PARAM_INPUT_2)
-          {
-            pass = p->value().c_str();
-            writeFile(SPIFFS, passPath, pass.c_str());
-          }
-          if (p->name() == PARAM_INPUT_3)
-          {
-            ip = p->value().c_str();
-            writeFile(SPIFFS, ipPath, ip.c_str());
-          }
-          if (p->name() == PARAM_INPUT_4)
-          {
-            gateway = p->value().c_str();
-            writeFile(SPIFFS, gatewayPath, gateway.c_str());
-          }
-        }
-      }
-      request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + ip);
-      delay(3000);
-      ESP.restart(); });
+    server.on("/", HTTP_POST, handleWi);
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+              { request->send(SPIFFS, "/wi-fi-settings.html", "text/html", false, wiFiSettingsProcessor); });
   }
 
   server.serveStatic("/", SPIFFS, "/");

@@ -2,7 +2,7 @@ const Commands = {
   GET_STATE: 0,
   SWITCH_POWER: 1,
   SWITCH_SLEEP_MODE: 2,
-  POWER_OFF_VU: 3,
+  SWITCH_VU: 3,
   TURN_ON_MAIN_RELAY: 4,
   TURN_OFF_MAIN_RELAY: 5,
   TURN_ON_SECONDARY_RELAY: 6,
@@ -22,7 +22,8 @@ const TaskTypes = {
   POWER_OFF: 2,
   TURN_ON_SLEEP_MODE: 3,
   TURN_OFF_SLEEP_MODE : 4,
-  TURN_OFF_VU: 5,
+  TURN_ON_VU: 5,
+  TURN_OFF_VU: 6,
 }
 
 const TaskTypesTitles = {
@@ -31,13 +32,14 @@ const TaskTypesTitles = {
   [TaskTypes.POWER_OFF]: "Power off",
   [TaskTypes.TURN_ON_SLEEP_MODE]: "Turn on sleep mode",
   [TaskTypes.TURN_OFF_SLEEP_MODE] : "Turn off sleep mode",
+  [TaskTypes.TURN_ON_VU]: "Turn on VU",
   [TaskTypes.TURN_OFF_VU]: "Turn off VU",
 }
 
 const IDs = {
   POWER_BUTTON: "power-button",
   SLEEP_MODE_BUTTON: "sleep-mode-button",
-  POWER_OFF_VU__BUTTON: "power-off-vu-button",
+  VU_BUTTON: "vu-button",
   VOLUME_SLIDER_CONTAINER: "volume-slider-container",
   VOLUME_SLIDER: "volume-slider",
   INPUT_SELECTOR: "input-selector",
@@ -81,11 +83,11 @@ function onMessage(event) {
 
   addOrRemoveClass(IDs.POWER_BUTTON, "progress", runningTaskType === TaskTypes.POWER_ON || runningTaskType === TaskTypes.POWER_OFF);
   addOrRemoveClass(IDs.SLEEP_MODE_BUTTON, "progress", runningTaskType === TaskTypes.TURN_ON_SLEEP_MODE || runningTaskType === TaskTypes.TURN_OFF_SLEEP_MODE)
-  addOrRemoveClass(IDs.POWER_OFF_VU__BUTTON, "progress", runningTaskType === TaskTypes.TURN_OFF_VU)
+  addOrRemoveClass(IDs.VU_BUTTON, "progress", runningTaskType === TaskTypes.TURN_OFF_VU)
 
   addOrRemoveClass(IDs.POWER_BUTTON, "enabled-power-button", isPowerOn);
   addOrRemoveClass(IDs.SLEEP_MODE_BUTTON, "enabled-sleep-mode-button", isSleepModeOn);
-  addOrRemoveClass(IDs.POWER_OFF_VU__BUTTON, "enabled-vu-button", isVUOn);
+  addOrRemoveClass(IDs.VU_BUTTON, "enabled-vu-button", isVUOn);
 
   setAtrribute("checked", {
     [IDs.MAIN_INPUT]: mainInputRelay,
@@ -97,7 +99,7 @@ function onMessage(event) {
   setAtrribute("disabled", {
     [IDs.POWER_BUTTON]: isRunningTask || isSleepModeOn,
     [IDs.SLEEP_MODE_BUTTON]: isRunningTaskOrPowerTurndedOff,
-    [IDs.POWER_OFF_VU__BUTTON]: isRunningTaskOrPowerTurndedOff || isSleepModeOn | !isVUOn,
+    [IDs.VU_BUTTON]: isRunningTaskOrPowerTurndedOff || isSleepModeOn,
     [IDs.MAIN_INPUT]: isRunningTaskOrPowerTurndedOff,
     [IDs.SECONDARY_INPUT]:  isRunningTaskOrPowerTurndedOff,
     [IDs.VOLUME_SLIDER]: isRunningTaskOrPowerTurndedOff
@@ -136,7 +138,7 @@ function onLoad(event) {
 function initButtons() {
   document.getElementById(IDs.POWER_BUTTON).addEventListener('click', switchPower);
   document.getElementById(IDs.SLEEP_MODE_BUTTON).addEventListener('click', switchSleepMode);
-  document.getElementById(IDs.POWER_OFF_VU__BUTTON).addEventListener('click', powerOffVU);
+  document.getElementById(IDs.VU_BUTTON).addEventListener('click', switchVU);
   document.getElementById(IDs.MAIN_INPUT).addEventListener('click', handleInputSwitchClicked);
   document.getElementById(IDs.SECONDARY_INPUT).addEventListener('click', handleInputSwitchClicked);
   const volumeSlider = document.getElementById(IDs.VOLUME_SLIDER);
@@ -154,8 +156,8 @@ function switchSleepMode() {
   websocket.send(Commands.SWITCH_SLEEP_MODE);
 }
 
-function powerOffVU() {
-  websocket.send(Commands.POWER_OFF_VU);
+function switchVU() {
+  websocket.send(Commands.SWITCH_VU);
 }
 
 function handleInputSwitchClicked(event) {

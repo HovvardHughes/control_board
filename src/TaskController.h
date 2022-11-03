@@ -8,6 +8,7 @@ enum TaskType
     POWER_OFF,
     TURN_ON_SLEEP_MODE,
     TURN_OFF_SLEEP_MODE,
+    TURN_ON_VU,
     TURN_OFF_VU,
 };
 

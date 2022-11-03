@@ -4,7 +4,8 @@
 #include <Buzzer.h>
 
 #define POWER_RELAY_COUNT 5
-#define POWER_VU_INDEX 3
+#define VU_INDEX 3
+#define VU_UNKNOWN_INDEX 4
 
 class PowerController
 {
@@ -28,7 +29,7 @@ private:
 
     Led _powerLed;
 
-    static bool turnOnSleepModeInternal(void *p)
+    static bool turnOnSleepMode(void *p)
     {
         PowerController *ptr = (PowerController *)p;
 
@@ -42,7 +43,7 @@ private:
         return false;
     }
 
-    static bool turnOffSleepModeInternal(void *p)
+    static bool turnOffSleepMode(void *p)
     {
         PowerController *ptr = (PowerController *)p;
 
@@ -55,7 +56,7 @@ private:
         return false;
     }
 
-    static bool turnOnPowerInternal(void *p)
+    static bool turnOnPower(void *p)
     {
         PowerController *ptr = (PowerController *)p;
 
@@ -74,7 +75,7 @@ private:
         return false;
     }
 
-    static bool turnOffPowerInternal(void *p)
+    static bool turnOffPower(void *p)
     {
         PowerController *ptr = (PowerController *)p;
 
@@ -92,12 +93,17 @@ private:
         return false;
     }
 
-    static bool turnOffVUOnceInternal(void *p)
+    static bool turnOnVU(void *p)
     {
         PowerController *ptr = (PowerController *)p;
+        ptr->_allPowerRelays[VU_UNKNOWN_INDEX].write(HIGH);
+        return false;
+    }
 
-        ptr->_allPowerRelays[POWER_VU_INDEX].writeAndForbidWriting(LOW);
-
+    static bool turnOffVU(void *p)
+    {
+        PowerController *ptr = (PowerController *)p;
+        ptr->_allPowerRelays[VU_INDEX].write(LOW);
         return false;
     }
 
@@ -111,62 +117,61 @@ public:
         _powerLed = Led(POWER_BUTTON_LED_CHANNEL, POWER_BUTTON_LED_PIN, timer);
     }
 
-    void turnOnSleepMode()
+    void setSleepMode(uint8_t state)
     {
         _buzzer->buzz(4);
 
-        _allPowerRelays[2].write(LOW);
-        _timer->in(LONG_TASK_DELAY, turnOnSleepModeInternal, this);
-    }
-
-    void turnOffSleepMode()
-    {
-        _buzzer->buzz(4);
-
-        _allPowerRelays[1].write(HIGH);
-        _allPowerRelays[3].write(HIGH);
-
-        _timer->in(LONG_TASK_DELAY, turnOffSleepModeInternal, this);
-    }
-
-    void turnOnPower()
-    {
-        _buzzer->buzz(2);
-
-        _allPowerRelays[0].write(HIGH);
-        _allPowerRelays[1].write(HIGH);
-        _allPowerRelays[3].write(HIGH);
-
-        _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
-
-        _timer->in(LONG_TASK_DELAY, turnOnPowerInternal, this);
-    }
-
-    void turnOffPower()
-    {
-
-        _buzzer->buzz(2);
-
-        _allPowerRelays[2].write(LOW);
-        _allPowerRelays[4].write(LOW);
-
-        _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
-
-        _timer->in(LONG_TASK_DELAY, turnOffPowerInternal, this);
-    }
-
-    void turnOffVUOnce()
-    {
-        Relay firstRelay = _allPowerRelays[4];
-        const bool wasWritable = firstRelay.isWritable();
-        if (wasWritable)
+        if (state)
         {
-            _buzzer->buzz(2, LONG_BUZZ_INTERVAL);
+            _allPowerRelays[2].write(LOW);
+            _timer->in(LONG_TASK_DELAY, turnOnSleepMode, this);
+        }
+        else
+        {
+            _allPowerRelays[1].write(HIGH);
+            _allPowerRelays[3].write(HIGH);
+            _timer->in(LONG_TASK_DELAY, turnOffSleepMode, this);
+        }
+    }
 
-            firstRelay.writeAndForbidWriting(LOW);
+    void setPower(uint8_t state)
+    {
+        _buzzer->buzz(2);
 
-            _timer->in(
-                LONG_TASK_DELAY, turnOffVUOnceInternal, this);
+        if (state)
+        {
+            _allPowerRelays[0].write(HIGH);
+            _allPowerRelays[1].write(HIGH);
+            _allPowerRelays[3].write(HIGH);
+
+            _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
+
+            _timer->in(LONG_TASK_DELAY, turnOnPower, this);
+        }
+        else
+        {
+            _allPowerRelays[2].write(LOW);
+            _allPowerRelays[4].write(LOW);
+
+            _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
+
+            _timer->in(LONG_TASK_DELAY, turnOffPower, this);
+        };
+    }
+
+    void setVU(uint8_t state)
+    {
+        _buzzer->buzz(6);
+
+        if (state)
+        {
+            _allPowerRelays[VU_INDEX].write(state);
+            _timer->in(LONG_TASK_DELAY, turnOnVU, this);
+        }
+        else
+        {
+            _allPowerRelays[VU_UNKNOWN_INDEX].write(state);
+            _timer->in(LONG_TASK_DELAY, turnOffVU, this);
         }
     }
 
@@ -187,8 +192,8 @@ public:
         return _isSleepModeOn;
     }
 
-    bool isPowerVUOn()
+    bool isVUOn()
     {
-        return _allPowerRelays[POWER_VU_INDEX].read();
+        return _allPowerRelays[VU_INDEX].read() && _allPowerRelays[VU_UNKNOWN_INDEX].read();
     }
 };

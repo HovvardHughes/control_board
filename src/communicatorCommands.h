@@ -4,7 +4,7 @@
 
 #define SWITCH_POWER "1"
 #define SWITCH_SLEEP_MODE "2"
-#define POWER_OFF_VU "3"
+#define SWITCH_VU "3"
 
 #define TURN_ON_MAIN_RELAY "4"
 #define TURN_OFF_MAIN_RELAY "5"
