@@ -9,7 +9,7 @@
 WiFiSettings wiFiSettings = WiFiSettings();
 
 AsyncWebServer server(80);
-AsyncWebSocket ws("/ws");
+AsyncWebSocket webSocket("/ws");
 
 const char *SSID_PARAM = "ssid";
 const char *PASSWORD_PARAM = "password";
@@ -23,7 +23,6 @@ IPAddress subnet(255, 255, 0, 0);
 unsigned long previousMillis = 0;
 const long interval = 10000;
 
-// Initialize WiFi
 bool initWiFi()
 {
   if (wiFiSettings.getSSID() == "" || wiFiSettings.getIP() == "")
@@ -62,7 +61,7 @@ void textStateAll()
   state |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_PIN) << 4;
   state |= taskController.isLongTaskRunning() << 5;
 
-  ws.textAll(String(state) + "|" + taskController.getRunningLongTaskType());
+  webSocket.textAll(String(state) + "|" + taskController.getRunningLongTaskType());
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
@@ -122,8 +121,8 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 
 void initWebSocket()
 {
-  ws.onEvent(onEvent);
-  server.addHandler(&ws);
+  webSocket.onEvent(onEvent);
+  server.addHandler(&webSocket);
 }
 
 String wiFiSettingsProcessor(const String &var)
@@ -204,5 +203,5 @@ void setupCommunicator()
 
 void tickCommunicator()
 {
-  ws.cleanupClients();
+  webSocket.cleanupClients();
 }
