@@ -1,86 +1,88 @@
 #include <Led.h>
 #include <Arduino.h>
-#include <Relay.h>
 
 class InputSelector
 {
 private:
-  Relay _allRelays[INPUT_RELAY_COUNT] = {
-      Relay(MAIN_INPUT_RELAY_IO_NUMBER),
-      Relay(SECONDARY_INPUT_RELAY_IO_NUMBER)};
+  uint8_t _allRelayPins[INPUT_RELAY_COUNT] = {
+      MAIN_INPUT_RELAY_PIN,
+      SECONDARY_INPUT_RELAY_PIN};
 
-  byte _selectedRelayIONumber = _allRelays[0].iONumber;
-  byte _notSelectedRelayIONumber = _allRelays[1].iONumber;
+  byte _pinOfselectedRelay = _allRelayPins[0];
+  byte _pinOfNotSelectedRelay = _allRelayPins[1];
 
 public:
   void setup()
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-      _allRelays[i].setup();
+      pinMode(_allRelayPins[i], OUTPUT);
   }
 
   void setSelectedRelayIONumber(int iONumber)
   {
-    _selectedRelayIONumber = iONumber;
+    _pinOfselectedRelay = iONumber;
   }
 
-  bool readRelay(int iONumber)
+  bool readRelay(uint8_t pin)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
     {
-      Relay relay = _allRelays[i];
-      if (relay.iONumber == iONumber)
-        return relay.read();
+      uint8_t currentPin = _allRelayPins[i];
+      if (currentPin == pin)
+        return digitalRead(currentPin);
     }
 
     return false;
   }
 
-  void writeToAllRelays(int state)
+  void writeToAllRelays(uint8_t state)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-      _allRelays[i].write(state);
+      digitalWrite(_allRelayPins[i], state);
   }
 
-  void writeToRelay(int iONumber, int state)
+  void writeToRelay(uint8_t pin, uint8_t state)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
     {
-      Relay relay = _allRelays[i];
-      if (relay.iONumber == iONumber)
-        relay.write(state);
+      uint8_t currentPin = _allRelayPins[i];
+      if (currentPin == pin)
+      {
+        digitalWrite(currentPin, state);
+        break;
+      }
     }
   }
 
-  void writeToSeletedRelay(int state)
+  void writeToSeletedRelay(uint8_t state)
   {
-    writeToRelay(_selectedRelayIONumber, state);
+    writeToRelay(_pinOfselectedRelay, state);
   }
 
-  void writeToNotSelected(int state)
+  void writeToNotSelected(uint8_t state)
   {
-    writeToRelay(_notSelectedRelayIONumber, state);
+    writeToRelay(_pinOfNotSelectedRelay, state);
   }
 
-  void writeToNotSelectedAndSetSelected(int state)
+  void writeToNotSelectedAndSetSelected(uint8_t state)
   {
-    writeToRelay(_notSelectedRelayIONumber, state);
-    _selectedRelayIONumber = _notSelectedRelayIONumber;
+    writeToRelay(_pinOfNotSelectedRelay, state);
+    _pinOfselectedRelay = _pinOfNotSelectedRelay;
   }
 
   void swapRelays()
   {
-    byte temp = _selectedRelayIONumber;
-    _selectedRelayIONumber = _notSelectedRelayIONumber;
-    _notSelectedRelayIONumber = temp;
+    byte temp = _pinOfselectedRelay;
+    _pinOfselectedRelay = _pinOfNotSelectedRelay;
+    _pinOfNotSelectedRelay = temp;
 
-    writeToRelay(_notSelectedRelayIONumber, LOW);
-    writeToRelay(_selectedRelayIONumber, HIGH);
+    writeToRelay(_pinOfNotSelectedRelay, LOW);
+    writeToRelay(_pinOfselectedRelay, HIGH);
   }
 
-  byte getInvertCount(int iOUnumber)
+  byte getInvertCount(uint8_t pin)
   {
-    return iOUnumber == MAIN_INPUT_RELAY_IO_NUMBER ? 2 : 4;
+    return pin == MAIN_INPUT_RELAY_PIN ? 2 : 4;
   }
 
   byte getInvertCount()
@@ -89,23 +91,20 @@ public:
 
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
     {
-      Relay relay = _allRelays[i];
-      if (relay.read())
-        count += getInvertCount(relay.iONumber);
+      uint8_t pin = _allRelayPins[i];
+      if (digitalRead(pin))
+        count += getInvertCount(pin);
       ;
     }
 
     return count;
   }
 
-  bool areAllRelays(int state)
+  bool areAllRelays(uint8_t state)
   {
     for (size_t i = 0; i < INPUT_RELAY_COUNT; i++)
-    {
-      Relay relay = _allRelays[i];
-      if (relay.read() != state)
+      if (digitalRead(_allRelayPins[i]))
         return false;
-    }
 
     return true;
   }

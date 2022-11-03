@@ -63,8 +63,8 @@ void textStateAll()
   state |= powerController.isPowerOn() << 0;
   state |= powerController.isSleepModeOn() << 1;
   state |= powerController.isVUOn() << 2;
-  state |= inputSelector.readRelay(MAIN_INPUT_RELAY_IO_NUMBER) << 3;
-  state |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_IO_NUMBER) << 4;
+  state |= inputSelector.readRelay(MAIN_INPUT_RELAY_PIN) << 3;
+  state |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_PIN) << 4;
   state |= taskController.isRunningTask() << 5;
 
   ws.textAll(String(state) + "|" + taskController.getRunningTaskType());
@@ -90,16 +90,16 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
       onLongPressPowerButtonStart();
 
     if (strcmp((char *)data, TURN_ON_MAIN_RELAY) == 0)
-      onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_IO_NUMBER, HIGH);
+      onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_PIN, HIGH);
 
     if (strcmp((char *)data, TURN_OFF_MAIN_RELAY) == 0)
-      onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_IO_NUMBER, LOW);
+      onClickInputSelectorCheckbox(MAIN_INPUT_RELAY_PIN, LOW);
 
     if (strcmp((char *)data, TURN_ON_SECONDARY_RELAY) == 0)
-      onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_IO_NUMBER, HIGH);
+      onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_PIN, HIGH);
 
     if (strcmp((char *)data, TURN_OFF_SECONDARY_RELAY) == 0)
-      onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_IO_NUMBER, LOW);
+      onClickInputSelectorCheckbox(SECONDARY_INPUT_RELAY_PIN, LOW);
 
     if (strcmp((char *)data, TURN_OFF_VOLUME_PWM) == 0 ||
         strcmp((char *)data, REVERSE_LOW_VOLUME_PWM) == 0 ||

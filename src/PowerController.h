@@ -20,12 +20,12 @@ private:
     bool _isPowerOn;
     bool _isSleepModeOn;
 
-    Relay _allPowerRelays[POWER_RELAY_COUNT] = {
-        Relay(25),
-        Relay(26),
-        Relay(27),
-        Relay(14),
-        Relay(12)};
+    uint8_t _allPowerRelayPins[POWER_RELAY_COUNT] = {
+        25,
+        26,
+        27,
+        14,
+        12};
 
     Led _powerLed;
 
@@ -33,8 +33,8 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        ptr->_allPowerRelays[1].write(LOW);
-        ptr->_allPowerRelays[3].write(LOW);
+        digitalWrite(ptr->_allPowerRelayPins[1], LOW);
+        digitalWrite(ptr->_allPowerRelayPins[3], LOW);
 
         ptr->_powerLed.startPwm(LONG_LED_PWM_INTERVAL);
 
@@ -47,7 +47,7 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        ptr->_allPowerRelays[2].write(HIGH);
+        digitalWrite(ptr->_allPowerRelayPins[2], HIGH);
 
         ptr->_powerLed.finishPwm(MAX_PWM_DUTY);
 
@@ -60,8 +60,8 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        ptr->_allPowerRelays[2].write(HIGH);
-        ptr->_allPowerRelays[4].write(HIGH);
+        digitalWrite(ptr->_allPowerRelayPins[2], HIGH);
+        digitalWrite(ptr->_allPowerRelayPins[4], HIGH);
 
         ptr->_inputSelector->writeToSeletedRelay(HIGH);
         ptr->_inputSelectorLed->writeMax();
@@ -79,9 +79,9 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        ptr->_allPowerRelays[0].write(LOW);
-        ptr->_allPowerRelays[1].write(LOW);
-        ptr->_allPowerRelays[3].write(LOW);
+        digitalWrite(ptr->_allPowerRelayPins[0], LOW);
+        digitalWrite(ptr->_allPowerRelayPins[1], LOW);
+        digitalWrite(ptr->_allPowerRelayPins[3], LOW);
 
         ptr->_inputSelector->writeToAllRelays(LOW);
         ptr->_inputSelectorLed->writeMin();
@@ -96,14 +96,14 @@ private:
     static bool turnOnVU(void *p)
     {
         PowerController *ptr = (PowerController *)p;
-        ptr->_allPowerRelays[VU_UNKNOWN_INDEX].write(HIGH);
+        digitalWrite(ptr->_allPowerRelayPins[VU_UNKNOWN_INDEX], HIGH);
         return false;
     }
 
     static bool turnOffVU(void *p)
     {
         PowerController *ptr = (PowerController *)p;
-        ptr->_allPowerRelays[VU_INDEX].write(LOW);
+        digitalWrite(ptr->_allPowerRelayPins[VU_INDEX], LOW);
         return false;
     }
 
@@ -123,13 +123,13 @@ public:
 
         if (state)
         {
-            _allPowerRelays[2].write(LOW);
+            digitalWrite(_allPowerRelayPins[2], LOW);
             _timer->in(LONG_TASK_DELAY, turnOnSleepMode, this);
         }
         else
         {
-            _allPowerRelays[1].write(HIGH);
-            _allPowerRelays[3].write(HIGH);
+            digitalWrite(_allPowerRelayPins[1], HIGH);
+            digitalWrite(_allPowerRelayPins[3], HIGH);
             _timer->in(LONG_TASK_DELAY, turnOffSleepMode, this);
         }
     }
@@ -140,9 +140,9 @@ public:
 
         if (state)
         {
-            _allPowerRelays[0].write(HIGH);
-            _allPowerRelays[1].write(HIGH);
-            _allPowerRelays[3].write(HIGH);
+            digitalWrite(_allPowerRelayPins[0], HIGH);
+            digitalWrite(_allPowerRelayPins[1], HIGH);
+            digitalWrite(_allPowerRelayPins[3], HIGH);
 
             _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
 
@@ -150,8 +150,8 @@ public:
         }
         else
         {
-            _allPowerRelays[2].write(LOW);
-            _allPowerRelays[4].write(LOW);
+            digitalWrite(_allPowerRelayPins[2], LOW);
+            digitalWrite(_allPowerRelayPins[4], LOW);
 
             _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
 
@@ -165,12 +165,12 @@ public:
 
         if (state)
         {
-            _allPowerRelays[VU_INDEX].write(state);
+            digitalWrite(_allPowerRelayPins[VU_INDEX], HIGH);
             _timer->in(LONG_TASK_DELAY, turnOnVU, this);
         }
         else
         {
-            _allPowerRelays[VU_UNKNOWN_INDEX].write(state);
+            digitalWrite(_allPowerRelayPins[VU_UNKNOWN_INDEX], LOW);
             _timer->in(LONG_TASK_DELAY, turnOffVU, this);
         }
     }
@@ -179,7 +179,7 @@ public:
     {
         _powerLed.setup();
         for (size_t i = 0; i < POWER_RELAY_COUNT; i++)
-            _allPowerRelays[i].setup();
+            pinMode(_allPowerRelayPins[i], OUTPUT);
     }
 
     bool isPowerOn()
@@ -194,6 +194,6 @@ public:
 
     bool isVUOn()
     {
-        return _allPowerRelays[VU_INDEX].read() && _allPowerRelays[VU_UNKNOWN_INDEX].read();
+        return digitalRead(_allPowerRelayPins[VU_INDEX]) && digitalRead(_allPowerRelayPins[VU_UNKNOWN_INDEX]);
     }
 };
