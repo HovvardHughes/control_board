@@ -1,5 +1,5 @@
 
-#include <timer.h>
+#include <arduino-timer.h>
 #include <InputSelector.h>
 #include <Buzzer.h>
 

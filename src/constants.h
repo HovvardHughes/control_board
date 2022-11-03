@@ -80,8 +80,8 @@ GPIO      Connected to...
 
 #define COM_PORT_SPEED 115200 // COM Port Baud Rate
 
-#define LONG_TASK_DELAY 1000 // For Debugging
-// #define LONG_TASK_DELAY 25000 // For Release - Pre-programmed Heating Filaments Delay
+// #define LONG_TASK_DELAY 1000 // For Debugging
+ #define LONG_TASK_DELAY 25000 // For Release - Pre-programmed Heating Filaments Delay
 
 #define LONG_TASK_RUNTIME LONG_TASK_DELAY + 500
 #define FAST_TASK_RUNTIME 500

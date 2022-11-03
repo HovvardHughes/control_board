@@ -45,15 +45,15 @@ void onVolumeChanged(u_int8_t *commmand)
 void onDoubleClickPowerButton()
 {
   if (powerController.isSleepModeOn())
-    taskController.runTask([]()
-                           { powerController.setSleepMode(false); },
-                           TaskType::TURN_OFF_SLEEP_MODE,
-                           LONG_TASK_RUNTIME);
+    taskController.runLongTask([]()
+                               { powerController.setSleepMode(false); },
+                               LongTaskType::TURN_OFF_SLEEP_MODE,
+                               LONG_TASK_RUNTIME);
   else
-    taskController.runTask([]()
-                           { powerController.setSleepMode(true); },
-                           TaskType::TURN_ON_SLEEP_MODE,
-                           LONG_TASK_RUNTIME);
+    taskController.runLongTask([]()
+                               { powerController.setSleepMode(true); },
+                               LongTaskType::TURN_ON_SLEEP_MODE,
+                               LONG_TASK_RUNTIME);
 }
 
 void onClickPowerButton()
@@ -65,15 +65,15 @@ void onClickPowerButton()
   }
 
   if (powerController.isPowerOn())
-    taskController.runTask([]()
-                           { powerController.setPower(false); },
-                           TaskType::POWER_OFF,
-                           LONG_TASK_RUNTIME);
+    taskController.runLongTask([]()
+                               { powerController.setPower(false); },
+                               LongTaskType::POWER_OFF,
+                               LONG_TASK_RUNTIME);
   else
-    taskController.runTask([]()
-                           { powerController.setPower(true); },
-                           TaskType::POWER_ON,
-                           LONG_TASK_RUNTIME);
+    taskController.runLongTask([]()
+                               { powerController.setPower(true); },
+                               LongTaskType::POWER_ON,
+                               LONG_TASK_RUNTIME);
 }
 
 void onLongPressPowerButtonStart()
@@ -88,15 +88,15 @@ void onLongPressPowerButtonStart()
   }
 
   if (powerController.isVUOn())
-    taskController.runTask([]()
-                           { powerController.setVU(false); },
-                           TaskType::TURN_OFF_VU,
-                           LONG_TASK_RUNTIME);
+    taskController.runLongTask([]()
+                               { powerController.setVU(false); },
+                               LongTaskType::TURN_OFF_VU,
+                               LONG_TASK_RUNTIME);
   else
-    taskController.runTask([]()
-                           { powerController.setVU(true); },
-                           TaskType::TURN_ON_VU,
-                           LONG_TASK_RUNTIME);
+    taskController.runLongTask([]()
+                               { powerController.setVU(true); },
+                               LongTaskType::TURN_ON_VU,
+                               LONG_TASK_RUNTIME);
 }
 
 void onClickInputSelectorButton()

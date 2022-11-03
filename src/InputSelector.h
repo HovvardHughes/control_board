@@ -1,5 +1,4 @@
 #include <Led.h>
-#include <Arduino.h>
 
 class InputSelector
 {

@@ -1,7 +1,4 @@
-#include <Arduino.h>
-#include <timer.h>
-
-enum TaskType
+enum LongTaskType
 {
     NONE,
     POWER_ON,
@@ -15,20 +12,21 @@ enum TaskType
 class TaskController
 {
 private:
-    bool _isTaskRunningForbidden;
-    bool _isRunningTask;
-    TaskType _runningTaskType;
+    bool _isFastTaskRunning;
+    bool _isLongTaskRunning;
+    LongTaskType _runningLongTaskType;
 
     Timer<> *_timer;
 
     void (*_prePostTaskAction)();
 
-    static bool finishTask(void *p)
+    static bool completeTask(void *p)
     {
         TaskController *ptr = (TaskController *)p;
-        ptr->_runningTaskType = TaskType::NONE;
-        ptr->_isRunningTask = false;
-        ptr->_isTaskRunningForbidden = false;
+
+        ptr->_runningLongTaskType = LongTaskType::NONE;
+        ptr->_isLongTaskRunning = false;
+        ptr->_isFastTaskRunning = false;
         ptr->_prePostTaskAction();
 
         return false;
@@ -38,7 +36,7 @@ private:
     {
         Serial.println("Check that previous task is completed to run new");
 
-        if (_isRunningTask || _isTaskRunningForbidden)
+        if (_isLongTaskRunning || _isFastTaskRunning)
         {
             Serial.println("Cannot run task, because previous is not completed");
             return true;
@@ -54,22 +52,19 @@ public:
         _prePostTaskAction = prePostTaskAction;
     }
 
-    void runTask(std::function<void()> action, TaskType taskType, unsigned long estimatedTime)
+    void runLongTask(std::function<void()> action, LongTaskType taskType, unsigned long estimatedTime)
     {
         if (checkRunningTask())
             return;
 
-        _runningTaskType = taskType;
-        _isRunningTask = true;
+        _runningLongTaskType = taskType;
+        _isLongTaskRunning = true;
 
         _prePostTaskAction();
 
-        Serial.println("Run task :: ");
-        Serial.print(taskType);
-
         action();
 
-        _timer->in(estimatedTime, finishTask, this);
+        _timer->in(estimatedTime, completeTask, this);
     }
 
     void runFastTask(std::function<void()> action)
@@ -77,19 +72,19 @@ public:
         if (checkRunningTask())
             return;
 
-        _isTaskRunningForbidden = true;
-        _timer->in(FAST_TASK_RUNTIME, finishTask, this);
+        _isFastTaskRunning = true;
+        _timer->in(FAST_TASK_RUNTIME, completeTask, this);
 
         action();
     }
 
-    bool isRunningTask()
+    bool isLongTaskRunning()
     {
-        return _isRunningTask;
+        return _isLongTaskRunning;
     }
 
-    TaskType getRunningTaskType()
+    LongTaskType getRunningLongTaskType()
     {
-        return _runningTaskType;
+        return _runningLongTaskType;
     }
 };

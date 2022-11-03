@@ -2,18 +2,15 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 #include <fileUtils.h>
-#include <arduino-timer.h>
 #include <communicatorCommands.h>
 #include <handlers.h>
 #include <WiFiSettings.h>
 
-extern TaskController taskController;
 WiFiSettings wiFiSettings = WiFiSettings();
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
-// Search for parameter in HTTP POST request
 const char *SSID_PARAM = "ssid";
 const char *PASSWORD_PARAM = "password";
 const char *IP_PARAM = "ip";
@@ -25,8 +22,6 @@ IPAddress subnet(255, 255, 0, 0);
 
 unsigned long previousMillis = 0;
 const long interval = 10000;
-
-extern PowerController powerController;
 
 // Initialize WiFi
 bool initWiFi()
@@ -65,9 +60,9 @@ void textStateAll()
   state |= powerController.isVUOn() << 2;
   state |= inputSelector.readRelay(MAIN_INPUT_RELAY_PIN) << 3;
   state |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_PIN) << 4;
-  state |= taskController.isRunningTask() << 5;
+  state |= taskController.isLongTaskRunning() << 5;
 
-  ws.textAll(String(state) + "|" + taskController.getRunningTaskType());
+  ws.textAll(String(state) + "|" + taskController.getRunningLongTaskType());
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
@@ -147,8 +142,14 @@ String wiFiSettingsProcessor(const String &var)
 
   return String();
 }
-void handleWi(AsyncWebServerRequest *request)
+void handleWiFiSettingsOpening(AsyncWebServerRequest *request)
 {
+  if (taskController.isLongTaskRunning())
+  {
+    request->send(503, "text/plain", "Task is running. Please, try again after some time");
+    return;
+  }
+
   int params = request->params();
   for (int i = 0; i < params; i++)
   {
@@ -165,8 +166,11 @@ void handleWi(AsyncWebServerRequest *request)
         wiFiSettings.setGateway(p->value().c_str());
     }
   }
+
   request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + wiFiSettings.getIP());
+
   delay(3000);
+
   ESP.restart();
 };
 
@@ -180,15 +184,16 @@ void setupCommunicator()
               { request->send(SPIFFS, "/control-board.html", "text/html", false); });
     server.on("/wi-fi-settings", HTTP_GET, [](AsyncWebServerRequest *request)
               { request->send(SPIFFS, "/wi-fi-settings.html", "text/html", false, wiFiSettingsProcessor); });
+    server.on("/wi-fi-settings", HTTP_POST, handleWiFiSettingsOpening);
 
     initWebSocket();
   }
   else
   {
-    WiFi.softAP("ESP-WIFI-MANAGER", NULL);
+    WiFi.softAP("ESP-Wi-Fi", NULL);
     IPAddress IP = WiFi.softAPIP();
 
-    server.on("/", HTTP_POST, handleWi);
+    server.on("/", HTTP_POST, handleWiFiSettingsOpening);
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
               { request->send(SPIFFS, "/wi-fi-settings.html", "text/html", false, wiFiSettingsProcessor); });
   }

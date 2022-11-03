@@ -1,6 +1,4 @@
-#include <Arduino.h>
 #include <constants.h>
-#include <arduino-timer.h>
 
 class Led
 {
