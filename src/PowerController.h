@@ -19,6 +19,7 @@ private:
 
     bool _isPowerOn;
     bool _isSleepModeOn;
+    bool _VUSwitchedOffManuallyly;
 
     uint8_t _allPowerRelayPins[POWER_RELAY_COUNT] = {
         25,
@@ -97,6 +98,7 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
         digitalWrite(ptr->_allPowerRelayPins[VU_UNKNOWN_INDEX], HIGH);
+        _VUSwitchedOffManuallyly = false;
         return false;
     }
 
@@ -104,6 +106,7 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
         digitalWrite(ptr->_allPowerRelayPins[VU_INDEX], LOW);
+        _VUSwitchedOffManuallyly = true;
         return false;
     }
 
