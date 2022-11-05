@@ -95,6 +95,9 @@ async function handleSaveButtonClicked() {
     const generalErrorMessage = "Something's gone wrong. Please, try again.";
 
     try {     
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), 10000);
+
         const response = await fetch('/wi-fi-settings', {
           method: 'post',
           body: {
@@ -102,8 +105,12 @@ async function handleSaveButtonClicked() {
             password: Inputs[IDs.PASSWORD_INPUT_CONTAINER],
             ip: Inputs[IDs.IP_INPUT_CONTAINER],
             gateway: Inputs[IDs.GATEWAY_INPUT_CONTAINER]
-          }
+          },
+          signal: controller.signal  
         });
+
+        clearTimeout(id);
+        
         saveResult = {
             text: await response.text() || generalErrorMessage,
             isError: response.status !== 200
