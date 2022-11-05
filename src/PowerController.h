@@ -19,7 +19,7 @@ private:
 
     bool _isPowerOn;
     bool _isSleepModeOn;
-    bool _VUSwitchedOffManuallyly;
+    bool _VUTurnedOffManually;
 
     uint8_t _allPowerRelayPins[POWER_RELAY_COUNT] = {
         25,
@@ -30,12 +30,20 @@ private:
 
     Led _powerLed;
 
+    void writeWithVUCheck(uint8_t pin, uint8_t state)
+    {
+        if ((pin == _allPowerRelayPins[VU_INDEX] || pin == _allPowerRelayPins[VU_UNKNOWN_INDEX]) && _VUTurnedOffManually)
+            return;
+
+        digitalWrite(pin, state);
+    }
+
     static bool turnOnSleepMode(void *p)
     {
         PowerController *ptr = (PowerController *)p;
 
-        digitalWrite(ptr->_allPowerRelayPins[1], LOW);
-        digitalWrite(ptr->_allPowerRelayPins[3], LOW);
+        ptr->writeWithVUCheck(ptr->_allPowerRelayPins[1], LOW);
+        ptr->writeWithVUCheck(ptr->_allPowerRelayPins[3], LOW);
 
         ptr->_powerLed.startPwm(LONG_LED_PWM_INTERVAL);
 
@@ -48,7 +56,7 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        digitalWrite(ptr->_allPowerRelayPins[2], HIGH);
+        ptr->writeWithVUCheck(ptr->_allPowerRelayPins[2], HIGH);
 
         ptr->_powerLed.finishPwm(MAX_PWM_DUTY);
 
@@ -61,8 +69,8 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        digitalWrite(ptr->_allPowerRelayPins[2], HIGH);
-        digitalWrite(ptr->_allPowerRelayPins[4], HIGH);
+        ptr->writeWithVUCheck(ptr->_allPowerRelayPins[2], HIGH);
+        ptr->writeWithVUCheck(ptr->_allPowerRelayPins[4], HIGH);
 
         ptr->_inputSelector->writeToSeletedRelay(HIGH);
         ptr->_inputSelectorLed->writeMax();
@@ -80,9 +88,9 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        digitalWrite(ptr->_allPowerRelayPins[0], LOW);
-        digitalWrite(ptr->_allPowerRelayPins[1], LOW);
-        digitalWrite(ptr->_allPowerRelayPins[3], LOW);
+        ptr->writeWithVUCheck(ptr->_allPowerRelayPins[0], LOW);
+        ptr->writeWithVUCheck(ptr->_allPowerRelayPins[1], LOW);
+        ptr->writeWithVUCheck(ptr->_allPowerRelayPins[3], LOW);
 
         ptr->_inputSelector->writeToAllRelays(LOW);
         ptr->_inputSelectorLed->writeMin();
@@ -98,7 +106,7 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
         digitalWrite(ptr->_allPowerRelayPins[VU_UNKNOWN_INDEX], HIGH);
-        ptr->_VUSwitchedOffManuallyly = false;
+        ptr->_VUTurnedOffManually = false;
         return false;
     }
 
@@ -106,7 +114,7 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
         digitalWrite(ptr->_allPowerRelayPins[VU_INDEX], LOW);
-        ptr->_VUSwitchedOffManuallyly = true;
+        ptr->_VUTurnedOffManually = true;
         return false;
     }
 
@@ -126,13 +134,13 @@ public:
 
         if (state)
         {
-            digitalWrite(_allPowerRelayPins[2], LOW);
+            writeWithVUCheck(_allPowerRelayPins[2], LOW);
             _timer->in(LONG_TASK_DELAY, turnOnSleepMode, this);
         }
         else
         {
-            digitalWrite(_allPowerRelayPins[1], HIGH);
-            digitalWrite(_allPowerRelayPins[3], HIGH);
+            writeWithVUCheck(_allPowerRelayPins[1], HIGH);
+            writeWithVUCheck(_allPowerRelayPins[3], HIGH);
             _timer->in(LONG_TASK_DELAY, turnOffSleepMode, this);
         }
     }
@@ -143,9 +151,9 @@ public:
 
         if (state)
         {
-            digitalWrite(_allPowerRelayPins[0], HIGH);
-            digitalWrite(_allPowerRelayPins[1], HIGH);
-            digitalWrite(_allPowerRelayPins[3], HIGH);
+            writeWithVUCheck(_allPowerRelayPins[0], HIGH);
+            writeWithVUCheck(_allPowerRelayPins[1], HIGH);
+            writeWithVUCheck(_allPowerRelayPins[3], HIGH);
 
             _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
 
@@ -153,8 +161,8 @@ public:
         }
         else
         {
-            digitalWrite(_allPowerRelayPins[2], LOW);
-            digitalWrite(_allPowerRelayPins[4], LOW);
+            writeWithVUCheck(_allPowerRelayPins[2], LOW);
+            writeWithVUCheck(_allPowerRelayPins[4], LOW);
 
             _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
 
@@ -164,7 +172,7 @@ public:
 
     void setVU(uint8_t state)
     {
-        _buzzer->buzz(6);
+        _buzzer->buzz(2, LONG_BUZZ_INTERVAL);
 
         if (state)
         {
