@@ -12,7 +12,8 @@ body {
   background-color: #2d2e32;
   color: #ccc;
   font-family: 'Courier New';
-  font-size: 0.9em
+  font-size: 14px;
+  overflow: hidden
 }
 
 * {

@@ -90,6 +90,7 @@ button {
   font-size: 16px;
   background-color: #25262a;
   color: #5ad898;
+  overflow: hidden
 }
 
 button:not(:disabled):hover {
