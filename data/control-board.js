@@ -62,9 +62,9 @@ function handleLoad() {
     initWebSocket()
     initControlHandlers()
     displayMessage('', false, false)
-    setAtrribute('disabled', Object.fromEntries(Object.values(IDs).map((id) => [id, false])))
-    addOrRemoveClass(IDs.INPUT_SELECTOR, 'disabled', false)
-    addOrRemoveClass(IDs.VOLUME_SLIDER_CONTAINER, 'disabled', false)
+    setAtrribute('disabled', Object.fromEntries(Object.values(IDs).map((id) => [id, true])))
+    addOrRemoveClass(IDs.INPUT_SELECTOR, 'disabled', true)
+    addOrRemoveClass(IDs.VOLUME_SLIDER_CONTAINER, 'disabled', true)
 }
 
 function initWebSocket() {
