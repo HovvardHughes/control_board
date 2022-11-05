@@ -4,8 +4,8 @@
 #include <Buzzer.h>
 
 #define POWER_RELAY_COUNT 5
-#define VU_INDEX 3
-#define VU_UNKNOWN_INDEX 4
+#define VU_INDEX_1 3
+#define VU_INDEX_2 4
 
 class PowerController
 {
@@ -32,7 +32,7 @@ private:
 
     void writeWithVUCheck(uint8_t pin, uint8_t state)
     {
-        if ((pin == _allPowerRelayPins[VU_INDEX] || pin == _allPowerRelayPins[VU_UNKNOWN_INDEX]) && _VUTurnedOffManually)
+        if ((pin == _allPowerRelayPins[VU_INDEX_1] || pin == _allPowerRelayPins[VU_INDEX_2]) && _VUTurnedOffManually)
             return;
 
         digitalWrite(pin, state);
@@ -105,7 +105,7 @@ private:
     static bool turnOnVU(void *p)
     {
         PowerController *ptr = (PowerController *)p;
-        digitalWrite(ptr->_allPowerRelayPins[VU_UNKNOWN_INDEX], HIGH);
+        digitalWrite(ptr->_allPowerRelayPins[VU_INDEX_2], HIGH);
         ptr->_VUTurnedOffManually = false;
         return false;
     }
@@ -113,7 +113,7 @@ private:
     static bool turnOffVU(void *p)
     {
         PowerController *ptr = (PowerController *)p;
-        digitalWrite(ptr->_allPowerRelayPins[VU_INDEX], LOW);
+        digitalWrite(ptr->_allPowerRelayPins[VU_INDEX_1], LOW);
         ptr->_VUTurnedOffManually = true;
         return false;
     }
@@ -176,12 +176,12 @@ public:
 
         if (state)
         {
-            digitalWrite(_allPowerRelayPins[VU_INDEX], HIGH);
+            digitalWrite(_allPowerRelayPins[VU_INDEX_1], HIGH);
             _timer->in(LONG_TASK_DELAY, turnOnVU, this);
         }
         else
         {
-            digitalWrite(_allPowerRelayPins[VU_UNKNOWN_INDEX], LOW);
+            digitalWrite(_allPowerRelayPins[VU_INDEX_2], LOW);
             _timer->in(LONG_TASK_DELAY, turnOffVU, this);
         }
     }
@@ -205,6 +205,6 @@ public:
 
     bool isVUOn()
     {
-        return digitalRead(_allPowerRelayPins[VU_INDEX]) && digitalRead(_allPowerRelayPins[VU_UNKNOWN_INDEX]);
+        return digitalRead(_allPowerRelayPins[VU_INDEX_1]) && digitalRead(_allPowerRelayPins[VU_INDEX_2]);
     }
 };
