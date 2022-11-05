@@ -128,19 +128,19 @@ function handleMessage(event) {
         [IDs.SECONDARY_INPUT]: secondaryInputRelay
     })
 
-    const isRunningTaskOrPowerTurndedOff = isRunningTask || !isPowerOn
+    const isRunningTaskOrPowerTurnedOff = isRunningTask || !isPowerOn
 
     setAtrribute('disabled', {
         [IDs.POWER_BUTTON]: isRunningTask || isSleepModeOn,
-        [IDs.SLEEP_MODE_BUTTON]: isRunningTaskOrPowerTurndedOff,
-        [IDs.VU_BUTTON]: isRunningTaskOrPowerTurndedOff || isSleepModeOn,
-        [IDs.MAIN_INPUT]: isRunningTaskOrPowerTurndedOff,
-        [IDs.SECONDARY_INPUT]: isRunningTaskOrPowerTurndedOff,
-        [IDs.VOLUME_SLIDER]: isRunningTaskOrPowerTurndedOff
+        [IDs.SLEEP_MODE_BUTTON]: isRunningTaskOrPowerTurnedOff,
+        [IDs.VU_BUTTON]: isRunningTaskOrPowerTurnedOff || isSleepModeOn,
+        [IDs.MAIN_INPUT]: isRunningTaskOrPowerTurnedOff,
+        [IDs.SECONDARY_INPUT]: isRunningTaskOrPowerTurnedOff,
+        [IDs.VOLUME_SLIDER]: isRunningTaskOrPowerTurnedOff
     })
 
-    addOrRemoveClass(IDs.INPUT_SELECTOR, 'disabled', isRunningTaskOrPowerTurndedOff)
-    addOrRemoveClass(IDs.VOLUME_SLIDER_CONTAINER, 'disabled', isRunningTaskOrPowerTurndedOff)
+    addOrRemoveClass(IDs.INPUT_SELECTOR, 'disabled', isRunningTaskOrPowerTurnedOff)
+    addOrRemoveClass(IDs.VOLUME_SLIDER_CONTAINER, 'disabled', isRunningTaskOrPowerTurnedOff)
 }
 
 function addOrRemoveClass(id, className, addClass) {
