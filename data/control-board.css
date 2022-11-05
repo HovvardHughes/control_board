@@ -68,7 +68,7 @@ body {
   display: grid;
   place-content: center center;
   position: relative;
-  margin: 0 16px;
+  margin: 0 8px;
   text-align: center;
   padding: 8px;
   cursor: default;
