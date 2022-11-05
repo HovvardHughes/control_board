@@ -98,7 +98,7 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
         digitalWrite(ptr->_allPowerRelayPins[VU_UNKNOWN_INDEX], HIGH);
-        _VUSwitchedOffManuallyly = false;
+        ptr->_VUSwitchedOffManuallyly = false;
         return false;
     }
 
@@ -106,7 +106,7 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
         digitalWrite(ptr->_allPowerRelayPins[VU_INDEX], LOW);
-        _VUSwitchedOffManuallyly = true;
+        ptr->_VUSwitchedOffManuallyly = true;
         return false;
     }
 

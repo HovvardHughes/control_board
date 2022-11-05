@@ -10,8 +10,9 @@
   </head>
   <body>
     <div class="card">
-      <div class="log">
-        <span id="log-message"></span>
+      <div class="display">
+        <div id="message-container">
+          <span id="message"></span><span class="blinking-dot">.</span><span class="blinking-dot">.</span><span class="blinking-dot">.</span></div>
       </div>
       <div class="content">
         <div class="left">
@@ -63,8 +64,8 @@
         <div id="input-selector">
           <span class="title">Inputs</span>
           <div class="input-numbers">
-            <div>I</div>
-            <div>II</div>
+            <span>I</span>
+            <span>II</span>
           </div>
           <div class="switches">
             <label class="switch">

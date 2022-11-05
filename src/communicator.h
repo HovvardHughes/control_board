@@ -108,15 +108,8 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
 {
-  switch (type)
-  {
-  case WS_EVT_CONNECT:
-    textStateAll();
-    break;
-  case WS_EVT_DATA:
+  if (type == WS_EVT_DATA)
     handleWebSocketMessage(arg, data, len);
-    break;
-  }
 }
 
 void initWebSocket()

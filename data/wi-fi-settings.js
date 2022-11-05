@@ -84,10 +84,8 @@ async function handleSaveButtonClicked() {
     ];
 
 
-    if(validationResults.includes(false)){
-        console.log("Hello");
+    if(validationResults.includes(false))
         return;
-    }
 
     let saveResult =  {
         text: "",
