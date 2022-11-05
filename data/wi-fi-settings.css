@@ -63,12 +63,12 @@ input:focus {
 }
 
 .error > *:not(input){
-  color: #f44336;
-  border-color: #f44336;
+  color: #ff0033;
+  border-color: #ff0033;
 }
 
 .error > input {
-  border-color: #f44336;
+  border-color: #ff0033;
 }
 
 .helper-text {
@@ -109,7 +109,7 @@ button[disabled] {
 }
 
 #save-result[class*=error] {
-  color: #f44336;
+  color: #ff0033;
 }
 
 #save-result[class*=success] {
