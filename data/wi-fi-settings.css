@@ -26,6 +26,7 @@ body {
 
 @media only screen and (max-width:550px) {
   body {
+    align-content: flex-start;
     grid-auto-columns: 100%;
   }
 }
@@ -37,7 +38,7 @@ body {
 h1 {
   text-align: center;
   margin: 0;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   cursor: default;
 }
 
@@ -58,7 +59,7 @@ input{
   color: #fff;
 }
 
-input:focus {
+*:focus {
   outline: none;
 }
 
@@ -79,10 +80,10 @@ input:focus {
 
 button {
   justify-self: center;
-  width: 50%;
+  width: 40%;
   height: 50px;
-  margin-top: 20px;
-  margin-bottom: 44px;
+  margin-top: 10px;
+  margin-bottom: 28px;
   border: none;
   border-radius: 18px;
   font-family: 'Courier New';

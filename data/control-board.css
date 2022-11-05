@@ -11,10 +11,12 @@ body {
   width: 100%;
   background-color: #2d2e32;
   color: #ccc;
-  box-sizing: border-box;
-  margin: 0;
   font-family: 'Courier New';
   font-size: 0.9em
+}
+
+* {
+  box-sizing: border-box;
 }
 
 @media only screen and (max-width:400px) {
