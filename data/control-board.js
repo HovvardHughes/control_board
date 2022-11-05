@@ -54,6 +54,7 @@ const Elements = Object.fromEntries(Object.values(IDs).map((id) => [id, document
 const Dots = document.getElementsByClassName('blinking-dot')
 
 let websocket
+let webSocketErrorCount = 0
 
 window.addEventListener('load', handleLoad)
 
@@ -70,16 +71,23 @@ function initWebSocket() {
     websocket = new WebSocket(`ws://${window.location.hostname}/ws`)
     websocket.onopen = handleOpen
     websocket.onclose = handleClose
-    websocket.onmessage = handleMessage
     websocket.onerror = handleError
+    websocket.onmessage = handleMessage
 }
 
 function handleOpen() {
+    webSocketErrorCount = 0
     websocket.send(Commands.GET_STATE)
 }
 
 function handleClose() {
     setTimeout(initWebSocket, 2000)
+}
+
+function handleError() {
+    webSocketErrorCount++
+    if(webSocketErrorCount > 5)
+        displayMessage('Connection is not established', true, false)
 }
 
 function handleMessage(event) {
@@ -145,10 +153,6 @@ function setAtrribute(attributeName, idsWithAttributeValue) {
     Object.entries(idsWithAttributeValue).forEach(
         ([id, attributeValue]) => (Elements[id][attributeName] = attributeValue)
     )
-}
-
-function handleError() {
-    displayMessage('Connection is not established', true, false)
 }
 
 function initControlHandlers() {
