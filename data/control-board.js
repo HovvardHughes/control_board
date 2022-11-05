@@ -163,8 +163,9 @@ function initControlHandlers() {
     Elements[IDs.SECONDARY_INPUT].addEventListener('click', handleInputSwitchClicked)
 
     const volumeSlider = Elements[IDs.VOLUME_SLIDER]
-    volumeSlider.addEventListener('change', handleVolumeSliderChanged)
-    volumeSlider.addEventListener('input', handleVolumeSliderInput)
+    volumeSlider.addEventListener('mouseup', handleVolumeSliderMouseUp)
+    volumeSlider.addEventListener('touchend', handleVolumeSliderMouseUp)
+    volumeSlider.addEventListener('input', handleVolumeSliderChanged)
     volumeSlider.addEventListener('keydown', handleVolumeSliderKeyDown)
 }
 
@@ -186,7 +187,7 @@ function handleInputSwitchClicked(event) {
     else websocket.send(value === '0' ? Commands.TURN_OFF_MAIN_RELAY : Commands.TURN_OFF_SECONDARY_RELAY)
 }
 
-function handleVolumeSliderInput(event) {
+function handleVolumeSliderChanged(event) {
     const value = parseInt(event.target.value)
 
     if (value === 99) websocket.send(Commands.FORWARD_HIGH_VOLUME_PWM)
@@ -204,7 +205,7 @@ function handleVolumeSliderInput(event) {
     if (value === 0) websocket.send(Commands.REVERSE_HIGH_VOLUME_PWM)
 }
 
-function handleVolumeSliderChanged() {
+function handleVolumeSliderMouseUp() {
     Elements[IDs.VOLUME_SLIDER].value = 50
     websocket.send(Commands.TURN_OFF_VOLUME_PWM)
 }

@@ -13,13 +13,7 @@ body {
   color: #ccc;
   font-family: 'Courier New';
   font-size: 14px;
-  overflow: hidden;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-   -khtml-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  overflow: hidden
 }
 
 * {
@@ -305,24 +299,26 @@ button:not(:disabled):active {
 .volume-slider-size-adjuster {
   display: inline-block;
   width: 24px;
-  height: 204px;
+  height: 200px;
 }
 
 input[type="range"] {
-  -webkit-appearance: none;
   position: relative;
+  right: 3px;
   background-color: transparent;
   cursor: pointer;
-  width: 204px;
-  /* height: 20px; */
-
+  -webkit-appearance: none;
+  width: 200px;
+  height: 20px;
   margin: 0;
   transform-origin: 100px 100px;
   transform: rotate(-90deg);
-  left: 3px;
 }
 
-input:focus {
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+input[type="range"]:focus {
   outline: none;
 }
 
@@ -345,7 +341,6 @@ input[type=range]::-moz-range-thumb {
   border-radius: 50%;
   border: 4px solid #9e9fbf;
   cursor: pointer;
-
 }
 
 input[type="range"]:not(:disabled):hover::-webkit-slider-thumb {
@@ -365,20 +360,30 @@ input[type="range"]:not(:disabled):active:-moz-range-thumb {
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
   cursor: pointer;
-  height: 4px;
-  border-radius: 4px;
-  background-color: #505162;
+  height: 1em;
+  border-bottom: 4px solid #505162;
+  background-color: transparent;
 }
 
 input[type=range]::-moz-range-track {
+  width: 100%;
   cursor: pointer;
-  height: 4px;
-  border-radius: 4px;
-  background-color: #505162;
+  height: 1em;
+  border-bottom: 4px solid #505162;
+  background-color: transparent;
 }
+
+input[type="range"]::-webkit-slider-runnable-track {
+  cursor: default;
+} 
 
 #volume-up-icon {
   margin-bottom: 8px;
+}
+
+#volume-low-icon {
+  margin-top: 8px;
 }
 
