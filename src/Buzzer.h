@@ -6,7 +6,7 @@ private:
   Timer<> *_timer;
   byte _countToInvertState = 0;
 
-  static bool invertBuzzState(void *p)
+  static bool invert(void *p)
   {
     Buzzer *ptr = (Buzzer *)p;
 
@@ -37,6 +37,6 @@ public:
     digitalWrite(BUZZER_PIN, HIGH);
     _countToInvertState--;
 
-    _timer->every(interval, invertBuzzState, this);
+    _timer->every(interval, invert, this);
   }
 };
