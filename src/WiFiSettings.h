@@ -1,7 +1,7 @@
-const char *SSID_PATH = "/ssid.txt";
-const char *PASSWORD_PATH = "/password.txt";
-const char *IP_PATH = "/ip.txt";
-const char *GATEWAY_PATH = "/gateway.txt";
+#define SSID_PATH  "/ssid.txt"
+#define PASSWORD_PATH  "/password.txt"
+#define IP_PATH "/ip.txt"
+#define GATEWAY_PATH "/gateway.txt"
 
 class WiFiSettings
 {

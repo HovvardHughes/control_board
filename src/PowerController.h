@@ -2,6 +2,7 @@
 #include <arduino-timer.h>
 #include <InputSelector.h>
 #include <Buzzer.h>
+#include <VolumeEngine.h>
 
 #define POWER_RELAY_COUNT 5
 #define VU_INDEX_1 3
@@ -16,6 +17,7 @@ private:
     InputSelector *_inputSelector;
     Led *_inputSelectorLed;
     Buzzer *_buzzer;
+    VolumeEngine *_volumeEngine;
 
     bool _isPowerOn;
     bool _isSleepModeOn;
@@ -119,12 +121,13 @@ private:
     }
 
 public:
-    PowerController(Timer<> *timer, InputSelector *inputSelector, Led *inputSelectorLed, Buzzer *buzzer)
+    PowerController(Timer<> *timer, InputSelector *inputSelector, Led *inputSelectorLed, Buzzer *buzzer, VolumeEngine *volumeEngine)
     {
         _timer = timer;
         _inputSelector = inputSelector;
         _inputSelectorLed = inputSelectorLed;
         _buzzer = buzzer;
+        _volumeEngine = volumeEngine;
         _powerLed = Led(POWER_BUTTON_LED_CHANNEL, POWER_BUTTON_LED_PIN, timer);
     }
 
@@ -139,6 +142,7 @@ public:
         }
         else
         {
+            _volumeEngine->turnOff();
             writeWithVUCheck(_allPowerRelayPins[1], HIGH);
             writeWithVUCheck(_allPowerRelayPins[3], HIGH);
             _timer->in(LONG_TASK_DELAY, turnOffSleepMode, this);
@@ -161,6 +165,7 @@ public:
         }
         else
         {
+            _volumeEngine->turnOff();
             writeWithVUCheck(_allPowerRelayPins[2], LOW);
             writeWithVUCheck(_allPowerRelayPins[4], LOW);
 

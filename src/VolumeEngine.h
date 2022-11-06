@@ -43,8 +43,8 @@ public:
 
   void disableIfActiveForLongTime()
   {
-    if ((lastForwardChannelDuty > MIN_PWM_DUTY && (millis() - notZeroForwardChannelDutyDuration > MAX_NOT_ZERO_DUTY_TIME)) ||
-        (lastReverseChannelDuty > MIN_PWM_DUTY && (millis() - notZeroReverseChannelDutyDuration > MAX_NOT_ZERO_DUTY_TIME)))
+    if ((ledcRead(FORWARD_VOLUME_CHANNEL) > MIN_PWM_DUTY && (millis() - notZeroForwardChannelDutyDuration > MAX_NOT_ZERO_DUTY_TIME)) ||
+        (ledcRead(REVERSE_VOLUME_CHANNEL) > MIN_PWM_DUTY && (millis() - notZeroReverseChannelDutyDuration > MAX_NOT_ZERO_DUTY_TIME)))
       write(MIN_PWM_DUTY, MIN_PWM_DUTY);
   }
 
@@ -69,6 +69,10 @@ public:
       write(MAX_VOLUME_DUTY, MIN_PWM_DUTY);
 
     if (strcmp((char *)commmand, TURN_OFF_VOLUME_PWM) == 0)
+      write(MIN_PWM_DUTY, MIN_PWM_DUTY);
+  }
+
+  void turnOff() {
       write(MIN_PWM_DUTY, MIN_PWM_DUTY);
   }
 };

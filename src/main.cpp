@@ -12,11 +12,11 @@ InputSelector inputSelector = InputSelector();
 
 Led inputSelectorLed = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUTTON_LED_PIN, &timer);
 
-PowerController powerController = PowerController(&timer, &inputSelector, &inputSelectorLed, &buzzer);
+VolumeEngine volumeEngine = VolumeEngine();
+
+PowerController powerController = PowerController(&timer, &inputSelector, &inputSelectorLed, &buzzer, &volumeEngine);
 
 TaskController taskController = TaskController(&timer, textStateAll);
-
-VolumeEngine volumeEngine = VolumeEngine();
 
 void setup()
 {
