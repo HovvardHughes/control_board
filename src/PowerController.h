@@ -49,8 +49,6 @@ private:
 
         ptr->writeWithVUCheck(PRLY2_PIN, HIGH);
 
-        ptr->_powerLed.completePwm(MAX_PWM_DUTY);
-
         ptr->_isSleepModeOn = false;
 
         return false;
@@ -126,12 +124,13 @@ public:
 
         if (state)
         {
+            _volumeEngine->turnOff();
             writeWithVUCheck(PRLY2_PIN, LOW);
             _timer->in(LONG_TASK_DELAY, turnOnSleepMode, this);
         }
         else
         {
-            _volumeEngine->turnOff();
+            _powerLed.completePwm(MAX_PWM_DUTY);
             writeWithVUCheck(PRLY1_PIN, HIGH);
             writeWithVUCheck(PRLY3_PIN, HIGH);
             _timer->in(LONG_TASK_DELAY, turnOffSleepMode, this);
