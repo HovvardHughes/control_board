@@ -4,7 +4,7 @@ class Buzzer
 {
 private:
   Timer<> *_timer;
-  byte _countToInvertState = 0;
+  uint8_t _countToInvertState = 0;
 
   static bool invert(void *p)
   {
@@ -27,7 +27,7 @@ public:
     pinMode(BUZZER_PIN, OUTPUT);
   }
 
-  void buzz(byte countToInvertState, unsigned long interval = SHORT_BUZZ_INTERVAL)
+  void buzz(uint8_t countToInvertState, unsigned long interval = SHORT_BUZZ_INTERVAL)
   {
     if (_countToInvertState > 0)
       return;

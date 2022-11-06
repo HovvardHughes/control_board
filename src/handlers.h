@@ -29,7 +29,7 @@ void onClickInputSelectorCheckbox(int pin, int state)
                            {
                              inputSelector.setPinOfSelectedRelay(pin);
 
-                             byte invertCount = inputSelector.getCountToInvertStateFromRelay(pin);
+                             uint8_t invertCount = inputSelector.getCountToInvertStateFromRelay(pin);
                              {
                                inputSelectorLed.blink(wereTurnedOff ? invertCount + 1 : invertCount);
                                buzzer.buzz(invertCount);
@@ -105,17 +105,17 @@ void onClickInputSelectorButton()
 
   taskController.runFastTask([]()
                              {
-    const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
+    const bool wereTurnedOff = inputSelector.areAllRelays(LOW);
 
-    if (areAllRelaysLow)
+    if (wereTurnedOff)
       inputSelector.writeToSeletedRelay(HIGH);
     else if (inputSelector.areAllRelays(HIGH))
       inputSelector.writeToNotSelectedRelay(LOW);
     else
       inputSelector.swapRelays();
 
-    const byte invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
-    inputSelectorLed.blink(areAllRelaysLow ? invertCount + 1 : invertCount);
+    const uint8_t invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
+    inputSelectorLed.blink(wereTurnedOff ? invertCount + 1 : invertCount);
     buzzer.buzz(invertCount); });
 }
 
@@ -129,15 +129,15 @@ void onDoubleClickInputSelectorButton()
                            if (inputSelector.areAllRelays(HIGH))
                            {
                              inputSelector.writeToNotSelectedRelay(LOW);
-                             const byte invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
+                             const uint8_t invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
                              inputSelectorLed.blink(invertCount);
                              buzzer.buzz(invertCount);
                            }
                            else
                            {
-                             const bool areAllRelaysLow = inputSelector.areAllRelays(LOW);
+                             const bool wereTurnedOff = inputSelector.areAllRelays(LOW);
                              inputSelector.writeToAllRelays(HIGH);
-                             inputSelectorLed.blink(areAllRelaysLow ? 3 : 2, LONG_LED_BLINK_INTERVAL);
+                             inputSelectorLed.blink(wereTurnedOff ?  3 : 2, LONG_LED_BLINK_INTERVAL);
                              buzzer.buzz(2, LONG_BUZZ_INTERVAL);
                            } });
 }
@@ -152,7 +152,7 @@ void onLongPressInputSelectorButtonStart()
                            if (inputSelector.areAllRelays(LOW))
                            {
                              inputSelector.writeToSeletedRelay(HIGH);
-                             const byte invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
+                             const uint8_t invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
                              inputSelectorLed.blink(invertCount + 1);
                              buzzer.buzz(invertCount);
                            }

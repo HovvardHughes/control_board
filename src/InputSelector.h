@@ -57,14 +57,14 @@ public:
     writeToRelay(_pinOfSelectedRelay, HIGH);
   }
 
-  byte getCountToInvertStateFromRelay(uint8_t pin)
+  uint8_t getCountToInvertStateFromRelay(uint8_t pin)
   {
     return pin == MAIN_INPUT_RELAY_PIN ? 2 : 4;
   }
 
-  byte getCountToInvertStateFromTurnedOnRelays()
+  uint8_t getCountToInvertStateFromTurnedOnRelays()
   {
-    byte count = 0;
+    uint8_t count = 0;
 
     if (digitalRead(MAIN_INPUT_RELAY_PIN))
       count += getCountToInvertStateFromRelay(MAIN_INPUT_RELAY_PIN);
@@ -75,7 +75,7 @@ public:
     return count;
   }
 
-  bool areAllRelays(uint8_t state)
+  uint8_t areAllRelays(uint8_t state)
   {
     return digitalRead(MAIN_INPUT_RELAY_PIN) == state && digitalRead(SECONDARY_INPUT_RELAY_PIN) == state;
   }
