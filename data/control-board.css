@@ -32,7 +32,7 @@ body {
     rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px;
   padding: 20px;
   display: grid;
-  width: 250px;
+  width: 280px;
   border-radius: 10px;
 }
 
@@ -119,8 +119,20 @@ body {
 }
 
 button:not(:disabled):hover {
-  background-color: #697181;
+  background-color: #555d6d;
 }
+
+/* @media (hover: hover) {
+  button:not(:disabled):hover {
+    background-color: #555d6d;
+  }
+} */
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):hover {
+    background-color: #555d6d;
+  }
+}
+
 button:not(:disabled):active {
   background-color: #555d6d;
 }
@@ -166,7 +178,6 @@ button:not(:disabled):active {
     transform: rotate(1turn);
   }
 }
-
 
 /* Input selector */
 

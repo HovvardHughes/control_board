@@ -56,15 +56,16 @@ const Dots = document.getElementsByClassName('blinking-dot')
 let websocket
 let webSocketErrorCount = 0
 
+let disableAllControlsId
+
 window.addEventListener('load', handleLoad)
 
 function handleLoad() {
+    deleteHoverEffectsOnMobile()
     initWebSocket()
     initControlHandlers()
     displayMessage('', false, false)
-    setAtrribute('disabled', Object.fromEntries(Object.values(IDs).map((id) => [id, true])))
-    addOrRemoveClass(IDs.INPUT_SELECTOR, 'disabled', true)
-    addOrRemoveClass(IDs.VOLUME_SLIDER_CONTAINER, 'disabled', true)
+    disableAllControlsId = setTimeout(disableAllControls, 1000)
 }
 
 function initWebSocket() {
@@ -77,6 +78,7 @@ function initWebSocket() {
 
 function handleOpen() {
     webSocketErrorCount = 0
+    clearInterval(disableAllControlsId)
     websocket.send(Commands.GET_STATE)
 }
 
@@ -86,8 +88,10 @@ function handleClose() {
 
 function handleError() {
     webSocketErrorCount++
-    if(webSocketErrorCount > 5)
+    if (webSocketErrorCount > 5) {
         displayMessage('Connection is not established', true, false)
+        disableAllControls()
+    }
 }
 
 function handleMessage(event) {
@@ -217,4 +221,32 @@ function displayMessage(message, error, ellipsisAnimation) {
     Elements[IDs.DISPLAY_MESSAGE].innerText = message
     addOrRemoveClass(IDs.DISPLAY_MESSAGE_CONTAINER, 'error', error)
     for (let dot of Dots) dot.style.display = ellipsisAnimation ? 'inline' : 'none'
+}
+
+function disableAllControls() {
+    setAtrribute('disabled', Object.fromEntries(Object.values(IDs).map((id) => [id, true])))
+    addOrRemoveClass(IDs.INPUT_SELECTOR, 'disabled', true)
+    addOrRemoveClass(IDs.VOLUME_SLIDER_CONTAINER, 'disabled', true)
+}
+
+function deleteHoverEffectsOnMobile() {
+    const hasTouch =
+        'ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
+
+    if (hasTouch)
+        try {
+            for (let si in document.styleSheets) {
+                let styleSheet = document.styleSheets[si]
+                
+                if (!styleSheet.cssRules) continue
+
+                for (let ri = styleSheet.cssRules.length - 1; ri >= 0; ri--) {
+                    if (!styleSheet.cssRules[ri].selectorText) continue
+
+                    if (styleSheet.cssRules[ri].selectorText.match(':hover')) {
+                        styleSheet.deleteRule(ri)
+                    }
+                }
+            }
+        } catch (ex) {}
 }
