@@ -57,20 +57,20 @@ public:
     writeToRelay(_pinOfSelectedRelay, HIGH);
   }
 
-  byte getCountToInvertFromRelay(uint8_t pin)
+  byte getCountToInvertStateFromRelay(uint8_t pin)
   {
     return pin == MAIN_INPUT_RELAY_PIN ? 2 : 4;
   }
 
-  byte getCountToInvertFromTurnedOnRelays()
+  byte getCountToInvertStateFromTurnedOnRelays()
   {
     byte count = 0;
 
     if (digitalRead(MAIN_INPUT_RELAY_PIN))
-      count += getCountToInvertFromRelay(MAIN_INPUT_RELAY_PIN);
+      count += getCountToInvertStateFromRelay(MAIN_INPUT_RELAY_PIN);
 
     if (digitalRead(SECONDARY_INPUT_RELAY_PIN))
-      count += getCountToInvertFromRelay(SECONDARY_INPUT_RELAY_PIN);
+      count += getCountToInvertStateFromRelay(SECONDARY_INPUT_RELAY_PIN);
 
     return count;
   }

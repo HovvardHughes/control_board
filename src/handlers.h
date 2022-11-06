@@ -29,7 +29,7 @@ void onClickInputSelectorCheckbox(int pin, int state)
                            {
                              inputSelector.setPinOfSelectedRelay(pin);
 
-                             byte invertCount = inputSelector.getCountToInvertFromRelay(pin);
+                             byte invertCount = inputSelector.getCountToInvertStateFromRelay(pin);
                              {
                                inputSelectorLed.blink(wereTurnedOff ? invertCount + 1 : invertCount);
                                buzzer.buzz(invertCount);
@@ -114,7 +114,7 @@ void onClickInputSelectorButton()
     else
       inputSelector.swapRelays();
 
-    const byte invertCount = inputSelector.getCountToInvertFromTurnedOnRelays();
+    const byte invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
     inputSelectorLed.blink(areAllRelaysLow ? invertCount + 1 : invertCount);
     buzzer.buzz(invertCount); });
 }
@@ -129,7 +129,7 @@ void onDoubleClickInputSelectorButton()
                            if (inputSelector.areAllRelays(HIGH))
                            {
                              inputSelector.writeToNotSelectedRelay(LOW);
-                             const byte invertCount = inputSelector.getCountToInvertFromTurnedOnRelays();
+                             const byte invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
                              inputSelectorLed.blink(invertCount);
                              buzzer.buzz(invertCount);
                            }
@@ -152,7 +152,7 @@ void onLongPressInputSelectorButtonStart()
                            if (inputSelector.areAllRelays(LOW))
                            {
                              inputSelector.writeToSeletedRelay(HIGH);
-                             const byte invertCount = inputSelector.getCountToInvertFromTurnedOnRelays();
+                             const byte invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
                              inputSelectorLed.blink(invertCount + 1);
                              buzzer.buzz(invertCount);
                            }
