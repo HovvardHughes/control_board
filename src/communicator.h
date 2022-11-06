@@ -1,22 +1,22 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
-#include <fileSystemUtils.h>
+#include <SPIFFSUtils.h>
 #include <communicatorCommands.h>
 #include <handlers.h>
 #include <WiFiSettings.h>
 
-#define TIME_TO_TRY_CONNECTING_WIFI 10000
+#define WIFI_CONNECTING_TIMEOUT 10000
 
 WiFiSettings wiFiSettings;
 
 AsyncWebServer server(80);
 AsyncWebSocket webSocket("/ws");
 
-const char *SSID_PARAM = "ssid";
-const char *PASSWORD_PARAM = "password";
-const char *IP_PARAM = "ip";
-const char *GATEWAY_PARAM = "gateway";
+#define SSID_PARAM "ssid"
+#define PASSWORD_PARAM "password"
+#define IP_PARAM "ip"
+#define GATEWAY_PARAM "gateway"
 
 IPAddress localIP;
 IPAddress localGateway;
@@ -42,7 +42,7 @@ bool initWiFi()
   while (WiFi.status() != WL_CONNECTED)
   {
     currentMillis = millis();
-    if (currentMillis - previousMillis >= TIME_TO_TRY_CONNECTING_WIFI)
+    if (currentMillis - previousMillis >= WIFI_CONNECTING_TIMEOUT)
       return false;
   }
 
@@ -135,12 +135,6 @@ String wiFiSettingsProcessor(const String &var)
 }
 void handleWiFiSettingsChanged(AsyncWebServerRequest *request)
 {
-  if (taskController.isLongTaskRunning())
-  {
-    request->send(503, "text/plain", "Task is running. Please, try again after some time");
-    return;
-  }
-
   int params = request->params();
   for (int i = 0; i < params; i++)
   {
@@ -160,11 +154,15 @@ void handleWiFiSettingsChanged(AsyncWebServerRequest *request)
     }
   }
 
-  request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + wiFiSettings.getIP());
-
-  delay(3000);
-
-  ESP.restart();
+  if (!powerController.isPowerOn() && !taskController.isLongTaskRunning() && !taskController.isFastTaskRunning())
+  {
+    request->send(200, "text/plain", "Wi-Fi settings saved. Control board will restart, connect to your router and open web-page on IP address: " + wiFiSettings.getIP());
+    delay(3000);
+    ESP.restart();
+    return;
+  }
+  else
+    request->send(200, "text/plain", "Wi-Fi settings saved. Restart control board, connect to your router and open web-page on IP address: " + wiFiSettings.getIP());
 };
 
 void setupCommunicator()

@@ -83,6 +83,11 @@ public:
         return _isLongTaskRunning;
     }
 
+    bool isFastTaskRunning()
+    {
+        return _isFastTaskRunning;
+    }
+
     LongTaskType getRunningLongTaskType()
     {
         return _runningLongTaskType;

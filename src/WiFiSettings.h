@@ -19,10 +19,10 @@ public:
     // _password = "19411945";
     // _ip = "192.168.1.200";
     // _gateway = "192.168.4.1";
-    _ssid = readFile(SPIFFS, SSID_PATH);
-    _password = readFile(SPIFFS, PASSWORD_PATH);
-    _ip = readFile(SPIFFS, IP_PATH);
-    _gateway = readFile(SPIFFS, GATEWAY_PATH);
+    _ssid = readFile(SSID_PATH);
+    _password = readFile(PASSWORD_PATH);
+    _ip = readFile(IP_PATH);
+    _gateway = readFile(GATEWAY_PATH);
   }
 
   String getSSID()
@@ -33,7 +33,7 @@ public:
   void setSSID(String ssid)
   {
     _ssid = ssid;
-    writeFile(SPIFFS, SSID_PATH, ssid.c_str());
+    writeFile(SSID_PATH, ssid.c_str());
   }
 
   String getPassword()
@@ -44,7 +44,7 @@ public:
   void setPassword(String password)
   {
     _password = password;
-    writeFile(SPIFFS, PASSWORD_PATH, password.c_str());
+    writeFile(PASSWORD_PATH, password.c_str());
   }
 
   String getIP()
@@ -55,7 +55,7 @@ public:
   void setIP(String ip)
   {
     _ip = ip;
-    writeFile(SPIFFS, IP_PATH, ip.c_str());
+    writeFile(IP_PATH, ip.c_str());
   }
 
   String getGateway()
@@ -66,6 +66,6 @@ public:
   void setGateway(String gateway)
   {
     _gateway = gateway;
-    writeFile(SPIFFS, GATEWAY_PATH, gateway.c_str());
+    writeFile(GATEWAY_PATH, gateway.c_str());
   }
 };

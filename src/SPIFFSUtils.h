@@ -1,14 +1,14 @@
 #include <SPIFFS.h>
 
-void writeFile(fs::FS &fs, const char *path, const char *message)
+void writeFile(const char *path, const char *data)
 {
-    File file = fs.open(path, FILE_WRITE);
-    file.print(message);
+    File file = SPIFFS.open(path, FILE_WRITE);
+    file.print(data);
 }
 
-String readFile(fs::FS &fs, const char *path)
+String readFile(const char *path)
 {
-    File file = fs.open(path);
+    File file = SPIFFS.open(path);
     if (!file || file.isDirectory())
         return String();
 
