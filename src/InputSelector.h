@@ -3,8 +3,12 @@
 class InputSelector
 {
 private:
-  byte _pinOfSelectedRelay = MAIN_INPUT_RELAY_PIN;
-  byte _pinOfNotSelectedRelay = SECONDARY_INPUT_RELAY_PIN;
+  uint8_t _pinOfSelectedRelay = MAIN_INPUT_RELAY_PIN;
+
+  uint8_t getPinOfNotSelectedRelay()
+  {
+    return _pinOfSelectedRelay == MAIN_INPUT_RELAY_PIN ? SECONDARY_INPUT_RELAY_PIN : MAIN_INPUT_RELAY_PIN;
+  }
 
 public:
   void setup()
@@ -41,22 +45,15 @@ public:
 
   void writeToNotSelectedRelay(uint8_t state)
   {
-    writeToRelay(_pinOfNotSelectedRelay, state);
-  }
-
-  void writeToNotSelectedAndSetSelected(uint8_t state)
-  {
-    writeToRelay(_pinOfNotSelectedRelay, state);
-    _pinOfSelectedRelay = _pinOfNotSelectedRelay;
+    writeToRelay(getPinOfNotSelectedRelay(), state);
   }
 
   void swapRelays()
   {
-    byte temp = _pinOfSelectedRelay;
-    _pinOfSelectedRelay = _pinOfNotSelectedRelay;
-    _pinOfNotSelectedRelay = temp;
+    uint8_t prevPinOfSelectedRelay = _pinOfSelectedRelay;
+    _pinOfSelectedRelay = getPinOfNotSelectedRelay();
 
-    writeToRelay(_pinOfNotSelectedRelay, LOW);
+    writeToRelay(prevPinOfSelectedRelay, LOW);
     writeToRelay(_pinOfSelectedRelay, HIGH);
   }
 
