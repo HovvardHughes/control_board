@@ -8,11 +8,11 @@ private:
 
   Timer<> *_timer;
 
-  uint32_t _countToInvertState = 0;
+  uint32_t _countToInvertState;
 
-  uintptr_t _currentPwmTask = 0;
-  uint8_t _dutyCycleInCurrentPwmTask = 0;
-  bool _incrementInCurrentPwmTask = false;
+  uintptr_t _currentPwmTask;
+  uint8_t _dutyCycleInCurrentPwmTask;
+  bool _incrementInCurrentPwmTask;
 
   void write(uint32_t duty)
   {
@@ -23,7 +23,7 @@ private:
   {
     Led *ptr = (Led *)p;
 
-    ptr->writeInverted();
+    ptr->write(ptr->read() == MIN_PWM_DUTY ? MAX_PWM_DUTY : MIN_PWM_DUTY);
     ptr->_countToInvertState--;
 
     return ptr->_countToInvertState > 0;
@@ -87,11 +87,6 @@ public:
     ledcWrite(_channel, MIN_PWM_DUTY);
   }
 
-  void writeInverted()
-  {
-    write(read() == MIN_PWM_DUTY ? MAX_PWM_DUTY : MIN_PWM_DUTY);
-  }
-
   void blink(uint32_t countToInvertState, unsigned long interval = SHORT_LED_BLINK_INTERVAL)
   {
     if (_countToInvertState > 0)
@@ -99,8 +94,7 @@ public:
 
     _countToInvertState = countToInvertState;
 
-    writeInverted();
-    _countToInvertState--;
+    writeInvertedIteration(this);
 
     _timer->every(interval, writeInvertedIteration, this);
   }
@@ -115,7 +109,7 @@ public:
     _currentPwmTask = _timer->every(interval, pwmIteratation, this);
   };
 
-  void finishPwm(uint8_t finiteDutyCycle)
+  void completePwm(uint8_t finiteDutyCycle)
   {
     uint32_t currentDutyCycle = read();
 

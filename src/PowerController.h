@@ -49,7 +49,7 @@ private:
 
         ptr->writeWithVUCheck(PRLY2_PIN, HIGH);
 
-        ptr->_powerLed.finishPwm(MAX_PWM_DUTY);
+        ptr->_powerLed.completePwm(MAX_PWM_DUTY);
 
         ptr->_isSleepModeOn = false;
 
@@ -68,7 +68,7 @@ private:
 
         ptr->_buzzer->buzz(4);
 
-        ptr->_powerLed.finishPwm(MAX_PWM_DUTY);
+        ptr->_powerLed.completePwm(MAX_PWM_DUTY);
 
         ptr->_isPowerOn = true;
 
@@ -86,7 +86,7 @@ private:
         ptr->_inputSelector->writeToAllRelays(LOW);
         ptr->_inputSelectorLed->writeMin();
 
-        ptr->_powerLed.finishPwm(MIN_PWM_DUTY);
+        ptr->_powerLed.completePwm(MIN_PWM_DUTY);
 
         ptr->_isPowerOn = false;
 
