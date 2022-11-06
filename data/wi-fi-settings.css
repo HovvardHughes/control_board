@@ -1,119 +1,119 @@
 html {
-  height: 100%;
+    height: 100%;
 }
 
 body {
-  display: grid;
-  place-content: center center;
-  height: 100%;
-  width: 100%;
-  background-color: #2d2e32;
-  color: #9e9e9e;
-  margin: 0;
-  font-family: 'Courier New';
-  grid-auto-columns: 500px;
+    display: grid;
+    place-content: center center;
+    height: 100%;
+    width: 100%;
+    background-color: #2d2e32;
+    color: #9e9e9e;
+    margin: 0;
+    font-family: 'Courier New';
+    grid-auto-columns: 500px;
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 #form {
-  position: relative;
-  display: grid;
-  padding: 16px;
+    position: relative;
+    display: grid;
+    padding: 16px;
 }
 
-@media only screen and (max-width:550px) {
-  body {
-    align-content: flex-start;
-    grid-auto-columns: 100%;
-  }
+@media only screen and (max-width: 550px) {
+    body {
+        align-content: flex-start;
+        grid-auto-columns: 100%;
+    }
 }
 
 #form > div {
-  display: grid;
+    display: grid;
 }
 
 h1 {
-  text-align: center;
-  margin: 0;
-  margin-bottom: 20px;
-  cursor: default;
+    text-align: center;
+    margin: 0;
+    margin-bottom: 20px;
+    cursor: default;
 }
 
 label {
-  margin-left: 16px;
-  margin-bottom: 4px;
-  font-size: 14px;
+    margin-left: 16px;
+    margin-bottom: 4px;
+    font-size: 14px;
 }
 
-input{
-  font-family: 'Courier New';
-  font-size: 14px;
-  height: 55px;
-  border: 1px solid #64f4ab;
-  border-radius: 14px;
-  background-color: #25262a;
-  padding: 0 10px 0 25px;
-  color: #fff;
+input {
+    font-family: 'Courier New';
+    font-size: 14px;
+    height: 55px;
+    border: 1px solid #64f4ab;
+    border-radius: 14px;
+    background-color: #25262a;
+    padding: 0 10px 0 25px;
+    color: #fff;
 }
 
 *:focus {
-  outline: none;
+    outline: none;
 }
 
-.error > *:not(input){
-  color: #ff0033;
-  border-color: #ff0033;
+.error > *:not(input) {
+    color: #ff0033;
+    border-color: #ff0033;
 }
 
 .error > input {
-  border-color: #ff0033;
+    border-color: #ff0033;
 }
 
 .helper-text {
-  margin-left: 16px;
-  padding: 4px 0;
-  font-size: 14px;
+    margin-left: 16px;
+    padding: 4px 0;
+    font-size: 14px;
 }
 
 button {
-  justify-self: center;
-  width: 40%;
-  height: 50px;
-  margin-top: 10px;
-  margin-bottom: 28px;
-  border: none;
-  border-radius: 18px;
-  font-family: 'Courier New';
-  font-size: 16px;
-  background-color: #25262a;
-  color: #5ad898;
-  overflow: hidden
+    justify-self: center;
+    width: 40%;
+    height: 50px;
+    margin-top: 10px;
+    margin-bottom: 28px;
+    border: none;
+    border-radius: 18px;
+    font-family: 'Courier New';
+    font-size: 16px;
+    background-color: #25262a;
+    color: #5ad898;
+    overflow: hidden;
 }
 
 button:not(:disabled):hover {
-  background-color: #fecd1a;
-  color: #1a1a1d;
-  cursor: pointer;
-  transition: 0.5s;
+    background-color: #fecd1a;
+    color: #1a1a1d;
+    cursor: pointer;
+    transition: 0.5s;
 }
 
 button[disabled] {
-  opacity: 0.5;
+    opacity: 0.5;
 }
 
 #save-result {
-  justify-self: center;
-  color: #64f4ab;
-  text-align: center;
+    justify-self: center;
+    color: #64f4ab;
+    text-align: center;
 }
 
-#save-result[class*=error] {
-  color: #ff0033;
+#save-result[class*='error'] {
+    color: #ff0033;
 }
 
-#save-result[class*=success] {
-  color: #64f4ab;
+#save-result[class*='success'] {
+    color: #64f4ab;
 }

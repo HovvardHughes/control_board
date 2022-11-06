@@ -58,6 +58,8 @@ let webSocketErrorCount = 0
 
 let disableAllControlsId
 
+let ignoreInputSwitchEvent
+
 window.addEventListener('load', handleLoad)
 
 function handleLoad() {
@@ -145,6 +147,8 @@ function handleMessage(event) {
 
     addOrRemoveClass(IDs.INPUT_SELECTOR, 'disabled', isRunningTaskOrPowerTurnedOff)
     addOrRemoveClass(IDs.VOLUME_SLIDER_CONTAINER, 'disabled', isRunningTaskOrPowerTurnedOff)
+
+    ignoreInputSwitchEvent = false
 }
 
 function addOrRemoveClass(id, className, addClass) {
@@ -185,9 +189,13 @@ function switchVU() {
 }
 
 function handleInputSwitchClicked(event) {
-    const { value, checked } = event.target
-    if (checked) websocket.send(value === '0' ? Commands.TURN_ON_MAIN_RELAY : Commands.TURN_ON_SECONDARY_RELAY)
-    else websocket.send(value === '0' ? Commands.TURN_OFF_MAIN_RELAY : Commands.TURN_OFF_SECONDARY_RELAY)
+    if (ignoreInputSwitchEvent) event.preventDefault()
+    else {
+        const { value, checked } = event.target
+        if (checked) websocket.send(value === '0' ? Commands.TURN_ON_MAIN_RELAY : Commands.TURN_ON_SECONDARY_RELAY)
+        else websocket.send(value === '0' ? Commands.TURN_OFF_MAIN_RELAY : Commands.TURN_OFF_SECONDARY_RELAY)
+        ignoreInputSwitchEvent = true
+    }
 }
 
 function handleVolumeSliderInput(event) {
@@ -237,7 +245,7 @@ function deleteHoverEffectsOnMobile() {
         try {
             for (let si in document.styleSheets) {
                 let styleSheet = document.styleSheets[si]
-                
+
                 if (!styleSheet.cssRules) continue
 
                 for (let ri = styleSheet.cssRules.length - 1; ri >= 0; ri--) {
