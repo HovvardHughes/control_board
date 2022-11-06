@@ -58,7 +58,7 @@ let webSocketErrorCount = 0
 
 let disableAllControlsId
 
-let ignoreInputSelectorSwitchUpdateWhenMessageRecieved
+let ignoreOnceInputSelectorSwitchUpdateWhenMessageRecieved
 
 window.addEventListener('load', handleLoad)
 
@@ -129,13 +129,13 @@ function handleMessage(event) {
     addOrRemoveClass(IDs.SLEEP_MODE_BUTTON, 'enabled-sleep-mode-button', isSleepModeOn)
     addOrRemoveClass(IDs.VU_BUTTON, 'enabled-vu-button', isVUOn)
 
-    if(!ignoreInputSelectorSwitchUpdateWhenMessageRecieved) {
+    if(!ignoreOnceInputSelectorSwitchUpdateWhenMessageRecieved) {
         setAtrribute('checked', {
             [IDs.MAIN_INPUT]: mainInputRelay,
             [IDs.SECONDARY_INPUT]: secondaryInputRelay
         })
-        ignoreInputSelectorSwitchUpdateWhenMessageRecieved = false
     }
+    ignoreOnceInputSelectorSwitchUpdateWhenMessageRecieved = false
     
     const isRunningTaskOrPowerTurnedOff = isRunningTask || !isPowerOn
 
@@ -193,7 +193,7 @@ function handleInputSwitchClicked(event) {
     const { value, checked } = event.target
     if (checked) websocket.send(value === '0' ? Commands.TURN_ON_MAIN_RELAY : Commands.TURN_ON_SECONDARY_RELAY)
     else websocket.send(value === '0' ? Commands.TURN_OFF_MAIN_RELAY : Commands.TURN_OFF_SECONDARY_RELAY)
-    ignoreInputSelectorSwitchUpdateWhenMessageRecieved = true
+    ignoreOnceInputSelectorSwitchUpdateWhenMessageRecieved = true
 }
 
 function handleVolumeSliderInput(event) {
