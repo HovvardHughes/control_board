@@ -4,12 +4,6 @@
 #include <Buzzer.h>
 #include <VolumeEngine.h>
 
-#define PRLY0 25
-#define PRLY1 26
-#define PRLY2 27
-#define PRLY3 14
-#define PRLY4 12
-
 class PowerController
 {
 
@@ -29,7 +23,7 @@ private:
 
     void writeWithVUCheck(uint8_t pin, uint8_t state)
     {
-        if ((pin == PRLY3 || pin == PRLY4) && _VUTurnedOffManually)
+        if ((pin == PRLY3_PIN || pin == PRLY4_PIN) && _VUTurnedOffManually)
             return;
 
         digitalWrite(pin, state);
@@ -39,8 +33,8 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        ptr->writeWithVUCheck(PRLY1, LOW);
-        ptr->writeWithVUCheck(PRLY3, LOW);
+        ptr->writeWithVUCheck(PRLY1_PIN, LOW);
+        ptr->writeWithVUCheck(PRLY3_PIN, LOW);
 
         ptr->_powerLed.startPwm(LONG_LED_PWM_INTERVAL);
 
@@ -53,7 +47,7 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        ptr->writeWithVUCheck(PRLY2, HIGH);
+        ptr->writeWithVUCheck(PRLY2_PIN, HIGH);
 
         ptr->_powerLed.finishPwm(MAX_PWM_DUTY);
 
@@ -66,8 +60,8 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        ptr->writeWithVUCheck(PRLY2, HIGH);
-        ptr->writeWithVUCheck(PRLY4, HIGH);
+        ptr->writeWithVUCheck(PRLY2_PIN, HIGH);
+        ptr->writeWithVUCheck(PRLY4_PIN, HIGH);
 
         ptr->_inputSelector->writeToSeletedRelay(HIGH);
         ptr->_inputSelectorLed->writeMax();
@@ -85,9 +79,9 @@ private:
     {
         PowerController *ptr = (PowerController *)p;
 
-        ptr->writeWithVUCheck(PRLY0, LOW);
-        ptr->writeWithVUCheck(PRLY1, LOW);
-        ptr->writeWithVUCheck(PRLY3, LOW);
+        ptr->writeWithVUCheck(PRLY0_PIN, LOW);
+        ptr->writeWithVUCheck(PRLY1_PIN, LOW);
+        ptr->writeWithVUCheck(PRLY3_PIN, LOW);
 
         ptr->_inputSelector->writeToAllRelays(LOW);
         ptr->_inputSelectorLed->writeMin();
@@ -102,7 +96,7 @@ private:
     static bool turnOnVU(void *p)
     {
         PowerController *ptr = (PowerController *)p;
-        digitalWrite(PRLY4, HIGH);
+        digitalWrite(PRLY4_PIN, HIGH);
         ptr->_VUTurnedOffManually = false;
         return false;
     }
@@ -110,7 +104,7 @@ private:
     static bool turnOffVU(void *p)
     {
         PowerController *ptr = (PowerController *)p;
-        digitalWrite(PRLY3, LOW);
+        digitalWrite(PRLY3_PIN, LOW);
         ptr->_VUTurnedOffManually = true;
         return false;
     }
@@ -132,14 +126,14 @@ public:
 
         if (state)
         {
-            writeWithVUCheck(PRLY2, LOW);
+            writeWithVUCheck(PRLY2_PIN, LOW);
             _timer->in(LONG_TASK_DELAY, turnOnSleepMode, this);
         }
         else
         {
             _volumeEngine->turnOff();
-            writeWithVUCheck(PRLY1, HIGH);
-            writeWithVUCheck(PRLY3, HIGH);
+            writeWithVUCheck(PRLY1_PIN, HIGH);
+            writeWithVUCheck(PRLY3_PIN, HIGH);
             _timer->in(LONG_TASK_DELAY, turnOffSleepMode, this);
         }
     }
@@ -150,9 +144,9 @@ public:
 
         if (state)
         {
-            writeWithVUCheck(PRLY0, HIGH);
-            writeWithVUCheck(PRLY1, HIGH);
-            writeWithVUCheck(PRLY3, HIGH);
+            writeWithVUCheck(PRLY0_PIN, HIGH);
+            writeWithVUCheck(PRLY1_PIN, HIGH);
+            writeWithVUCheck(PRLY3_PIN, HIGH);
 
             _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
 
@@ -161,8 +155,8 @@ public:
         else
         {
             _volumeEngine->turnOff();
-            writeWithVUCheck(PRLY2, LOW);
-            writeWithVUCheck(PRLY4, LOW);
+            writeWithVUCheck(PRLY2_PIN, LOW);
+            writeWithVUCheck(PRLY4_PIN, LOW);
 
             _powerLed.startPwm(SHORT_LED_PWM_INTERVAL);
 
@@ -176,12 +170,12 @@ public:
 
         if (state)
         {
-            digitalWrite(PRLY3, HIGH);
+            digitalWrite(PRLY3_PIN, HIGH);
             _timer->in(LONG_TASK_DELAY, turnOnVU, this);
         }
         else
         {
-            digitalWrite(PRLY4, LOW);
+            digitalWrite(PRLY4_PIN, LOW);
             _timer->in(LONG_TASK_DELAY, turnOffVU, this);
         }
     }
@@ -189,11 +183,11 @@ public:
     void setup()
     {
         _powerLed.setup();
-        pinMode(PRLY0, OUTPUT);
-        pinMode(PRLY1, OUTPUT);
-        pinMode(PRLY2, OUTPUT);
-        pinMode(PRLY3, OUTPUT);
-        pinMode(PRLY4, OUTPUT);
+        pinMode(PRLY0_PIN, OUTPUT);
+        pinMode(PRLY1_PIN, OUTPUT);
+        pinMode(PRLY2_PIN, OUTPUT);
+        pinMode(PRLY3_PIN, OUTPUT);
+        pinMode(PRLY4_PIN, OUTPUT);
     }
 
     bool isPowerOn()
@@ -208,6 +202,6 @@ public:
 
     bool isVUOn()
     {
-        return digitalRead(PRLY3) && digitalRead(PRLY4);
+        return digitalRead(PRLY3_PIN) && digitalRead(PRLY4_PIN);
     }
 };

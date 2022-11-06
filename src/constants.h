@@ -31,6 +31,13 @@ GPIO      Connected to...
 36        ADC1                'SELFVIN'
 */
 
+// POWER:
+#define PRLY0_PIN 25
+#define PRLY1_PIN 26
+#define PRLY2_PIN 27
+#define PRLY3_PIN 14
+#define PRLY4_PIN 12
+
 // BUTTONS:
 #define POWER_BUTTON_PIN 19
 #define INPUT_SELECTOR_BUTTON_PIN 18
@@ -50,38 +57,36 @@ GPIO      Connected to...
 #define INPUT_SELECTOR_BUTTON_LED_PIN 2
 #define INPUT_SELECTOR_BUTTON_LED_CHANNEL 1
 
-#define SHORT_LED_BLINK_INTERVAL 75 // blink interval in millis
-#define LONG_LED_BLINK_INTERVAL 150 // blink interval in millis
+#define SHORT_LED_BLINK_INTERVAL 75
+#define LONG_LED_BLINK_INTERVAL 150
 
-#define SHORT_LED_PWM_INTERVAL 5 // PWM interval in millis
-#define LONG_LED_PWM_INTERVAL 15 // PWM interval in millis
+#define SHORT_LED_PWM_INTERVAL 5
+#define LONG_LED_PWM_INTERVAL 15
 
 #define PWM_FREQUENCY 25000
-
 #define PWM_RESOLUTION 8
-
 #define MIN_PWM_DUTY 0
 #define MAX_PWM_DUTY 255
 
 // BUZZER:
 #define BUZZER_PIN 4
-#define SHORT_BUZZ_INTERVAL 50 // short buzz interval in millis
-#define LONG_BUZZ_INTERVAL 100 // long buzz interval in millis
+#define SHORT_BUZZ_INTERVAL 50
+#define LONG_BUZZ_INTERVAL 100
+
+// INPUT RELAYS
+#define MAIN_INPUT_RELAY_PIN 32
+#define SECONDARY_INPUT_RELAY_PIN 33
+
+// Tasks:
+#define LONG_TASK_DELAY 1000 // For Debugging
+//  #define LONG_TASK_DELAY 25000 // For Release
+
+#define LONG_TASK_RUNTIME LONG_TASK_DELAY + 500
+#define FAST_TASK_RUNTIME 500
+
+// Other:
+#define COM_PORT_SPEED 115200 // COM Port Baud Rate
 
 // I2C:
 
 // 1WIRE:
-
-// INPUT RELAYS
-#define INPUT_RELAY_COUNT 2 // Number of power-relays in array
-
-#define MAIN_INPUT_RELAY_PIN 32
-#define SECONDARY_INPUT_RELAY_PIN 33
-
-#define COM_PORT_SPEED 115200 // COM Port Baud Rate
-
-#define LONG_TASK_DELAY 1000 // For Debugging
-//  #define LONG_TASK_DELAY 25000 // For Release - Pre-programmed Heating Filaments Delay
-
-#define LONG_TASK_RUNTIME LONG_TASK_DELAY + 500
-#define FAST_TASK_RUNTIME 500

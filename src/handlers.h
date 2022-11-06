@@ -9,15 +9,15 @@ extern Led inputSelectorLed;
 extern TaskController taskController;
 extern VolumeEngine volumeEngine;
 
-void onClickInputSelectorCheckbox(int relayIONumber, int state)
+void onClickInputSelectorCheckbox(int pin, int state)
 {
   if (!powerController.isPowerOn())
     return;
 
-  taskController.runFastTask([relayIONumber, state]()
+  taskController.runFastTask([pin, state]()
                              {
                            const bool wereTurnedOff = inputSelector.areAllRelays(LOW);
-                           inputSelector.writeToRelay(relayIONumber, state);
+                           inputSelector.writeToRelay(pin, state);
 
                            if (inputSelector.areAllRelays(LOW))
                            {
@@ -27,9 +27,9 @@ void onClickInputSelectorCheckbox(int relayIONumber, int state)
 
                            if (state == HIGH)
                            {
-                             inputSelector.setSelectedRelayIONumber(relayIONumber);
+                             inputSelector.setPinOfSelectedRelay(pin);
 
-                             byte invertCount = inputSelector.getInvertCount(relayIONumber);
+                             byte invertCount = inputSelector.getCountToInvertFromRelay(pin);
                              {
                                inputSelectorLed.blink(wereTurnedOff ? invertCount + 1 : invertCount);
                                buzzer.buzz(invertCount);
@@ -110,11 +110,11 @@ void onClickInputSelectorButton()
     if (areAllRelaysLow)
       inputSelector.writeToSeletedRelay(HIGH);
     else if (inputSelector.areAllRelays(HIGH))
-      inputSelector.writeToNotSelected(LOW);
+      inputSelector.writeToNotSelectedRelay(LOW);
     else
       inputSelector.swapRelays();
 
-    const byte invertCount = inputSelector.getInvertCount();
+    const byte invertCount = inputSelector.getCountToInvertFromTurnedOnRelays();
     inputSelectorLed.blink(areAllRelaysLow ? invertCount + 1 : invertCount);
     buzzer.buzz(invertCount); });
 }
@@ -128,8 +128,8 @@ void onDoubleClickInputSelectorButton()
                              {
                            if (inputSelector.areAllRelays(HIGH))
                            {
-                             inputSelector.writeToNotSelected(LOW);
-                             const byte invertCount = inputSelector.getInvertCount();
+                             inputSelector.writeToNotSelectedRelay(LOW);
+                             const byte invertCount = inputSelector.getCountToInvertFromTurnedOnRelays();
                              inputSelectorLed.blink(invertCount);
                              buzzer.buzz(invertCount);
                            }
@@ -152,7 +152,7 @@ void onLongPressInputSelectorButtonStart()
                            if (inputSelector.areAllRelays(LOW))
                            {
                              inputSelector.writeToSeletedRelay(HIGH);
-                             const byte invertCount = inputSelector.getInvertCount();
+                             const byte invertCount = inputSelector.getCountToInvertFromTurnedOnRelays();
                              inputSelectorLed.blink(invertCount + 1);
                              buzzer.buzz(invertCount);
                            }
