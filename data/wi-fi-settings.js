@@ -102,14 +102,15 @@ async function handleSaveButtonClicked() {
         const controller = new AbortController()
         const id = setTimeout(() => controller.abort(), 10000)
 
+        const formData = new FormData()
+        formData.append("ssid", Inputs[IDs.SSID_INPUT_CONTAINER].value)
+        formData.append("password", Inputs[IDs.PASSWORD_INPUT_CONTAINER].value)
+        formData.append("ip", Inputs[IDs.IP_INPUT_CONTAINER].value)
+        formData.append("gateway", Inputs[IDs.GATEWAY_INPUT_CONTAINER].value)
+
         const response = await fetch('/wi-fi-settings', {
             method: 'post',
-            body: {
-                ssid: Inputs[IDs.SSID_INPUT_CONTAINER],
-                password: Inputs[IDs.PASSWORD_INPUT_CONTAINER],
-                ip: Inputs[IDs.IP_INPUT_CONTAINER],
-                gateway: Inputs[IDs.GATEWAY_INPUT_CONTAINER]
-            },
+            body: formData,
             signal: controller.signal
         })
 

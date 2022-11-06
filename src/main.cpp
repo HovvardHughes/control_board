@@ -48,6 +48,7 @@ void setup()
 
   volumeEngine.setup();
 
+  initSPIFFS();
   setupCommunicator();
 }
 

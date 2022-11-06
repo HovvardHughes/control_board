@@ -20,3 +20,8 @@ String readFile(fs::FS &fs, const char *path)
     }
     return fileContent;
 }
+
+void initSPIFFS()
+{
+    SPIFFS.begin(true);
+}
