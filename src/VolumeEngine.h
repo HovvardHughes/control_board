@@ -1,6 +1,6 @@
 #include <communicatorCommands.h>
 
-#define MAX_NOT_ZERO_DUTY_TIME 1000 * 20
+#define MAX_NOT_ZERO_DUTY_DURATION 1000 * 20
 
 #define MIN_VOLUME_DUTY 175
 #define MIDDLE_VOLUME_DUTY 225
@@ -9,27 +9,16 @@
 class VolumeEngine
 {
 private:
-  int lastForwardChannelDuty;
-  int lastReverseChannelDuty;
-  unsigned long notZeroForwardChannelDutyDuration;
-  unsigned long notZeroReverseChannelDutyDuration;
+  unsigned long forwardNotZeroChannelDutyDuration;
+  unsigned long reverseNotZeroChannelDutyDuration;
 
   void write(uint32_t forwardChannelDuty, uint32_t reverseChannelDuty)
   {
-    if (forwardChannelDuty != lastForwardChannelDuty)
-    {
-      ledcWrite(FORWARD_VOLUME_CHANNEL, forwardChannelDuty);
-      lastForwardChannelDuty = forwardChannelDuty;
-    }
 
-    if (reverseChannelDuty != lastReverseChannelDuty)
-    {
-      ledcWrite(REVERSE_VOLUME_CHANNEL, reverseChannelDuty);
-      lastReverseChannelDuty = reverseChannelDuty;
-    }
-
-    notZeroForwardChannelDutyDuration = millis();
-    notZeroReverseChannelDutyDuration = millis();
+    ledcWrite(FORWARD_VOLUME_CHANNEL, forwardChannelDuty);
+    ledcWrite(REVERSE_VOLUME_CHANNEL, reverseChannelDuty);
+    forwardNotZeroChannelDutyDuration = forwardChannelDuty > MIN_PWM_DUTY ? millis() : 0;
+    reverseNotZeroChannelDutyDuration = reverseChannelDuty > MIN_PWM_DUTY ? millis() : 0;
   }
 
 public:
@@ -41,10 +30,10 @@ public:
     ledcAttachPin(FORWARD_VOLUME_PIN, FORWARD_VOLUME_CHANNEL);
   }
 
-  void disableIfActiveForLongTime()
+  void turnOffIfActiveForLongTime()
   {
-    if ((ledcRead(FORWARD_VOLUME_CHANNEL) > MIN_PWM_DUTY && (millis() - notZeroForwardChannelDutyDuration > MAX_NOT_ZERO_DUTY_TIME)) ||
-        (ledcRead(REVERSE_VOLUME_CHANNEL) > MIN_PWM_DUTY && (millis() - notZeroReverseChannelDutyDuration > MAX_NOT_ZERO_DUTY_TIME)))
+    if ((ledcRead(FORWARD_VOLUME_CHANNEL) > MIN_PWM_DUTY && (millis() - forwardNotZeroChannelDutyDuration > MAX_NOT_ZERO_DUTY_DURATION)) ||
+        (ledcRead(REVERSE_VOLUME_CHANNEL) > MIN_PWM_DUTY && (millis() - reverseNotZeroChannelDutyDuration > MAX_NOT_ZERO_DUTY_DURATION)))
       write(MIN_PWM_DUTY, MIN_PWM_DUTY);
   }
 
@@ -72,7 +61,8 @@ public:
       write(MIN_PWM_DUTY, MIN_PWM_DUTY);
   }
 
-  void turnOff() {
-      write(MIN_PWM_DUTY, MIN_PWM_DUTY);
+  void turnOff()
+  {
+    write(MIN_PWM_DUTY, MIN_PWM_DUTY);
   }
 };

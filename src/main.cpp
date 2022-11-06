@@ -59,7 +59,7 @@ void loop()
   powerButton.tick();
   inputSelectorButton.tick();
   mainPowerOnButton.tick();
-  volumeEngine.disableIfActiveForLongTime();
+  volumeEngine.turnOffIfActiveForLongTime();
 
   tickCommunicator();
 }
