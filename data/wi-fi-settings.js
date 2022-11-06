@@ -31,6 +31,8 @@ const SaveResult =  document.getElementById(IDs.SAVE_RESULT);
 window.addEventListener('load', onLoad);
 
 function onLoad() {
+    deleteHoverEffectsOnMobile()
+    
     SaveButton.addEventListener('click', handleSaveButtonClicked);
 
     const validateInput = event => validateInputWithIp(event.target.name, event.target.value);
@@ -133,3 +135,24 @@ async function handleSaveButtonClicked() {
     }
   }
 
+  function deleteHoverEffectsOnMobile() {
+    const hasTouch =
+        'ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
+
+    if (hasTouch)
+        try {
+            for (let si in document.styleSheets) {
+                let styleSheet = document.styleSheets[si]
+                
+                if (!styleSheet.cssRules) continue
+
+                for (let ri = styleSheet.cssRules.length - 1; ri >= 0; ri--) {
+                    if (!styleSheet.cssRules[ri].selectorText) continue
+
+                    if (styleSheet.cssRules[ri].selectorText.match(':hover')) {
+                        styleSheet.deleteRule(ri)
+                    }
+                }
+            }
+        } catch (ignored) {}
+}

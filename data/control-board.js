@@ -248,5 +248,5 @@ function deleteHoverEffectsOnMobile() {
                     }
                 }
             }
-        } catch (ex) {}
+        } catch (ignored) {}
 }
