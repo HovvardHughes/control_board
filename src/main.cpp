@@ -6,6 +6,7 @@ Buzzer buzzer = Buzzer(&timer);
 
 OneButton powerButton(POWER_BUTTON_PIN);
 OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN);
+OneButton mainPowerOnButton(MAIN_POWER_ON_PIN);
 
 InputSelector inputSelector = InputSelector();
 
@@ -24,6 +25,7 @@ void setup()
 
   pinMode(POWER_BUTTON_PIN, INPUT_PULLUP);
   pinMode(INPUT_SELECTOR_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(MAIN_POWER_ON_PIN, INPUT_PULLDOWN);
 
   inputSelectorLed.setup();
 
@@ -41,6 +43,9 @@ void setup()
   inputSelectorButton.attachDoubleClick(onDoubleClickInputSelectorButton);
   inputSelectorButton.attachLongPressStart(onLongPressInputSelectorButtonStart);
 
+  mainPowerOnButton.attachLongPressStart(onClickPowerButton);
+  mainPowerOnButton.attachLongPressStop(onClickPowerButton);
+
   volumeEngine.setup();
 
   initSPIFFS();
@@ -53,6 +58,7 @@ void loop()
 
   powerButton.tick();
   inputSelectorButton.tick();
+  mainPowerOnButton.tick();
   volumeEngine.turnOffIfActiveForLongTime();
 
   tickCommunicator();
