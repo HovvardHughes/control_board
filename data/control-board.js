@@ -27,7 +27,7 @@ const TaskTypes = {
 }
 
 const TaskTypeTitles = {
-    [TaskTypes.NONE]: 'No active tasks',
+    [TaskTypes.NONE]: '',
     [TaskTypes.POWER_ON]: 'Turn on power',
     [TaskTypes.POWER_OFF]: 'Turn off power',
     [TaskTypes.TURN_ON_SLEEP_MODE]: 'Turn on sleep mode',
