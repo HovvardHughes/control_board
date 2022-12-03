@@ -142,7 +142,7 @@ function handleMessage(event) {
     setAtrribute('disabled', {
         [IDs.POWER_BUTTON]: isRunningTask || isSleepModeOn,
         [IDs.SLEEP_MODE_BUTTON]: isRunningTaskOrPowerTurnedOff,
-        [IDs.VU_BUTTON]: isRunningTaskOrPowerTurnedOff || isSleepModeOn,
+        [IDs.VU_BUTTON]: isRunningTask,
         [IDs.MAIN_INPUT]: isRunningTaskOrPowerTurnedOff,
         [IDs.SECONDARY_INPUT]: isRunningTaskOrPowerTurnedOff,
         [IDs.VOLUME_SLIDER]: isRunningTaskOrPowerTurnedOff

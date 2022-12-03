@@ -77,15 +77,6 @@ void onClickPowerButton()
 
 void onLongPressPowerButtonStart()
 {
-  if (!powerController.isPowerOn())
-    return;
-
-  if (powerController.isSleepModeOn())
-  {
-    onDoubleClickPowerButton();
-    return;
-  }
-
   if (powerController.isVUOn())
     taskController.runLongTask([]()
                                { powerController.setVU(false); },
