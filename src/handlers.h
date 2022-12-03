@@ -89,6 +89,17 @@ void onLongPressPowerButtonStart()
                                LONG_TASK_RUNTIME);
 }
 
+void processMainPowerSource()
+{
+  if (taskController.isFastTaskRunning() || taskController.isLongTaskRunning() || powerController.isSleepModeOn())
+    return;
+
+  bool changed = powerController.updateMainPowerState();
+
+  if (changed && powerController.isMainPowerSourceOn() != powerController.isPowerOn())
+    onClickPowerButton();
+}
+
 void onClickInputSelectorButton()
 {
   if (!powerController.isPowerOn())

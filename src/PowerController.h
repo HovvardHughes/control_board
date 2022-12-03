@@ -4,6 +4,8 @@
 #include <Buzzer.h>
 #include <VolumeEngine.h>
 
+#define MAIN_POWER_SOURCE_STATE_CHANGED_DEBOUNCE_MILLIS 3000
+
 class PowerController
 {
 
@@ -20,6 +22,9 @@ private:
     bool _VUTurnedOffManually;
 
     Led _powerLed;
+
+    int _isMainPowerSourceOn;
+    unsigned long _mainPowerSourceStateChangedStartMillis;
 
     void writeWithVUCheck(uint8_t pin, uint8_t state)
     {
@@ -187,6 +192,7 @@ public:
         pinMode(PRLY2_PIN, OUTPUT);
         pinMode(PRLY3_PIN, OUTPUT);
         pinMode(PRLY4_PIN, OUTPUT);
+        pinMode(MAIN_POWER_SOURCE_PIN, INPUT_PULLUP);
     }
 
     bool isPowerOn()
@@ -202,5 +208,34 @@ public:
     bool isVUOn()
     {
         return digitalRead(PRLY3_PIN) && digitalRead(PRLY4_PIN);
+    }
+
+        bool isMainPowerSourceOn()
+    {
+        return _isMainPowerSourceOn;
+    }
+
+    bool updateMainPowerState()
+    {
+        int state = digitalRead(MAIN_POWER_SOURCE_PIN);
+
+        if (state != _isMainPowerSourceOn)
+        {
+            if (_mainPowerSourceStateChangedStartMillis == 0)
+                _mainPowerSourceStateChangedStartMillis = millis();
+            else
+            {
+                if (millis() - _mainPowerSourceStateChangedStartMillis >= MAIN_POWER_SOURCE_STATE_CHANGED_DEBOUNCE_MILLIS)
+                {
+                    _mainPowerSourceStateChangedStartMillis = 0;
+                    _isMainPowerSourceOn = state;
+                    return true;
+                }
+            }
+        }
+        else
+            _mainPowerSourceStateChangedStartMillis = 0;
+
+        return false;
     }
 };

@@ -38,10 +38,11 @@ GPIO      Connected to...
 #define PRLY3_PIN 14
 #define PRLY4_PIN 12
 
+#define MAIN_POWER_SOURCE_PIN 21
+
 // BUTTONS:
 #define POWER_BUTTON_PIN 19
 #define INPUT_SELECTOR_BUTTON_PIN 18
-#define MAIN_POWER_ON_PIN 21
 
 // VOLUME:
 #define REVERSE_VOLUME_PIN 16
