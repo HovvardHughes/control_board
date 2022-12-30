@@ -79,8 +79,8 @@ GPIO      Connected to...
 #define SECONDARY_INPUT_RELAY_PIN 33
 
 // Tasks:
-#define LONG_TASK_DELAY 1000 // For Debugging
-// #define LONG_TASK_DELAY 25000 // For Release
+// #define LONG_TASK_DELAY 1000 // For Debugging
+#define LONG_TASK_DELAY 25000 // For Release
 
 #define LONG_TASK_RUNTIME LONG_TASK_DELAY + 500
 #define FAST_TASK_RUNTIME 500
