@@ -3,6 +3,7 @@
 #include <InputSelector.h>
 #include <Buzzer.h>
 #include <VolumeEngine.h>
+#include <ControlBoardEEPROM.h>
 
 #define MAIN_POWER_SOURCE_STATE_CHANGED_DEBOUNCE_MILLIS 3000
 
@@ -16,6 +17,7 @@ private:
     Led *_inputSelectorLed;
     Buzzer *_buzzer;
     VolumeEngine *_volumeEngine;
+    ControlBoardEEPROM *_eeprom;
 
     bool _isPowerOn;
     bool _isSleepModeOn;
@@ -101,6 +103,7 @@ private:
         PowerController *ptr = (PowerController *)p;
         digitalWrite(PRLY4_PIN, HIGH);
         ptr->_VUTurnedOffManually = false;
+        ptr->_eeprom->writeVUTurnedOffManually(false);
         return false;
     }
 
@@ -109,17 +112,19 @@ private:
         PowerController *ptr = (PowerController *)p;
         digitalWrite(PRLY3_PIN, LOW);
         ptr->_VUTurnedOffManually = true;
+        ptr->_eeprom->writeVUTurnedOffManually(true);
         return false;
     }
 
 public:
-    PowerController(Timer<> *timer, InputSelector *inputSelector, Led *inputSelectorLed, Buzzer *buzzer, VolumeEngine *volumeEngine)
+    PowerController(Timer<> *timer, InputSelector *inputSelector, Led *inputSelectorLed, Buzzer *buzzer, VolumeEngine *volumeEngine, ControlBoardEEPROM *eeprom)
     {
         _timer = timer;
         _inputSelector = inputSelector;
         _inputSelectorLed = inputSelectorLed;
         _buzzer = buzzer;
         _volumeEngine = volumeEngine;
+        _eeprom = eeprom;
         _powerLed = Led(POWER_BUTTON_LED_CHANNEL, POWER_BUTTON_LED_PIN, timer);
     }
 
@@ -193,6 +198,7 @@ public:
         pinMode(PRLY3_PIN, OUTPUT);
         pinMode(PRLY4_PIN, OUTPUT);
         pinMode(MAIN_POWER_SOURCE_PIN, INPUT_PULLUP);
+        _VUTurnedOffManually = _eeprom->readVUTurnedOffManually();
     }
 
     bool isPowerOn()
@@ -210,7 +216,7 @@ public:
         return digitalRead(PRLY3_PIN) && digitalRead(PRLY4_PIN);
     }
 
-        bool isMainPowerSourceOn()
+    bool isMainPowerSourceOn()
     {
         return _isMainPowerSourceOn;
     }

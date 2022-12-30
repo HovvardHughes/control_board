@@ -43,6 +43,9 @@ void onVolumeChanged(u_int8_t *commmand)
 
 void onDoubleClickPowerButton()
 {
+  if (!powerController.isPowerOn())
+    return;
+
   if (powerController.isSleepModeOn())
     taskController.runLongTask([]()
                                { powerController.setSleepMode(false); },

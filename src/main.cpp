@@ -13,7 +13,9 @@ Led inputSelectorLed = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUT
 
 VolumeEngine volumeEngine = VolumeEngine();
 
-PowerController powerController = PowerController(&timer, &inputSelector, &inputSelectorLed, &buzzer, &volumeEngine);
+ControlBoardEEPROM eeprom = ControlBoardEEPROM();
+
+PowerController powerController = PowerController(&timer, &inputSelector, &inputSelectorLed, &buzzer, &volumeEngine, &eeprom);
 
 TaskController taskController = TaskController(&timer, textStateAll);
 
@@ -30,6 +32,8 @@ void setup()
   buzzer.setup();
 
   inputSelector.setup();
+
+  eeprom.setup();
 
   powerController.setup();
 
@@ -54,7 +58,7 @@ void loop()
   powerButton.tick();
   inputSelectorButton.tick();
   volumeEngine.turnOffIfActiveForLongTime();
-  
+
   processMainPowerSource();
 
   tickCommunicator();
