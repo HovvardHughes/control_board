@@ -5,8 +5,13 @@
 #include <communicatorCommands.h>
 #include <handlers.h>
 #include <WiFiSettings.h>
+#include <TemperatureMeasurer.h>
 
 #define WIFI_CONNECTING_TIMEOUT 10000
+#define STATE_PUSHING_INTERVAL 5000
+
+extern TemperatureMeasurer temperatureMeasurer;
+extern Timer<> timer;
 
 WiFiSettings wiFiSettings;
 
@@ -60,7 +65,7 @@ void textStateAll()
   state |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_PIN) << 4;
   state |= taskController.isLongTaskRunning() << 5;
 
-  webSocket.textAll(String(state) + "|" + taskController.getRunningLongTaskType());
+  webSocket.textAll(String(state) + "|" + taskController.getRunningLongTaskType() + "|" + temperatureMeasurer.getInCelsius());
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
@@ -191,6 +196,11 @@ void setupCommunicator()
 
   server.serveStatic("/", SPIFFS, "/");
   server.begin();
+
+  timer.every(STATE_PUSHING_INTERVAL, [](void *)
+              {
+                textStateAll();
+                return true; });
 }
 
 void tickCommunicator()

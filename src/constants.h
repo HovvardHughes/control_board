@@ -85,9 +85,8 @@ GPIO      Connected to...
 #define LONG_TASK_RUNTIME LONG_TASK_DELAY + 500
 #define FAST_TASK_RUNTIME 500
 
+// 1WIRE:
+#define ONE_WIRE_BUS 13
+
 // Other:
 #define COM_PORT_SPEED 115200 // COM Port Baud Rate
-
-// I2C:
-
-// 1WIRE:

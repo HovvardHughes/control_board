@@ -19,10 +19,12 @@ PowerController powerController = PowerController(&timer, &inputSelector, &input
 
 TaskController taskController = TaskController(&timer, textStateAll);
 
+TemperatureMeasurer temperatureMeasurer = TemperatureMeasurer(&timer, &taskController);
+
 void setup()
 {
   Serial.begin(COM_PORT_SPEED);
-  Serial.println("OneButton Starting...");
+  Serial.println("Starting...");
 
   pinMode(POWER_BUTTON_PIN, INPUT_PULLUP);
   pinMode(INPUT_SELECTOR_BUTTON_PIN, INPUT_PULLUP);
@@ -47,9 +49,12 @@ void setup()
 
   volumeEngine.setup();
 
+  temperatureMeasurer.setup();
+
   initSPIFFS();
   setupCommunicator();
 }
+
 
 void loop()
 {

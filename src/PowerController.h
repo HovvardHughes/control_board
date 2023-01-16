@@ -197,7 +197,7 @@ public:
         pinMode(PRLY2_PIN, OUTPUT);
         pinMode(PRLY3_PIN, OUTPUT);
         pinMode(PRLY4_PIN, OUTPUT);
-        pinMode(MAIN_POWER_SOURCE_PIN, INPUT_PULLUP);
+        pinMode(MAIN_POWER_SOURCE_PIN, INPUT_PULLDOWN);
         _VUTurnedOffManually = _eeprom->readVUTurnedOffManually();
     }
 

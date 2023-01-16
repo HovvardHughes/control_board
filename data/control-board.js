@@ -1,3 +1,5 @@
+const NON_BREAKING_SPACE = '\xa0'
+
 const Commands = {
     GET_STATE: 0,
     SWITCH_POWER: 1,
@@ -27,7 +29,7 @@ const TaskTypes = {
 }
 
 const TaskTypeTitles = {
-    [TaskTypes.NONE]: '',
+    [TaskTypes.NONE]: NON_BREAKING_SPACE,
     [TaskTypes.POWER_ON]: 'Turn on power',
     [TaskTypes.POWER_OFF]: 'Turn off power',
     [TaskTypes.TURN_ON_SLEEP_MODE]: 'Turn on sleep mode',
@@ -46,7 +48,8 @@ const IDs = {
     MAIN_INPUT: 'main-relay',
     SECONDARY_INPUT: 'secondary-relay',
     DISPLAY_MESSAGE_CONTAINER: 'message-container',
-    DISPLAY_MESSAGE: 'message'
+    DISPLAY_MESSAGE: 'message',
+    TEMPERATURE: 'temperature'
 }
 
 const Elements = Object.fromEntries(Object.values(IDs).map((id) => [id, document.getElementById(id)]))
@@ -66,7 +69,7 @@ function handleLoad() {
     deleteHoverEffectsOnMobile()
     initWebSocket()
     initControlHandlers()
-    displayMessage('', false, false)
+    displayMessage(NON_BREAKING_SPACE, false, false)
     disableAllControlsId = setTimeout(disableAllControls, 1000)
 }
 
@@ -103,6 +106,7 @@ function handleMessage(event) {
 
     const state = parseInt(splitData[0])
     const runningTaskType = parseInt(splitData[1])
+    const temperature = parseFloat(splitData[2]).toFixed(1)
 
     const isPowerOn = getBit(state, 0)
     const isSleepModeOn = getBit(state, 1)
@@ -150,6 +154,8 @@ function handleMessage(event) {
 
     addOrRemoveClass(IDs.INPUT_SELECTOR, 'disabled', isRunningTaskOrPowerTurnedOff)
     addOrRemoveClass(IDs.VOLUME_SLIDER_CONTAINER, 'disabled', isRunningTaskOrPowerTurnedOff)
+
+    Elements[IDs.TEMPERATURE].innerHTML = `${temperature} °C`
 }
 
 function addOrRemoveClass(id, className, addClass) {
