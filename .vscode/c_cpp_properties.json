@@ -12,6 +12,7 @@
                 "/Volumes/Data/repos/control_board/src",
                 "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/EEPROM/src",
                 "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/SPIFFS/src",
+                "/Volumes/Data/repos/control_board/.pio/libdeps/esp32dev/INA219_WE/src",
                 "/Volumes/Data/repos/control_board/.pio/libdeps/esp32dev/DallasTemperature",
                 "/Volumes/Data/repos/control_board/.pio/libdeps/esp32dev/OneWire",
                 "/Volumes/Data/repos/control_board/.pio/libdeps/esp32dev/ESPAsyncWebServer-esphome/src",
@@ -196,6 +197,7 @@
                 "/Users/guapo/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/qspi_qspi/include",
                 "/Users/guapo/.platformio/packages/framework-arduinoespressif32/cores/esp32",
                 "/Users/guapo/.platformio/packages/framework-arduinoespressif32/variants/esp32",
+                "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                 "/Volumes/Data/repos/control_board/.pio/libdeps/esp32dev/Unity/src",
                 "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/ArduinoOTA/src",
                 "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/AsyncUDP/src",
@@ -224,7 +226,6 @@
                 "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src",
                 "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                 "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
-                "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                 ""
             ],
             "browse": {
@@ -234,6 +235,7 @@
                     "/Volumes/Data/repos/control_board/src",
                     "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/EEPROM/src",
                     "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/SPIFFS/src",
+                    "/Volumes/Data/repos/control_board/.pio/libdeps/esp32dev/INA219_WE/src",
                     "/Volumes/Data/repos/control_board/.pio/libdeps/esp32dev/DallasTemperature",
                     "/Volumes/Data/repos/control_board/.pio/libdeps/esp32dev/OneWire",
                     "/Volumes/Data/repos/control_board/.pio/libdeps/esp32dev/ESPAsyncWebServer-esphome/src",
@@ -418,6 +420,7 @@
                     "/Users/guapo/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/qspi_qspi/include",
                     "/Users/guapo/.platformio/packages/framework-arduinoespressif32/cores/esp32",
                     "/Users/guapo/.platformio/packages/framework-arduinoespressif32/variants/esp32",
+                    "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                     "/Volumes/Data/repos/control_board/.pio/libdeps/esp32dev/Unity/src",
                     "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/ArduinoOTA/src",
                     "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/AsyncUDP/src",
@@ -446,7 +449,6 @@
                     "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src",
                     "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                     "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
-                    "/Users/guapo/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                     ""
                 ]
             },

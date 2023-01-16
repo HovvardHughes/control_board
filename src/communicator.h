@@ -6,11 +6,13 @@
 #include <handlers.h>
 #include <WiFiSettings.h>
 #include <TemperatureMeasurer.h>
+#include <CurrentMeasurer.h>
 
 #define WIFI_CONNECTING_TIMEOUT 10000
 #define STATE_PUSHING_INTERVAL 5000
 
 extern TemperatureMeasurer temperatureMeasurer;
+extern CurrentMeasurer currentMeasurer;
 extern Timer<> timer;
 
 WiFiSettings wiFiSettings;
@@ -65,7 +67,7 @@ void textStateAll()
   state |= inputSelector.readRelay(SECONDARY_INPUT_RELAY_PIN) << 4;
   state |= taskController.isLongTaskRunning() << 5;
 
-  webSocket.textAll(String(state) + "|" + taskController.getRunningLongTaskType() + "|" + temperatureMeasurer.getInCelsius());
+  webSocket.textAll(String(state) + "|" + taskController.getRunningLongTaskType() + "|" + temperatureMeasurer.getInCelsius() + "|" + currentMeasurer.getCathodeCurrentsString());
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
@@ -112,8 +114,15 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
 {
-  if (type == WS_EVT_DATA)
+  switch (type)
+  {
+  case WS_CONNECTED:
+    textStateAll();
+    break;
+  case WS_EVT_DATA:
     handleWebSocketMessage(arg, data, len);
+    break;
+  }
 }
 
 void initWebSocket()

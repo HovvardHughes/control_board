@@ -20,6 +20,7 @@ PowerController powerController = PowerController(&timer, &inputSelector, &input
 TaskController taskController = TaskController(&timer, textStateAll);
 
 TemperatureMeasurer temperatureMeasurer = TemperatureMeasurer(&timer, &taskController);
+CurrentMeasurer currentMeasurer = CurrentMeasurer();
 
 void setup()
 {
@@ -49,12 +50,12 @@ void setup()
 
   volumeEngine.setup();
 
+  currentMeasurer.setup();
   temperatureMeasurer.setup();
 
   initSPIFFS();
   setupCommunicator();
 }
-
 
 void loop()
 {
@@ -67,4 +68,6 @@ void loop()
   processMainPowerSource();
 
   tickCommunicator();
+
+  currentMeasurer.printDebugInfo();
 }

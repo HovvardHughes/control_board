@@ -11,16 +11,21 @@
   <body>
     <div class="card">
       <div class="display">
-        <div id="temperature">0.0 °C</div>
+        <div id="temperature-container">
+          <span id="temperature-value">0.00</span>
+          <span id="temperature-units">&deg;C</span>
+        </div>
         <div id="message-container">
-          <span id="message"></span>&nbsp;<span class="blinking-dot">.</span><span class="blinking-dot">.</span><span class="blinking-dot">.</span></div>
-          <!-- <div id="currents">
-            <span>0 mA</span>
-            <span>0 mA</span>
-            <span>0 mA</span>
-            <span>0 mA</span>
-          </div> -->
+        <span id="message">&nbsp;</span><span class="blinking-dot">&nbsp;.</span><span class="blinking-dot">.</span><span class="blinking-dot">.</span>
       </div>
+      <div id="currents">
+        <div>0.00</div>
+        <div>0.00</div>
+        <div>0.00</div>
+        <div>0.00</div>
+        <div>[mA]</div>
+      </div>
+    </div>
       <div class="content">
         <div class="left">
           <button type="button" class="button" id="power-button">

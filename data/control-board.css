@@ -37,8 +37,9 @@ body {
     box-shadow: rgb(0 0 0 / 20%) 0px 2px 1px -1px, rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px;
     padding: 20px;
     display: grid;
-    width: 280px;
+    width: 300px;
     border-radius: 10px;
+    place-content: center center;
 }
 
 @media only screen and (max-width: 400px) {
@@ -81,12 +82,38 @@ body {
 }
 
 .display > *:not(:last-child) {
-    margin-bottom: 2px;
+    margin-bottom: 4px;
 }
 
-#temperature {
-    font-size: 12px;
+#temperature-container {
     justify-self: flex-end;
+}
+
+#currents {
+    display: grid;
+    grid-auto-flow: column;  
+    justify-content: space-between;
+    margin: 0 16px;
+}
+
+#currents > *:not(:last-child) {
+    width: 36px;
+    margin-right: 10px;
+}
+
+#temperature-container, #currents {
+    font-size: 0.9em;
+}
+
+#temperature-units, #currents > *:last-child {
+    opacity: 0.5;
+}
+
+#message-container {
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .blinking-dot {
@@ -106,13 +133,6 @@ body {
 }
 .blinking-dot:nth-child(3) {
     animation-delay: 500ms;
-}
-
-#currents {
-    display: grid;
-    grid-auto-flow: column;  
-    justify-content: space-between;
-    margin: 0 16px;
 }
 
 .icon {

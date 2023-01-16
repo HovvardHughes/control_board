@@ -88,5 +88,13 @@ GPIO      Connected to...
 // 1WIRE:
 #define ONE_WIRE_BUS 13
 
+// I2C
+#define SDA 22
+#define SCL 23
+#define INA_1 0x40
+#define INA_2 0x41
+#define INA_3 0x42
+#define INA_4 0x43
+
 // Other:
 #define COM_PORT_SPEED 115200 // COM Port Baud Rate
