@@ -5,11 +5,12 @@
 
 #define INA_COUNT 4
 #define CORRECTION_FACTOR 1.025
+#define CORRECTION_ADS 1.01
 
 class CurrentMeasurer
 {
 private:
-    INA219_WE inas[INA_COUNT] = {INA219_WE(INA_1), INA219_WE(INA_2), INA219_WE(INA_3), INA219_WE(INA_4)};
+    INA219_WE inas[INA_COUNT] = {INA219_WE(INA_PIN_1), INA219_WE(INA_PIN_2), INA219_WE(INA_PIN_3), INA219_WE(INA_PIN_4)};
 
     float getCathodeCurrent(INA219_WE ina)
     {
@@ -38,6 +39,9 @@ public:
 
     void printDebugInfo()
     {
+        Serial.println("");
+        Serial.print("Voltage [V]: ");
+        Serial.print(getVoltageString());
 
         for (size_t i = 0; i < INA_COUNT; i++)
         {
@@ -52,9 +56,7 @@ public:
             float correctedVoltage_V = busVoltage_V * CORRECTION_FACTOR;   // used, corrected measurements
             float cathodeShuntCurrent_mA = correctedVoltage_V * 100;       // used, "cheat" conversion V to mA, cause we measure V instead of mA
             float busVoltage_magnifier = busVoltage_V * 1000;              // Workaround used for debug + precise voltage("mA") tuning. The proposal to display in the terminal mode or do it getting out of a commentary for the possibility of adjusting
-
             Serial.println("");
-
             Serial.print("INA: ");
             Serial.print(i);
             Serial.print(" :: Shunt Voltage [mV]: ");
@@ -85,9 +87,14 @@ public:
 
     String getCathodeCurrentsString()
     {
-        return String(getCathodeCurrent(inas[0])) + ":" + 
-        String(getCathodeCurrent(inas[1])) + ":" + 
-        String(getCathodeCurrent(inas[2])) + ":" + 
-        String(getCathodeCurrent(inas[3]));
+        return String(getCathodeCurrent(inas[0])) + ":" +
+               String(getCathodeCurrent(inas[1])) + ":" +
+               String(getCathodeCurrent(inas[2])) + ":" +
+               String(getCathodeCurrent(inas[3]));
+    }
+
+    String getVoltageString()
+    {
+        return String(analogRead(ADC_PIN) * 3.3 / 4095 * CORRECTION_ADS);
     }
 };

@@ -85,8 +85,13 @@ body {
     margin-bottom: 4px;
 }
 
-#temperature-container {
+#voltage-temperature-container {
     justify-self: flex-end;
+    font-size: 0.9em;
+}
+
+#voltage-temperature-container > :last-child {
+    text-align: end;
 }
 
 #currents {
@@ -101,11 +106,11 @@ body {
     margin-right: 10px;
 }
 
-#temperature-container, #currents {
+#temperature-voltage-container, #currents {
     font-size: 0.9em;
 }
 
-#temperature-units, #currents > *:last-child {
+.measurement-units {
     opacity: 0.5;
 }
 

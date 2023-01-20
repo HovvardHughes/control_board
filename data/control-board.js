@@ -1,5 +1,6 @@
 const NON_BREAKING_SPACE = '\xa0'
-const NORMAL_TEMPERATURE_DEGREES_CELSIUS = 65.00
+const MAX_NORMAL_TEMPERATURE_DEGREES_CELSIUS = 65.00
+const MAX_NORMAL_CURRENT_MA = 85.00
 
 const Commands = {
     GET_STATE: 0,
@@ -50,7 +51,9 @@ const IDs = {
     SECONDARY_INPUT: 'secondary-relay',
     DISPLAY_MESSAGE_CONTAINER: 'message-container',
     DISPLAY_MESSAGE: 'message',
-    TEMPERATURE: 'temperature-value',
+    TEMPERATURE_CONTAINER: 'temperature-container',
+    TEMPERATURE: 'temperature',
+    VOLTAGE: 'voltage',
     CURRENTS: 'currents'
 }
 
@@ -86,7 +89,6 @@ function initWebSocket() {
 function handleOpen() {
     webSocketErrorCount = 0
     clearInterval(disableAllControlsId)
-    // websocket.send(Commands.GET_STATE)
 }
 
 function handleClose() {
@@ -109,7 +111,8 @@ function handleMessage(event) {
     const state = parseInt(splitData[0])
     const runningTaskType = parseInt(splitData[1])
     const temperature = parseFloat(splitData[2])
-    const currents = splitData[3].split(":").map(parseFloat)
+    const voltage = parseFloat(splitData[3])
+    const currents = splitData[4].split(":").map(parseFloat)
 
     const isPowerOn = getBit(state, 0)
     const isSleepModeOn = getBit(state, 1)
@@ -121,20 +124,20 @@ function handleMessage(event) {
     displayMessage(TaskTypeTitles[runningTaskType], false, isRunningTask)
 
     addOrRemoveClass(
-        IDs.POWER_BUTTON,
+        Elements[IDs.POWER_BUTTON],
         'progress',
         runningTaskType === TaskTypes.POWER_ON || runningTaskType === TaskTypes.POWER_OFF
     )
     addOrRemoveClass(
-        IDs.SLEEP_MODE_BUTTON,
+        Elements[IDs.SLEEP_MODE_BUTTON],
         'progress',
         runningTaskType === TaskTypes.TURN_ON_SLEEP_MODE || runningTaskType === TaskTypes.TURN_OFF_SLEEP_MODE
     )
-    addOrRemoveClass(IDs.VU_BUTTON, 'progress', runningTaskType === TaskTypes.TURN_OFF_VU)
+    addOrRemoveClass(Elements[IDs.VU_BUTTON], 'progress', runningTaskType === TaskTypes.TURN_OFF_VU)
 
-    addOrRemoveClass(IDs.POWER_BUTTON, 'enabled-power-button', isPowerOn)
-    addOrRemoveClass(IDs.SLEEP_MODE_BUTTON, 'enabled-sleep-mode-button', isSleepModeOn)
-    addOrRemoveClass(IDs.VU_BUTTON, 'enabled-vu-button', isVUOn)
+    addOrRemoveClass(Elements[IDs.POWER_BUTTON], 'enabled-power-button', isPowerOn)
+    addOrRemoveClass(Elements[IDs.SLEEP_MODE_BUTTON], 'enabled-sleep-mode-button', isSleepModeOn)
+    addOrRemoveClass(Elements[IDs.VU_BUTTON], 'enabled-vu-button', isVUOn)
 
     if(!ignoreOnceInputSelectorSwitchUpdateWhenMessageRecieved) {
         setAtrribute('checked', {
@@ -155,18 +158,23 @@ function handleMessage(event) {
         [IDs.VOLUME_SLIDER]: isRunningTaskOrPowerTurnedOff
     })
 
-    addOrRemoveClass(IDs.INPUT_SELECTOR, 'disabled', isRunningTaskOrPowerTurnedOff)
-    addOrRemoveClass(IDs.VOLUME_SLIDER_CONTAINER, 'disabled', isRunningTaskOrPowerTurnedOff)
+    addOrRemoveClass(Elements[IDs.INPUT_SELECTOR], 'disabled', isRunningTaskOrPowerTurnedOff)
+    addOrRemoveClass(Elements[IDs.VOLUME_SLIDER_CONTAINER], 'disabled', isRunningTaskOrPowerTurnedOff)
 
     Elements[IDs.TEMPERATURE].innerText = temperature
-    addOrRemoveClass(IDs.TEMPERATURE, 'error', temperature > NORMAL_TEMPERATURE_DEGREES_CELSIUS)
+    addOrRemoveClass(Elements[IDs.TEMPERATURE_CONTAINER], 'error', temperature > MAX_NORMAL_TEMPERATURE_DEGREES_CELSIUS)
+
+    Elements[IDs.VOLTAGE].innerText = voltage
 
     const currentNodes = Elements[IDs.CURRENTS].querySelectorAll("* > *")
-    currents.forEach((current, currentIndex) => currentNodes[currentIndex].innerHTML = current)
+    currents.forEach((current, currentIndex) => {
+        const element = currentNodes[currentIndex]
+        element.innerHTML = current
+        addOrRemoveClass(element, "error", current > MAX_NORMAL_CURRENT_MA)
+    })
 }
 
-function addOrRemoveClass(id, className, addClass) {
-    const element = Elements[id]
+function addOrRemoveClass(element, className, addClass) {
     if (addClass) element.classList.add(className)
     else element.classList.remove(className)
 }
@@ -238,14 +246,14 @@ function handleVolumeSliderKeyDown(event) {
 
 function displayMessage(message, error, ellipsisAnimation) {
     Elements[IDs.DISPLAY_MESSAGE].innerText = message
-    addOrRemoveClass(IDs.DISPLAY_MESSAGE_CONTAINER, 'error', error)
+    addOrRemoveClass(Elements[IDs.DISPLAY_MESSAGE_CONTAINER], 'error', error)
     for (let dot of Dots) dot.style.display = ellipsisAnimation ? 'inline' : 'none'
 }
 
 function disableAllControls() {
     setAtrribute('disabled', Object.fromEntries(Object.values(IDs).map((id) => [id, true])))
-    addOrRemoveClass(IDs.INPUT_SELECTOR, 'disabled', true)
-    addOrRemoveClass(IDs.VOLUME_SLIDER_CONTAINER, 'disabled', true)
+    addOrRemoveClass(Elements[IDs.INPUT_SELECTOR], 'disabled', true)
+    addOrRemoveClass(Elements[IDs.VOLUME_SLIDER_CONTAINER], 'disabled', true)
 }
 
 function deleteHoverEffectsOnMobile() {

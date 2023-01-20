@@ -11,9 +11,10 @@
   <body>
     <div class="card">
       <div class="display">
-        <div id="temperature-container">
-          <span id="temperature-value">0.00</span>
-          <span id="temperature-units">&deg;C</span>
+        <div id="voltage-temperature-container">
+          <span id="temperature-container"><span id="temperature">0.00</span><span class="measurement-units"> &deg;C</span></span>
+          /
+          <span id="voltage">0.00</span><span class="measurement-units"> V</span>
         </div>
         <div id="message-container">
         <span id="message">&nbsp;</span><span class="blinking-dot">&nbsp;.</span><span class="blinking-dot">.</span><span class="blinking-dot">.</span>
@@ -23,7 +24,7 @@
         <div>0.00</div>
         <div>0.00</div>
         <div>0.00</div>
-        <div>[mA]</div>
+        <div class="measurement-units">[mA]</div>
       </div>
     </div>
       <div class="content">
