@@ -15,14 +15,14 @@ public:
 
   void readSettings()
   {
-    _ssid = "Begemot";
-    _password = "19411945";
-    _ip = "192.168.1.200";
-    _gateway = "192.168.4.1";
-    // _ssid = readFile(SSID_PATH);
-    // _password = readFile(PASSWORD_PATH);
-    // _ip = readFile(IP_PATH);
-    // _gateway = readFile(GATEWAY_PATH);
+    // _ssid = "Begemot";
+    // _password = "19411945";
+    // _ip = "192.168.1.200";
+    // _gateway = "192.168.4.1";
+    _ssid = readFile(SSID_PATH);
+    _password = readFile(PASSWORD_PATH);
+    _ip = readFile(IP_PATH);
+    _gateway = readFile(GATEWAY_PATH);
   }
 
   String getSSID()
