@@ -8,7 +8,7 @@
 #define CORRECTION_ADS 1.01
 
 #define MAX_NORMAL_CURRENT_MA 85.00
-#define HIGH_CURRENT_MAX_DURATION 5000
+#define HIGH_CURRENT_MAX_DURATION 2000
 
 struct INA219_WE_STATE
 {
@@ -41,6 +41,13 @@ private:
 
     bool checkInaState(INA219_WE_STATE *inaState)
     {
+        if (!_isPowerOn() || _taskController->isRunningTask())
+        {
+            if (inaState->highCurrentStaredMillis > 0)
+                inaState->highCurrentStaredMillis = 0;
+            return true;
+        }
+
         if (inaState->lastCurrentMeasurement > MAX_NORMAL_CURRENT_MA)
         {
             Serial.println("Токи больше");
@@ -142,9 +149,6 @@ public:
     {
         for (size_t i = 0; i < INA_COUNT; i++)
             updateCathodeCurrentMa(&inas[i]);
-
-        if (!_isPowerOn() || _taskController->isRunningTask())
-            return;
 
         for (size_t i = 0; i < INA_COUNT; i++)
             if (!checkInaState(&inas[i]))
