@@ -37,7 +37,7 @@ body {
     box-shadow: rgb(0 0 0 / 20%) 0px 2px 1px -1px, rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px;
     padding: 20px;
     display: grid;
-    width: 300px;
+    width: 320px;
     border-radius: 10px;
     place-content: center stretch;
 }
@@ -95,22 +95,38 @@ body {
 }
 
 #currents {
-    display: flex;
-    /* justify-content: space-between; */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     margin: 0 8px;
 }
 
-.current-value {
-    display: inline-block;
-    width: 56px;
-    text-align: start;
+#currents > *:first-child{
+    margin-right: 8px;
 }
+
+#currents > *:last-child{
+    margin-left: 8px;
+}
+
+.current-row {
+    display: flex;
+}
+
+.current-row > span:first-child {
+    margin-right: auto;
+}
+
+.current-name {
+    display: inline-block;
+    width: 30px;
+}
+
 
 #temperature-voltage-container, #currents {
     font-size: 0.9em;
 }
 
-.measurement-units {
+.secondary {
     opacity: 0.5;
 }
 

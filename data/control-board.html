@@ -12,21 +12,29 @@
     <div class="card">
       <div class="display">
         <div id="voltage-temperature-container">
-          <span id="temperature-container"><span id="temperature">0.00</span><span class="measurement-units"> &deg;C</span></span>
+          <span id="temperature-container"><span id="temperature">0.00</span><span class="secondary"> &deg;C</span></span>
           /
-          <span id="voltage">0.00</span><span class="measurement-units"> V</span>
+          <span id="voltage">0.00</span><span class="secondary"> V</span>
         </div>
         <div id="message-container">
         <span id="message">&nbsp;</span><span class="blinking-dot">&nbsp;.</span><span class="blinking-dot">.</span><span class="blinking-dot">.</span>
       </div>
       <div id="currents">
         <div>
-          <span class="current-value">0.00</span><span class="measurement-units">[mA]</span>
-          <span class="current-value">0.00</span><span class="measurement-units">[mA]</span>
+          <div class="current-row">
+            <span class="current-name secondary">C1:</span><span class="1 current-value">0.00</span><span class="secondary">&nbsp;mA</span>
+          </div>
+          <div class="current-row">
+          <span class="current-name secondary">C2:</span><span class="2 current-value">0.00</span><span class="secondary">&nbsp;mA</span>
+        </div>
         </div>
         <div>
-          <span class="current-value">0.00</span><span class="measurement-units">[mA]</span>
-          <span class="current-value">0.00</span><span class="measurement-units">[mA]</span>
+          <div class="current-row">
+          <span class="current-name secondary">C3:</span><span class="3 current-value">0.00</span><span class="secondary">&nbsp;mA</span>
+          </div>
+          <div class="current-row">
+          <span class="current-name secondary">C4:</span><span class="4 current-value">0.00</span><span class="secondary">&nbsp;mA</span>
+        </div>
         </div>
       </div>
     </div>
@@ -80,8 +88,8 @@
         <div id="input-selector">
           <span class="title">Inputs</span>
           <div class="input-numbers">
-            <span>I</span>
-            <span>II</span>
+            <span>1</span>
+            <span>2</span>
           </div>
           <div class="switches">
             <label class="switch">

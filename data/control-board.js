@@ -177,7 +177,7 @@ function handleMessage(event) {
     Elements[IDs.VOLTAGE].innerText = voltage
 
     const currentValues = Elements[IDs.CURRENTS].querySelectorAll('* > .current-value')
-    const currentUnits = Elements[IDs.CURRENTS].querySelectorAll('* > .measurement-units')
+    const currentUnits = Elements[IDs.CURRENTS].querySelectorAll('* > .secondary:last-child')
     currents.forEach((current, currentIndex) => {
         const value = currentValues[currentIndex]
         const units = currentUnits[currentIndex]
