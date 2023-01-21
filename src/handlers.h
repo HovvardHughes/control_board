@@ -171,3 +171,8 @@ void onLongPressInputSelectorButtonStart()
                              inputSelectorLed.writeMin();
                            } });
 }
+
+void powerOffEmergency() {
+  powerController.powerOffEmergency();
+  taskController.setRunningLongTaskType(EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE);
+}

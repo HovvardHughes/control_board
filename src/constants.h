@@ -99,4 +99,4 @@ GPIO      Connected to...
 
 #define ADC_PIN 36
 // Other:
-#define COM_PORT_SPEED 115200 // COM Port Baud Rate
+#define COM_PORT_SPEED 115200

@@ -110,7 +110,7 @@ body {
     font-size: 0.9em;
 }
 
-.measurement-units {
+*:not([class^='error']) > .measurement-units {
     opacity: 0.5;
 }
 

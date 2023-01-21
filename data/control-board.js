@@ -27,7 +27,9 @@ const TaskTypes = {
     TURN_ON_SLEEP_MODE: 3,
     TURN_OFF_SLEEP_MODE: 4,
     TURN_ON_VU: 5,
-    TURN_OFF_VU: 6
+    TURN_OFF_VU: 6,
+    EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS: 7,
+    EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE: 8,
 }
 
 const TaskTypeTitles = {
@@ -37,7 +39,9 @@ const TaskTypeTitles = {
     [TaskTypes.TURN_ON_SLEEP_MODE]: 'Turn on sleep mode',
     [TaskTypes.TURN_OFF_SLEEP_MODE]: 'Turn off sleep mode',
     [TaskTypes.TURN_ON_VU]: 'Turn on VU',
-    [TaskTypes.TURN_OFF_VU]: 'Turn off VU'
+    [TaskTypes.TURN_OFF_VU]: 'Turn off VU',
+    [TaskTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS]: 'Emergency power off because of high currens',
+    [TaskTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE]: 'Emergency power off becaue of high temperature'
 }
 
 const IDs = {

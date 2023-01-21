@@ -7,6 +7,8 @@ enum LongTaskType
     TURN_OFF_SLEEP_MODE,
     TURN_ON_VU,
     TURN_OFF_VU,
+    EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS,
+    EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE,
 };
 
 class TaskController
@@ -78,6 +80,17 @@ public:
         action();
     }
 
+    void setRunningLongTaskType(LongTaskType runningLongTaskType)
+    {
+        _runningLongTaskType = runningLongTaskType;
+        _prePostTaskAction();
+    }
+
+    LongTaskType getRunningLongTaskType()
+    {
+        return _runningLongTaskType;
+    }
+
     bool isLongTaskRunning()
     {
         return _isLongTaskRunning;
@@ -86,10 +99,5 @@ public:
     bool isFastTaskRunning()
     {
         return _isFastTaskRunning;
-    }
-
-    LongTaskType getRunningLongTaskType()
-    {
-        return _runningLongTaskType;
     }
 };

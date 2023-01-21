@@ -19,7 +19,15 @@ PowerController powerController = PowerController(&timer, &inputSelector, &input
 
 TaskController taskController = TaskController(&timer, textStateAll);
 
-TemperatureMeasurer temperatureMeasurer = TemperatureMeasurer(&timer, &taskController);
+TemperatureMeasurer temperatureMeasurer = TemperatureMeasurer(
+    &timer,
+    &taskController,
+    powerOffEmergency,
+    []()
+    { return powerController.isPowerOn(); },
+    []()
+    { return taskController.isLongTaskRunning() || taskController.isFastTaskRunning(); });
+
 CurrentMeasurer currentMeasurer = CurrentMeasurer();
 
 void setup()
@@ -63,11 +71,11 @@ void loop()
 
   powerButton.tick();
   inputSelectorButton.tick();
-  volumeEngine.turnOffIfActiveForLongTime();
+  volumeEngine.check();
 
   processMainPowerSource();
 
   tickCommunicator();
 
-  currentMeasurer.printDebugInfo();
+  // currentMeasurer.printDebugInfo();
 }

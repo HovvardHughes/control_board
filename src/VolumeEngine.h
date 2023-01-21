@@ -9,16 +9,16 @@
 class VolumeEngine
 {
 private:
-  unsigned long forwardNotZeroChannelDutyDuration;
-  unsigned long reverseNotZeroChannelDutyDuration;
+  unsigned long forwardNotZeroChannelDutyStartedMillis;
+  unsigned long reverseNotZeroChannelDutyStartedMillis;
 
   void write(uint32_t forwardChannelDuty, uint32_t reverseChannelDuty)
   {
 
     ledcWrite(FORWARD_VOLUME_CHANNEL, forwardChannelDuty);
     ledcWrite(REVERSE_VOLUME_CHANNEL, reverseChannelDuty);
-    forwardNotZeroChannelDutyDuration = forwardChannelDuty > MIN_PWM_DUTY ? millis() : 0;
-    reverseNotZeroChannelDutyDuration = reverseChannelDuty > MIN_PWM_DUTY ? millis() : 0;
+    forwardNotZeroChannelDutyStartedMillis = forwardChannelDuty > MIN_PWM_DUTY ? millis() : 0;
+    reverseNotZeroChannelDutyStartedMillis = reverseChannelDuty > MIN_PWM_DUTY ? millis() : 0;
   }
 
 public:
@@ -30,10 +30,10 @@ public:
     ledcAttachPin(FORWARD_VOLUME_PIN, FORWARD_VOLUME_CHANNEL);
   }
 
-  void turnOffIfActiveForLongTime()
+  void check()
   {
-    if ((ledcRead(FORWARD_VOLUME_CHANNEL) > MIN_PWM_DUTY && (millis() - forwardNotZeroChannelDutyDuration > MAX_NOT_ZERO_DUTY_DURATION)) ||
-        (ledcRead(REVERSE_VOLUME_CHANNEL) > MIN_PWM_DUTY && (millis() - reverseNotZeroChannelDutyDuration > MAX_NOT_ZERO_DUTY_DURATION)))
+    if ((ledcRead(FORWARD_VOLUME_CHANNEL) > MIN_PWM_DUTY && (millis() - forwardNotZeroChannelDutyStartedMillis > MAX_NOT_ZERO_DUTY_DURATION)) ||
+        (ledcRead(REVERSE_VOLUME_CHANNEL) > MIN_PWM_DUTY && (millis() - reverseNotZeroChannelDutyStartedMillis > MAX_NOT_ZERO_DUTY_DURATION)))
       write(MIN_PWM_DUTY, MIN_PWM_DUTY);
   }
 

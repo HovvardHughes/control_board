@@ -173,6 +173,26 @@ public:
         };
     }
 
+    void powerOffEmergency()
+    {
+        _buzzer->buzz(10, LONG_BUZZ_INTERVAL);
+
+        _volumeEngine->turnOff();
+
+        digitalWrite(PRLY2_PIN, LOW);
+        digitalWrite(PRLY4_PIN, LOW);
+        digitalWrite(PRLY0_PIN, LOW);
+        digitalWrite(PRLY1_PIN, LOW);
+        digitalWrite(PRLY3_PIN, LOW);
+        _powerLed.writeMin();
+
+        _inputSelector->writeToAllRelays(LOW);
+        _inputSelectorLed->writeMin();
+
+        _isSleepModeOn = false;
+        _isPowerOn = false;
+    }
+
     void setVU(uint8_t state)
     {
         _buzzer->buzz(2, LONG_BUZZ_INTERVAL);
