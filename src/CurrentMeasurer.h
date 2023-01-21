@@ -26,10 +26,8 @@ private:
         {INA219_WE(INA_PIN_3), 0.0, 0},
         {INA219_WE(INA_PIN_4), 0.0, 0}};
 
-    TaskController *_taskController;
-
     void (*_powerOffEmergency)();
-    bool (*_isPowerOn)();
+    bool (*_needToCheckCurrents)();
 
     void updateCathodeCurrentMa(INA219_WE_STATE *inaState)
     {
@@ -41,7 +39,7 @@ private:
 
     bool checkInaState(INA219_WE_STATE *inaState)
     {
-        if (!_isPowerOn() || _taskController->isRunningTask())
+        if (_needToCheckCurrents())
         {
             if (inaState->highCurrentStaredMillis > 0)
                 inaState->highCurrentStaredMillis = 0;
@@ -50,10 +48,8 @@ private:
 
         if (inaState->lastCurrentMeasurement > MAX_NORMAL_CURRENT_MA)
         {
-            Serial.println("Токи больше");
             if (inaState->highCurrentStaredMillis > 0 && millis() - inaState->highCurrentStaredMillis > HIGH_CURRENT_MAX_DURATION)
             {
-                Serial.println("Выключаю питание");
                 _powerOffEmergency();
                 inaState->highCurrentStaredMillis = 0;
                 return false;
@@ -61,10 +57,7 @@ private:
             else
             {
                 if (inaState->highCurrentStaredMillis == 0)
-                {
-                    Serial.println("Устанавливаю секундомер");
                     inaState->highCurrentStaredMillis = millis();
-                }
             }
         }
         else
@@ -74,11 +67,10 @@ private:
     }
 
 public:
-    CurrentMeasurer(TaskController *taskController, void (*powerOffEmergency)(), bool (*isPowerOn)())
+    CurrentMeasurer(void (*powerOffEmergency)(), bool (*needToCheckCurrents)())
     {
-        _taskController = taskController;
         _powerOffEmergency = powerOffEmergency;
-        _isPowerOn = isPowerOn;
+        _needToCheckCurrents = needToCheckCurrents;
     }
 
     void setup()

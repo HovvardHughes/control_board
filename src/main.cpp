@@ -27,16 +27,15 @@ TemperatureMeasurer temperatureMeasurer = TemperatureMeasurer(
       powerOffEmergency(EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE);
     },
     []()
-    { return powerController.isPowerOn(); });
+    { return powerController.anyPowerRelayTurnedOn(); });
 
 CurrentMeasurer currentMeasurer = CurrentMeasurer(
-    &taskController,
     []()
     {
       powerOffEmergency(EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS);
     },
     []()
-    { return powerController.isPowerOn(); });
+    { return powerController.anyPowerRelayTurnedOn() && !taskController.isRunningTask(); });
 
 void setup()
 {

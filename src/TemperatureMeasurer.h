@@ -16,7 +16,7 @@ private:
     TaskController *_taskController;
 
     void (*_powerOffEmergency)();
-    bool (*_isPowerOn)();
+    bool (*_anyPowerRelayTurnedOn)();
 
     float _lastMeasurement = 0.00;
     unsigned long highTemperatureStaredMillis = 0;
@@ -31,7 +31,7 @@ private:
         ptr->_sensors.requestTemperatures();
         ptr->_lastMeasurement = ptr->_sensors.getTempCByIndex(0);
 
-        if (!ptr->_isPowerOn())
+        if (!ptr->_anyPowerRelayTurnedOn())
         {
             ptr->highTemperatureStaredMillis = 0;
             return true;
@@ -57,14 +57,14 @@ private:
     }
 
 public:
-    TemperatureMeasurer(Timer<> *timer, TaskController *taskController, void (*powerOffEmergency)(), bool (*isPowerOn)())
+    TemperatureMeasurer(Timer<> *timer, TaskController *taskController, void (*powerOffEmergency)(), bool (*anyPowerRelayTurnedOn)())
     {
         _timer = timer;
         _taskController = taskController;
         _powerOffEmergency = powerOffEmergency;
-        _isPowerOn = isPowerOn;
+        _anyPowerRelayTurnedOn = anyPowerRelayTurnedOn;
     }
-    
+
     void setup()
     {
         _sensors.begin();

@@ -241,6 +241,11 @@ public:
         return _isMainPowerSourceOn;
     }
 
+    bool anyPowerRelayTurnedOn()
+    {
+        return digitalRead(PRLY0_PIN) || digitalRead(PRLY1_PIN) || digitalRead(PRLY2_PIN) || digitalRead(PRLY3_PIN) || digitalRead(PRLY4_PIN);
+    }
+
     bool updateMainPowerState()
     {
         int state = digitalRead(MAIN_POWER_SOURCE_PIN);
