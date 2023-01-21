@@ -39,7 +39,7 @@ body {
     display: grid;
     width: 300px;
     border-radius: 10px;
-    place-content: center center;
+    place-content: center stretch;
 }
 
 @media only screen and (max-width: 400px) {
@@ -95,22 +95,22 @@ body {
 }
 
 #currents {
-    display: grid;
-    grid-auto-flow: column;  
-    justify-content: space-between;
-    margin: 0 16px;
+    display: flex;
+    /* justify-content: space-between; */
+    margin: 0 8px;
 }
 
-#currents > *:not(:last-child) {
-    width: 36px;
-    margin-right: 10px;
+.current-value {
+    display: inline-block;
+    width: 56px;
+    text-align: start;
 }
 
 #temperature-voltage-container, #currents {
     font-size: 0.9em;
 }
 
-*:not([class^='error']) > .measurement-units {
+.measurement-units {
     opacity: 0.5;
 }
 
@@ -153,6 +153,7 @@ body {
 }
 
 .error {
+    opacity: 1;
     color: #ff0033;
 }
 /* Buttons */

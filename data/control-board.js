@@ -176,11 +176,17 @@ function handleMessage(event) {
 
     Elements[IDs.VOLTAGE].innerText = voltage
 
-    const currentNodes = Elements[IDs.CURRENTS].querySelectorAll('* > *')
+    const currentValues = Elements[IDs.CURRENTS].querySelectorAll('* > .current-value')
+    const currentUnits = Elements[IDs.CURRENTS].querySelectorAll('* > .measurement-units')
     currents.forEach((current, currentIndex) => {
-        const element = currentNodes[currentIndex]
-        element.innerHTML = current
-        addOrRemoveClass(element, 'error', current > MAX_NORMAL_CURRENT_MA)
+        const value = currentValues[currentIndex]
+        const units = currentUnits[currentIndex]
+
+        value.innerHTML = current
+
+        const addErrorClass = current > MAX_NORMAL_CURRENT_MA
+        addOrRemoveClass(value, 'error', addErrorClass)
+        addOrRemoveClass(units, 'error', addErrorClass)
     })
 }
 
