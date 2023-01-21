@@ -14,7 +14,9 @@ private:
 
     Timer<> *_timer;
     TaskController *_taskController;
-    PowerController *_powerController;
+
+    void (*_powerOffEmergency)();
+    bool (*_isPowerOn)();
 
     float _lastMeasurement = 0.00;
     unsigned long highTemperatureStaredMillis = 0;
@@ -29,7 +31,7 @@ private:
         ptr->_sensors.requestTemperatures();
         ptr->_lastMeasurement = ptr->_sensors.getTempCByIndex(0);
 
-        if (!ptr->_powerController->isPowerOn())
+        if (!ptr->_isPowerOn())
         {
             ptr->highTemperatureStaredMillis = 0.0;
             return true;
@@ -40,7 +42,7 @@ private:
             Serial.println("Питание больше");
             if (ptr->highTemperatureStaredMillis > 0.0 && millis() - ptr->highTemperatureStaredMillis > HIGH_TEMPERATURE_MAX_DURATION)
             {
-                ptr->_powerController->powerOffEmergency();
+                ptr->_powerOffEmergency();
                 ptr->highTemperatureStaredMillis = 0.0;
             }
             else
@@ -56,11 +58,12 @@ private:
     }
 
 public:
-    TemperatureMeasurer(Timer<> *timer, TaskController *taskController, PowerController *powerController)
+    TemperatureMeasurer(Timer<> *timer, TaskController *taskController, void (*powerOffEmergency)(), bool (*isPowerOn)())
     {
         _timer = timer;
         _taskController = taskController;
-        _powerController = powerController;
+        _powerOffEmergency = powerOffEmergency;
+        _isPowerOn = isPowerOn;
     }
     void setup()
     {
