@@ -1,6 +1,6 @@
-enum LongTaskType
+enum DisplayMessageType
 {
-    NONE,
+    EMPTY,
     POWER_ON,
     POWER_OFF,
     TURN_ON_SLEEP_MODE,
@@ -16,7 +16,7 @@ class TaskController
 private:
     bool _isFastTaskRunning;
     bool _isLongTaskRunning;
-    LongTaskType _runningLongTaskType;
+    DisplayMessageType _displayMessageType;
 
     Timer<> *_timer;
 
@@ -26,7 +26,7 @@ private:
     {
         TaskController *ptr = (TaskController *)p;
 
-        ptr->_runningLongTaskType = LongTaskType::NONE;
+        ptr->_displayMessageType = DisplayMessageType::EMPTY;
         ptr->_isLongTaskRunning = false;
         ptr->_isFastTaskRunning = false;
         ptr->_prePostTaskAction();
@@ -54,12 +54,12 @@ public:
         _prePostTaskAction = prePostTaskAction;
     }
 
-    void runLongTask(std::function<void()> action, LongTaskType taskType, unsigned long estimatedTime)
+    void runLongTask(std::function<void()> action, DisplayMessageType displayMessageType, unsigned long estimatedTime)
     {
         if (checkRunningTask())
             return;
 
-        _runningLongTaskType = taskType;
+        _displayMessageType = displayMessageType;
         _isLongTaskRunning = true;
 
         _prePostTaskAction();
@@ -80,15 +80,15 @@ public:
         action();
     }
 
-    void setRunningLongTaskType(LongTaskType runningLongTaskType)
+    void setDisplayMessageType(DisplayMessageType displayMessageType)
     {
-        _runningLongTaskType = runningLongTaskType;
+        _displayMessageType = displayMessageType;
         _prePostTaskAction();
     }
 
-    LongTaskType getRunningLongTaskType()
+    DisplayMessageType getDisplayMessageType()
     {
-        return _runningLongTaskType;
+        return _displayMessageType;
     }
 
     bool isLongTaskRunning()

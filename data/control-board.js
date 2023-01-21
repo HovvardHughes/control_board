@@ -1,6 +1,6 @@
 const NON_BREAKING_SPACE = '\xa0'
-const MAX_NORMAL_TEMPERATURE_DEGREES_CELSIUS = 65.00
-const MAX_NORMAL_CURRENT_MA = 85.00
+const MAX_NORMAL_TEMPERATURE_DEGREES_CELSIUS = 65.0
+const MAX_NORMAL_CURRENT_MA = 85.0
 
 const Commands = {
     GET_STATE: 0,
@@ -20,8 +20,8 @@ const Commands = {
     FORWARD_HIGH_VOLUME_PWM: 14
 }
 
-const TaskTypes = {
-    NONE: 0,
+const DisplayMessageTypes = {
+    EMPTY: 0,
     POWER_ON: 1,
     POWER_OFF: 2,
     TURN_ON_SLEEP_MODE: 3,
@@ -29,19 +29,19 @@ const TaskTypes = {
     TURN_ON_VU: 5,
     TURN_OFF_VU: 6,
     EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS: 7,
-    EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE: 8,
+    EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE: 8
 }
 
-const TaskTypeTitles = {
-    [TaskTypes.NONE]: NON_BREAKING_SPACE,
-    [TaskTypes.POWER_ON]: 'Turn on power',
-    [TaskTypes.POWER_OFF]: 'Turn off power',
-    [TaskTypes.TURN_ON_SLEEP_MODE]: 'Turn on sleep mode',
-    [TaskTypes.TURN_OFF_SLEEP_MODE]: 'Turn off sleep mode',
-    [TaskTypes.TURN_ON_VU]: 'Turn on VU',
-    [TaskTypes.TURN_OFF_VU]: 'Turn off VU',
-    [TaskTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS]: 'Emergency power off because of high currens',
-    [TaskTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE]: 'Emergency power off becaue of high temperature'
+const DisplayTitles = {
+    [DisplayMessageTypes.EMPTY]: NON_BREAKING_SPACE,
+    [DisplayMessageTypes.POWER_ON]: 'Turn on power',
+    [DisplayMessageTypes.POWER_OFF]: 'Turn off power',
+    [DisplayMessageTypes.TURN_ON_SLEEP_MODE]: 'Turn on sleep mode',
+    [DisplayMessageTypes.TURN_OFF_SLEEP_MODE]: 'Turn off sleep mode',
+    [DisplayMessageTypes.TURN_ON_VU]: 'Turn on VU',
+    [DisplayMessageTypes.TURN_OFF_VU]: 'Turn off VU',
+    [DisplayMessageTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS]: 'Emergency power off because of high currens',
+    [DisplayMessageTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE]: 'Emergency power off becaue of high temperature'
 }
 
 const IDs = {
@@ -113,10 +113,10 @@ function handleMessage(event) {
     const splitData = event.data.split('|')
 
     const state = parseInt(splitData[0])
-    const runningTaskType = parseInt(splitData[1])
+    const displayMessageType = parseInt(splitData[1])
     const temperature = parseFloat(splitData[2])
     const voltage = parseFloat(splitData[3])
-    const currents = splitData[4].split(":").map(parseFloat)
+    const currents = splitData[4].split(':').map(parseFloat)
 
     const isPowerOn = getBit(state, 0)
     const isSleepModeOn = getBit(state, 1)
@@ -125,32 +125,38 @@ function handleMessage(event) {
     const secondaryInputRelay = getBit(state, 4)
     const isRunningTask = getBit(state, 5)
 
-    displayMessage(TaskTypeTitles[runningTaskType], false, isRunningTask)
+    displayMessage(
+        DisplayTitles[displayMessageType],
+        displayMessageType === DisplayMessageTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE ||
+            displayMessageType === DisplayMessageTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS,
+        isRunningTask
+    )
 
     addOrRemoveClass(
         Elements[IDs.POWER_BUTTON],
         'progress',
-        runningTaskType === TaskTypes.POWER_ON || runningTaskType === TaskTypes.POWER_OFF
+        displayMessageType === DisplayMessageTypes.POWER_ON || displayMessageType === DisplayMessageTypes.POWER_OFF
     )
     addOrRemoveClass(
         Elements[IDs.SLEEP_MODE_BUTTON],
         'progress',
-        runningTaskType === TaskTypes.TURN_ON_SLEEP_MODE || runningTaskType === TaskTypes.TURN_OFF_SLEEP_MODE
+        displayMessageType === DisplayMessageTypes.TURN_ON_SLEEP_MODE ||
+            displayMessageType === DisplayMessageTypes.TURN_OFF_SLEEP_MODE
     )
-    addOrRemoveClass(Elements[IDs.VU_BUTTON], 'progress', runningTaskType === TaskTypes.TURN_OFF_VU)
+    addOrRemoveClass(Elements[IDs.VU_BUTTON], 'progress', displayMessageType === DisplayMessageTypes.TURN_OFF_VU)
 
     addOrRemoveClass(Elements[IDs.POWER_BUTTON], 'enabled-power-button', isPowerOn)
     addOrRemoveClass(Elements[IDs.SLEEP_MODE_BUTTON], 'enabled-sleep-mode-button', isSleepModeOn)
     addOrRemoveClass(Elements[IDs.VU_BUTTON], 'enabled-vu-button', isVUOn)
 
-    if(!ignoreOnceInputSelectorSwitchUpdateWhenMessageRecieved) {
+    if (!ignoreOnceInputSelectorSwitchUpdateWhenMessageRecieved) {
         setAtrribute('checked', {
             [IDs.MAIN_INPUT]: mainInputRelay,
             [IDs.SECONDARY_INPUT]: secondaryInputRelay
         })
     }
     ignoreOnceInputSelectorSwitchUpdateWhenMessageRecieved = false
-    
+
     const isRunningTaskOrPowerTurnedOff = isRunningTask || !isPowerOn
 
     setAtrribute('disabled', {
@@ -170,11 +176,11 @@ function handleMessage(event) {
 
     Elements[IDs.VOLTAGE].innerText = voltage
 
-    const currentNodes = Elements[IDs.CURRENTS].querySelectorAll("* > *")
+    const currentNodes = Elements[IDs.CURRENTS].querySelectorAll('* > *')
     currents.forEach((current, currentIndex) => {
         const element = currentNodes[currentIndex]
         element.innerHTML = current
-        addOrRemoveClass(element, "error", current > MAX_NORMAL_CURRENT_MA)
+        addOrRemoveClass(element, 'error', current > MAX_NORMAL_CURRENT_MA)
     })
 }
 

@@ -49,12 +49,12 @@ void onDoubleClickPowerButton()
   if (powerController.isSleepModeOn())
     taskController.runLongTask([]()
                                { powerController.setSleepMode(false); },
-                               LongTaskType::TURN_OFF_SLEEP_MODE,
+                               DisplayMessageType::TURN_OFF_SLEEP_MODE,
                                LONG_TASK_RUNTIME);
   else
     taskController.runLongTask([]()
                                { powerController.setSleepMode(true); },
-                               LongTaskType::TURN_ON_SLEEP_MODE,
+                               DisplayMessageType::TURN_ON_SLEEP_MODE,
                                LONG_TASK_RUNTIME);
 }
 
@@ -69,12 +69,12 @@ void onClickPowerButton()
   if (powerController.isPowerOn())
     taskController.runLongTask([]()
                                { powerController.setPower(false); },
-                               LongTaskType::POWER_OFF,
+                               DisplayMessageType::POWER_OFF,
                                LONG_TASK_RUNTIME);
   else
     taskController.runLongTask([]()
                                { powerController.setPower(true); },
-                               LongTaskType::POWER_ON,
+                               DisplayMessageType::POWER_ON,
                                LONG_TASK_RUNTIME);
 }
 
@@ -83,12 +83,12 @@ void onLongPressPowerButtonStart()
   if (powerController.isVUOn())
     taskController.runLongTask([]()
                                { powerController.setVU(false); },
-                               LongTaskType::TURN_OFF_VU,
+                               DisplayMessageType::TURN_OFF_VU,
                                LONG_TASK_RUNTIME);
   else
     taskController.runLongTask([]()
                                { powerController.setVU(true); },
-                               LongTaskType::TURN_ON_VU,
+                               DisplayMessageType::TURN_ON_VU,
                                LONG_TASK_RUNTIME);
 }
 
@@ -172,7 +172,8 @@ void onLongPressInputSelectorButtonStart()
                            } });
 }
 
-void powerOffEmergency() {
+void powerOffEmergency()
+{
   powerController.powerOffEmergency();
-  taskController.setRunningLongTaskType(EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE);
+  taskController.setDisplayMessageType(EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE);
 }
