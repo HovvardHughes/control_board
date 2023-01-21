@@ -27,7 +27,7 @@ private:
         {INA219_WE(INA_PIN_4), 0.0, 0}};
 
     void (*_powerOffEmergency)();
-    bool (*_needToCheckCurrents)();
+    bool (*_canCheckCurrents)();
 
     void updateCathodeCurrentMa(INA219_WE_STATE *inaState)
     {
@@ -39,7 +39,7 @@ private:
 
     bool checkInaState(INA219_WE_STATE *inaState)
     {
-        if (_needToCheckCurrents())
+        if (!_canCheckCurrents())
         {
             if (inaState->highCurrentStaredMillis > 0)
                 inaState->highCurrentStaredMillis = 0;
@@ -67,10 +67,10 @@ private:
     }
 
 public:
-    CurrentMeasurer(void (*powerOffEmergency)(), bool (*needToCheckCurrents)())
+    CurrentMeasurer(void (*powerOffEmergency)(), bool (*canCheckCurrents)())
     {
         _powerOffEmergency = powerOffEmergency;
-        _needToCheckCurrents = needToCheckCurrents;
+        _canCheckCurrents = canCheckCurrents;
     }
 
     void setup()
