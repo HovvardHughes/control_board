@@ -19,14 +19,7 @@ PowerController powerController = PowerController(&timer, &inputSelector, &input
 
 TaskController taskController = TaskController(&timer, textStateAll);
 
-TemperatureMeasurer temperatureMeasurer = TemperatureMeasurer(
-    &timer,
-    &taskController,
-    powerOffEmergency,
-    []()
-    { return powerController.isPowerOn(); },
-    []()
-    { return taskController.isLongTaskRunning() || taskController.isFastTaskRunning(); });
+TemperatureMeasurer temperatureMeasurer = TemperatureMeasurer(&timer, &taskController, &powerController);
 
 CurrentMeasurer currentMeasurer = CurrentMeasurer();
 
