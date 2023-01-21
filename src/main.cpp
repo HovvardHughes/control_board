@@ -30,6 +30,7 @@ TemperatureMeasurer temperatureMeasurer = TemperatureMeasurer(
     { return powerController.isPowerOn(); });
 
 CurrentMeasurer currentMeasurer = CurrentMeasurer(
+    &taskController,
     []()
     {
       powerOffEmergency(EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS);

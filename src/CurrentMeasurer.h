@@ -26,6 +26,8 @@ private:
         {INA219_WE(INA_PIN_3), 0.0, 0},
         {INA219_WE(INA_PIN_4), 0.0, 0}};
 
+    TaskController *_taskController;
+
     void (*_powerOffEmergency)();
     bool (*_isPowerOn)();
 
@@ -65,8 +67,9 @@ private:
     }
 
 public:
-    CurrentMeasurer(void (*powerOffEmergency)(), bool (*isPowerOn)())
+    CurrentMeasurer(TaskController *taskController, void (*powerOffEmergency)(), bool (*isPowerOn)())
     {
+        _taskController = taskController;
         _powerOffEmergency = powerOffEmergency;
         _isPowerOn = isPowerOn;
     }
@@ -140,7 +143,7 @@ public:
         for (size_t i = 0; i < INA_COUNT; i++)
             updateCathodeCurrentMa(&inas[i]);
 
-        if (!_isPowerOn())
+        if (!_isPowerOn() || _taskController->isRunningTask())
             return;
 
         for (size_t i = 0; i < INA_COUNT; i++)

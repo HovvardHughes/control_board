@@ -168,7 +168,7 @@ void handleWiFiSettingsChanged(AsyncWebServerRequest *request)
     }
   }
 
-  if (!powerController.isPowerOn() && !taskController.isLongTaskRunning() && !taskController.isFastTaskRunning())
+  if (!powerController.isPowerOn() && !taskController.isRunningTask())
   {
     request->send(200, "text/plain", "Wi-Fi settings saved. Control board will restart, connect to your router and open web-page on IP address: " + wiFiSettings.getIP());
     delay(3000);

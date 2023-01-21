@@ -47,6 +47,11 @@ private:
         return false;
     }
 
+    bool isFastTaskRunning()
+    {
+        return _isFastTaskRunning;
+    }
+
 public:
     TaskController(Timer<> *timer, void (*prePostTaskAction)())
     {
@@ -96,8 +101,8 @@ public:
         return _isLongTaskRunning;
     }
 
-    bool isFastTaskRunning()
+    bool isRunningTask()
     {
-        return _isFastTaskRunning;
+        return _isLongTaskRunning || _isFastTaskRunning;
     }
 };

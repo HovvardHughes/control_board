@@ -25,7 +25,7 @@ private:
     {
         TemperatureMeasurer *ptr = (TemperatureMeasurer *)p;
 
-        if (ptr->_lastMeasurement < MAX_NORMAL_TEMPERATURE_DEGREES_CELSIUS && ptr->_taskController->isFastTaskRunning() || ptr->_taskController->isLongTaskRunning())
+        if (ptr->_taskController->isRunningTask())
             return true;
 
         ptr->_sensors.requestTemperatures();

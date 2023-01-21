@@ -98,8 +98,7 @@ void processMainPowerSource()
   bool changed = powerController.updateMainPowerState();
 
   if (!changed ||
-      taskController.isFastTaskRunning() ||
-      taskController.isLongTaskRunning() ||
+      taskController.isRunningTask() ||
       powerController.isSleepModeOn() ||
       powerController.isMainPowerSourceOn() == powerController.isPowerOn())
     return;
