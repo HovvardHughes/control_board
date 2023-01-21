@@ -172,8 +172,8 @@ void onLongPressInputSelectorButtonStart()
                            } });
 }
 
-void powerOffEmergency()
+void powerOffEmergency(DisplayMessageType displayMessageType)
 {
   powerController.powerOffEmergency();
-  taskController.setDisplayMessageType(EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE);
+  taskController.setDisplayMessageType(displayMessageType);
 }

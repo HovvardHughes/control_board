@@ -23,11 +23,19 @@ TemperatureMeasurer temperatureMeasurer = TemperatureMeasurer(
     &timer,
     &taskController,
     []()
-    { powerOffEmergency(); },
+    {
+      powerOffEmergency(EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE);
+    },
     []()
     { return powerController.isPowerOn(); });
 
-CurrentMeasurer currentMeasurer = CurrentMeasurer();
+CurrentMeasurer currentMeasurer = CurrentMeasurer(
+    []()
+    {
+      powerOffEmergency(EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS);
+    },
+    []()
+    { return powerController.isPowerOn(); });
 
 void setup()
 {
@@ -73,6 +81,8 @@ void loop()
   volumeEngine.check();
 
   processMainPowerSource();
+
+  currentMeasurer.process();
 
   tickCommunicator();
 

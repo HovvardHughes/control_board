@@ -33,26 +33,25 @@ private:
 
         if (!ptr->_isPowerOn())
         {
-            ptr->highTemperatureStaredMillis = 0.0;
+            ptr->highTemperatureStaredMillis = 0;
             return true;
         }
 
         if (ptr->_lastMeasurement > MAX_NORMAL_TEMPERATURE_DEGREES_CELSIUS)
         {
-            Serial.println("Питание больше");
-            if (ptr->highTemperatureStaredMillis > 0.0 && millis() - ptr->highTemperatureStaredMillis > HIGH_TEMPERATURE_MAX_DURATION)
+            if (ptr->highTemperatureStaredMillis > 0 && millis() - ptr->highTemperatureStaredMillis > HIGH_TEMPERATURE_MAX_DURATION)
             {
                 ptr->_powerOffEmergency();
-                ptr->highTemperatureStaredMillis = 0.0;
+                ptr->highTemperatureStaredMillis = 0;
             }
             else
             {
-                if (ptr->highTemperatureStaredMillis == 0.0)
+                if (ptr->highTemperatureStaredMillis == 0)
                     ptr->highTemperatureStaredMillis = millis();
             }
         }
         else
-            ptr->highTemperatureStaredMillis = 0.0;
+            ptr->highTemperatureStaredMillis = 0;
 
         return true;
     }
@@ -65,6 +64,7 @@ public:
         _powerOffEmergency = powerOffEmergency;
         _isPowerOn = isPowerOn;
     }
+    
     void setup()
     {
         _sensors.begin();

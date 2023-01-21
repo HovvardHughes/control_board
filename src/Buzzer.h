@@ -13,7 +13,12 @@ private:
     digitalWrite(BUZZER_PIN, !digitalRead(BUZZER_PIN));
     ptr->_countToInvertState--;
 
-    return ptr->_countToInvertState > 0;
+    bool anyInversionsLeft = ptr->_countToInvertState > 0;
+
+    if (!anyInversionsLeft)
+      digitalWrite(BUZZER_PIN, LOW);
+
+    return anyInversionsLeft;
   }
 
 public:

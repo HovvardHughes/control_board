@@ -40,8 +40,8 @@ const DisplayTitles = {
     [DisplayMessageTypes.TURN_OFF_SLEEP_MODE]: 'Turn off sleep mode',
     [DisplayMessageTypes.TURN_ON_VU]: 'Turn on VU',
     [DisplayMessageTypes.TURN_OFF_VU]: 'Turn off VU',
-    [DisplayMessageTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS]: 'Emergency power off because of high currens',
-    [DisplayMessageTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE]: 'Emergency power off becaue of high temperature'
+    [DisplayMessageTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_CURRENTS]: 'Emergency power off because of high currents',
+    [DisplayMessageTypes.EMERGENCY_POWER_OFF_BECAUSE_OF_TEMPERATURE]: 'Emergency power off because of high temperature'
 }
 
 const IDs = {
