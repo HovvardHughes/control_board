@@ -4,7 +4,6 @@
 #include <iostream>
 
 #define INA_COUNT 4
-#define CORRECTION_FACTOR 1.025
 #define CORRECTION_ADS 1.01
 
 #define MAX_NORMAL_CURRENT_MA 85.00
@@ -13,6 +12,7 @@
 struct INA219_WE_STATE
 {
     INA219_WE ina;
+    float correctionFactor;
     float lastCurrentMeasurement;
     unsigned long highCurrentStaredMillis;
 };
@@ -21,10 +21,10 @@ class CurrentMeasurer
 {
 private:
     INA219_WE_STATE inas[INA_COUNT] = {
-        {INA219_WE(INA_PIN_1), 0.0, 0},
-        {INA219_WE(INA_PIN_2), 0.0, 0},
-        {INA219_WE(INA_PIN_3), 0.0, 0},
-        {INA219_WE(INA_PIN_4), 0.0, 0}};
+        {INA219_WE(INA_PIN_1), 1.025, 0.0, 0},
+        {INA219_WE(INA_PIN_2), 1.025, 0.0, 0},
+        {INA219_WE(INA_PIN_3), 1.025, 0.0, 0},
+        {INA219_WE(INA_PIN_4), 1.025, 0.0, 0}};
 
     void (*_powerOffEmergency)();
     bool (*_canCheckCurrents)();
@@ -32,7 +32,7 @@ private:
     void updateCathodeCurrentMa(INA219_WE_STATE *inaState)
     {
         float busVoltage_V = inaState->ina.getBusVoltage_V();
-        float correctedVoltage_V = busVoltage_V * CORRECTION_FACTOR;
+        float correctedVoltage_V = busVoltage_V * inaState->correctionFactor;
         float cathodeShuntCurrent_mA = correctedVoltage_V * 100;
         inaState->lastCurrentMeasurement = cathodeShuntCurrent_mA;
     }
@@ -98,6 +98,7 @@ public:
         for (size_t i = 0; i < INA_COUNT; i++)
         {
             INA219_WE ina = inas[i].ina;
+            float correctionFactor = inas[i].correctionFactor;
 
             float shuntVoltage_mV = ina.getShuntVoltage_mV();              // not used, for debug info only
             float busVoltage_V = ina.getBusVoltage_V();                    // used, primary reading
@@ -105,7 +106,7 @@ public:
             float current_mA = ina.getCurrent_mA();                        // not used, for debug info only
             float power_mW = ina.getBusPower();                            // not used, for debug info only
             bool ina219_overflow = ina.getOverflow();                      // for debug, migt be useful, might be changed to simple "o\f" in user intrface
-            float correctedVoltage_V = busVoltage_V * CORRECTION_FACTOR;   // used, corrected measurements
+            float correctedVoltage_V = busVoltage_V * correctionFactor;    // used, corrected measurements
             float cathodeShuntCurrent_mA = correctedVoltage_V * 100;       // used, "cheat" conversion V to mA, cause we measure V instead of mA
             float busVoltage_magnifier = busVoltage_V * 1000;              // Workaround used for debug + precise voltage("mA") tuning. The proposal to display in the terminal mode or do it getting out of a commentary for the possibility of adjusting
             Serial.println("");
