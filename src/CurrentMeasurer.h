@@ -5,6 +5,11 @@
 
 #define INA_COUNT 4
 #define CORRECTION_ADS 1.01
+//CORRECTION = (BUS VOLTAGE)/(REAL VOLTAGE)
+#define CORRECTION_INA0 0.9781
+#define CORRECTION_INA1 0.9781
+#define CORRECTION_INA2 0.9666
+#define CORRECTION_INA3 0.9666
 
 #define MAX_NORMAL_CURRENT_MA 85.00
 #define HIGH_CURRENT_MAX_DURATION 2000
@@ -21,10 +26,10 @@ class CurrentMeasurer
 {
 private:
     INA219_WE_STATE inas[INA_COUNT] = {
-        {INA219_WE(INA_PIN_1), 1.025, 0.0, 0},
-        {INA219_WE(INA_PIN_2), 1.025, 0.0, 0},
-        {INA219_WE(INA_PIN_3), 1.025, 0.0, 0},
-        {INA219_WE(INA_PIN_4), 1.025, 0.0, 0}};
+        {INA219_WE(INA_PIN_1), CORRECTION_INA0, 0.0, 0},
+        {INA219_WE(INA_PIN_2), CORRECTION_INA1, 0.0, 0},
+        {INA219_WE(INA_PIN_3), CORRECTION_INA2, 0.0, 0},
+        {INA219_WE(INA_PIN_4), CORRECTION_INA3, 0.0, 0}};
 
     void (*_powerOffEmergency)();
     bool (*_canCheckCurrents)();
@@ -91,9 +96,9 @@ public:
 
     void printDebugInfo()
     {
-        Serial.println("");
-        Serial.print("Voltage [V]: ");
-        Serial.print(getVoltageString());
+        //Serial.println("");
+        //Serial.print("Voltage [V]: ");
+        //Serial.print(getVoltageString());
 
         for (size_t i = 0; i < INA_COUNT; i++)
         {
@@ -112,16 +117,16 @@ public:
             Serial.println("");
             Serial.print("INA: ");
             Serial.print(i);
-            Serial.print(" :: Shunt Voltage [mV]: ");
-            Serial.print(shuntVoltage_mV);
-            Serial.print(" :: Bus Voltage [V]: ");
-            Serial.print(busVoltage_V);
-            Serial.print(" :: Load Voltage [V]: ");
-            Serial.print(loadVoltage_V);
-            Serial.print(" :: Current [mA]: ");
-            Serial.print(current_mA);
-            Serial.print(" :: Bus Power [mW]: ");
-            Serial.print(power_mW);
+            // Serial.print(" :: Shunt Voltage [mV]: ");
+            // Serial.print(shuntVoltage_mV);
+            // Serial.print(" :: Bus Voltage [V]: ");
+            // Serial.print(busVoltage_V);
+            // Serial.print(" :: Load Voltage [V]: ");
+            // Serial.print(loadVoltage_V);
+            // Serial.print(" :: Current [mA]: ");
+            // Serial.print(current_mA);
+            // Serial.print(" :: Bus Power [mW]: ");
+            // Serial.print(power_mW);
 
             Serial.print(" :: Bus Voltage Magnifier [V*100]: ");
             Serial.print(busVoltage_magnifier);
