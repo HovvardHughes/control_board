@@ -70,6 +70,11 @@ void setup()
 
   initSPIFFS();
   setupCommunicator();
+
+  // timer.every(1000, [](void *)
+  //             {
+  // currentMeasurer.printDebugInfo();
+  // return true; });
 }
 
 void loop()
@@ -85,6 +90,4 @@ void loop()
   currentMeasurer.process();
 
   tickCommunicator();
-
-  // currentMeasurer.printDebugInfo();
 }
