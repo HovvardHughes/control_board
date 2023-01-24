@@ -143,7 +143,11 @@ function handleMessage(event) {
         displayMessageType === DisplayMessageTypes.TURN_ON_SLEEP_MODE ||
             displayMessageType === DisplayMessageTypes.TURN_OFF_SLEEP_MODE
     )
-    addOrRemoveClass(Elements[IDs.VU_BUTTON], 'progress', displayMessageType === DisplayMessageTypes.TURN_OFF_VU)
+    addOrRemoveClass(
+        Elements[IDs.VU_BUTTON],
+        'progress',
+        displayMessageType === DisplayMessageTypes.TURN_ON_VU || displayMessageType === DisplayMessageTypes.TURN_OFF_VU
+    )
 
     addOrRemoveClass(Elements[IDs.POWER_BUTTON], 'enabled-power-button', isPowerOn)
     addOrRemoveClass(Elements[IDs.SLEEP_MODE_BUTTON], 'enabled-sleep-mode-button', isSleepModeOn)
