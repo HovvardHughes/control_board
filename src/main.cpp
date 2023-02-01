@@ -71,10 +71,13 @@ void setup()
   initSPIFFS();
   setupCommunicator();
 
-  timer.every(1000, [](void *)
-              {
-  currentMeasurer.printDebugInfo();
-  return true; });
+//UNCOMMENT FOR DEBUG INFO:
+
+  // timer.every(1000, [](void *)
+  //             {
+  // currentMeasurer.printDebugInfo();
+  // return true; });
+  
 }
 
 void loop()
