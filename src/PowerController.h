@@ -3,7 +3,6 @@
 #include <InputSelector.h>
 #include <Buzzer.h>
 #include <VolumeEngine.h>
-#include <ControlBoardEEPROM.h>
 
 #define MAIN_POWER_SOURCE_STATE_CHANGED_DEBOUNCE_MILLIS 3000
 
@@ -68,8 +67,9 @@ private:
         ptr->writeWithVUCheck(PRLY2_PIN, HIGH);
         ptr->writeWithVUCheck(PRLY4_PIN, HIGH);
 
-        ptr->_inputSelector->writeToSeletedRelay(HIGH);
-        ptr->_inputSelectorLed->writeMax();
+        bool isAnyPoweredOn = ptr->_inputSelector->writeStateFromSavedData();
+        if (isAnyPoweredOn)
+            ptr->_inputSelectorLed->writeMax();
 
         ptr->_buzzer->buzz(4);
 

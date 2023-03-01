@@ -60,7 +60,7 @@ void textStateAll()
 {
   int state = 0;
 
-  state |= powerController.isPowerOn() << 0;
+  state |= powerController.isPowerOn();
   state |= powerController.isSleepModeOn() << 1;
   state |= powerController.isVUOn() << 2;
   state |= inputSelector.readRelay(MAIN_INPUT_RELAY_PIN) << 3;

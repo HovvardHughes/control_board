@@ -7,13 +7,13 @@ Buzzer buzzer = Buzzer(&timer);
 OneButton powerButton(POWER_BUTTON_PIN);
 OneButton inputSelectorButton(INPUT_SELECTOR_BUTTON_PIN);
 
-InputSelector inputSelector = InputSelector();
+ControlBoardEEPROM eeprom = ControlBoardEEPROM();
+
+InputSelector inputSelector = InputSelector(&eeprom);
 
 Led inputSelectorLed = Led(INPUT_SELECTOR_BUTTON_LED_CHANNEL, INPUT_SELECTOR_BUTTON_LED_PIN, &timer);
 
 VolumeEngine volumeEngine = VolumeEngine();
-
-ControlBoardEEPROM eeprom = ControlBoardEEPROM();
 
 PowerController powerController = PowerController(&timer, &inputSelector, &inputSelectorLed, &buzzer, &volumeEngine, &eeprom);
 
@@ -42,6 +42,8 @@ void setup()
   Serial.begin(COM_PORT_SPEED);
   Serial.println("Starting...");
 
+  eeprom.setup();
+
   pinMode(POWER_BUTTON_PIN, INPUT_PULLUP);
   pinMode(INPUT_SELECTOR_BUTTON_PIN, INPUT_PULLUP);
 
@@ -50,8 +52,6 @@ void setup()
   buzzer.setup();
 
   inputSelector.setup();
-
-  eeprom.setup();
 
   powerController.setup();
 

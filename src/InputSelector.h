@@ -1,9 +1,11 @@
 #include <Led.h>
+#include <ControlBoardEEPROM.h>
 
 class InputSelector
 {
 private:
-  uint8_t _pinOfSelectedRelay = MAIN_INPUT_RELAY_PIN;
+  ControlBoardEEPROM *_eeprom;
+  uint8_t _pinOfSelectedRelay;
 
   uint8_t getPinOfNotSelectedRelay()
   {
@@ -11,6 +13,11 @@ private:
   }
 
 public:
+  InputSelector(ControlBoardEEPROM *eeprom)
+  {
+    _eeprom = eeprom;
+  }
+
   void setup()
   {
     pinMode(MAIN_INPUT_RELAY_PIN, OUTPUT);
@@ -48,6 +55,18 @@ public:
     writeToRelay(getPinOfNotSelectedRelay(), state);
   }
 
+  bool writeStateFromSavedData()
+  {
+    InputSelectorState state = _eeprom->readInputSelectorState();
+
+    _pinOfSelectedRelay = state.selectedRelayPin;
+    
+    writeToRelay(MAIN_INPUT_RELAY_PIN, state.isMainRelayPoweredOn);
+    writeToRelay(SECONDARY_INPUT_RELAY_PIN, state.isSecondaryRelayPowered);
+
+    return state.isMainRelayPoweredOn || state.isSecondaryRelayPowered;
+  }
+
   void swapRelays()
   {
     uint8_t prevPinOfSelectedRelay = _pinOfSelectedRelay;
@@ -73,6 +92,11 @@ public:
       count += getCountToInvertStateFromRelay(SECONDARY_INPUT_RELAY_PIN);
 
     return count;
+  }
+
+  void saveStateToEeprom()
+  {
+    _eeprom->writeInputSelectorState(readRelay(MAIN_INPUT_RELAY_PIN), readRelay(SECONDARY_INPUT_RELAY_PIN), _pinOfSelectedRelay);
   }
 
   uint8_t areAllRelays(uint8_t state)

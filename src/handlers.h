@@ -8,6 +8,7 @@ extern InputSelector inputSelector;
 extern Led inputSelectorLed;
 extern TaskController taskController;
 extern VolumeEngine volumeEngine;
+extern VolumeEngine volumeEngine;
 
 void onClickInputSelectorCheckbox(int pin, int state)
 {
@@ -16,24 +17,26 @@ void onClickInputSelectorCheckbox(int pin, int state)
 
   taskController.runFastTask([pin, state]()
                              {
-                           const bool wereTurnedOff = inputSelector.areAllRelays(LOW);
-                           inputSelector.writeToRelay(pin, state);
+                               const bool wereTurnedOff = inputSelector.areAllRelays(LOW);
+                               inputSelector.writeToRelay(pin, state);
 
-                           if (inputSelector.areAllRelays(LOW))
-                           {
-                             inputSelectorLed.writeMin();
-                             return;
-                           }
+                               if (inputSelector.areAllRelays(LOW))
+                               {
+                                 inputSelectorLed.writeMin();
+                                 return;
+                               }
 
-                           if (state == HIGH)
-                           {
-                             inputSelector.setPinOfSelectedRelay(pin);
+                               if (state == HIGH)
+                               {
+                                 inputSelector.setPinOfSelectedRelay(pin);
 
-                             uint8_t invertCount = inputSelector.getCountToInvertStateFromRelay(pin);
-                             {
-                               inputSelectorLed.blink(wereTurnedOff ? invertCount + 1 : invertCount);
-                               buzzer.buzz(invertCount);
-                             }} });
+                                 uint8_t invertCount = inputSelector.getCountToInvertStateFromRelay(pin);
+                                 {
+                                   inputSelectorLed.blink(wereTurnedOff ? invertCount + 1 : invertCount);
+                                   buzzer.buzz(invertCount);
+                                 }
+                               }
+                               inputSelector.saveStateToEeprom(); });
 }
 
 void onVolumeChanged(u_int8_t *commmand)
@@ -122,6 +125,8 @@ void onClickInputSelectorButton()
     else
       inputSelector.swapRelays();
 
+    inputSelector.saveStateToEeprom();
+
     const uint8_t invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
     inputSelectorLed.blink(wereTurnedOff ? invertCount + 1 : invertCount);
     buzzer.buzz(invertCount); });
@@ -137,6 +142,7 @@ void onDoubleClickInputSelectorButton()
                            if (inputSelector.areAllRelays(HIGH))
                            {
                              inputSelector.writeToNotSelectedRelay(LOW);
+                             inputSelector.saveStateToEeprom();
                              const uint8_t invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
                              inputSelectorLed.blink(invertCount);
                              buzzer.buzz(invertCount);
@@ -145,6 +151,7 @@ void onDoubleClickInputSelectorButton()
                            {
                              const bool wereTurnedOff = inputSelector.areAllRelays(LOW);
                              inputSelector.writeToAllRelays(HIGH);
+                             inputSelector.saveStateToEeprom();
                              inputSelectorLed.blink(wereTurnedOff ?  3 : 2, LONG_LED_BLINK_INTERVAL);
                              buzzer.buzz(2, LONG_BUZZ_INTERVAL);
                            } });
@@ -160,6 +167,7 @@ void onLongPressInputSelectorButtonStart()
                            if (inputSelector.areAllRelays(LOW))
                            {
                              inputSelector.writeToSeletedRelay(HIGH);
+                             inputSelector.saveStateToEeprom();
                              const uint8_t invertCount = inputSelector.getCountToInvertStateFromTurnedOnRelays();
                              inputSelectorLed.blink(invertCount + 1);
                              buzzer.buzz(invertCount);
@@ -167,6 +175,7 @@ void onLongPressInputSelectorButtonStart()
                            else
                            {
                              inputSelector.writeToAllRelays(LOW);
+                             inputSelector.saveStateToEeprom();
                              inputSelectorLed.writeMin();
                            } });
 }
