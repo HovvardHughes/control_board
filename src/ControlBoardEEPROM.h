@@ -42,7 +42,6 @@ public:
         state |= secondaryRelayState << 1;
         state |= (selectedRelayPin == MAIN_INPUT_RELAY_PIN ? MAIN_INPUT_SELECTOR_RELAY_BIT : SECONDARY_INPUT_SELECTOR_RELAY_BIT) << 2;
 
-        Serial.println(state);
         EEPROM.write(INPUT_SELECTOR_STATE_ADDRESS, state);
         EEPROM.commit();
     }
