@@ -71,6 +71,8 @@ void setup()
   initSPIFFS();
   setupCommunicator();
 
+  Serial.println("Started...");
+
 //UNCOMMENT FOR DEBUG INFO:
 
   // timer.every(1000, [](void *)

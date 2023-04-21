@@ -36,8 +36,14 @@ public:
 
     void writeInputSelectorState(bool mainRelayState, bool secondaryRelayState, uint8_t selectedRelayPin)
     {
-        EEPROM.write(INPUT_SELECTOR_STATE_ADDRESS,
-                     mainRelayState | secondaryRelayState << 1 || ((selectedRelayPin == MAIN_INPUT_RELAY_PIN ? MAIN_INPUT_SELECTOR_RELAY_BIT : SECONDARY_INPUT_SELECTOR_RELAY_BIT) << 2));
+        uint8_t state = 0;
+
+        state |= mainRelayState;
+        state |= secondaryRelayState << 1;
+        state |= (selectedRelayPin == MAIN_INPUT_RELAY_PIN ? MAIN_INPUT_SELECTOR_RELAY_BIT : SECONDARY_INPUT_SELECTOR_RELAY_BIT) << 2;
+
+        Serial.println(state);
+        EEPROM.write(INPUT_SELECTOR_STATE_ADDRESS, state);
         EEPROM.commit();
     }
 
@@ -47,6 +53,6 @@ public:
         return {
             (readResult & 1) == 1,
             (readResult & 2) == 2,
-            (readResult & 4) == 4 ? SECONDARY_INPUT_RELAY_PIN : MAIN_INPUT_RELAY_PIN};
+            (readResult & 4) == 4 ? (uint8_t)SECONDARY_INPUT_RELAY_PIN : (uint8_t)MAIN_INPUT_RELAY_PIN};
     }
 };

@@ -15,10 +15,10 @@ public:
 
   void readSettings()
   {
-    // _ssid = "Begemot";
-    // _password = "19411945";
-    // _ip = "192.168.1.200";
-    // _gateway = "192.168.4.1";
+    _ssid = "YANA27";
+    _password = "TUJH27042010";
+    _ip = "192.168.1.200";
+    _gateway = "192.168.4.1";
     _ssid = readFile(SSID_PATH);
     _password = readFile(PASSWORD_PATH);
     _ip = readFile(IP_PATH);
